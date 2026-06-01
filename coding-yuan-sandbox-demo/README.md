@@ -1,4 +1,4 @@
-# Coding Yuan Sandbox Demo
+# Codingape Sandbox Demo
 
 This project is a safe local target for Codex Office controlled patch-run demos.
 
