@@ -90,7 +90,11 @@ For an external pilot run, open `/office`, choose a small local project folder, 
 Run First Task: Update README
 ```
 
-The first task is intentionally small. It should show the context preview, plan, diff, verification, Human Gate, Apply Gate, rollback/report path, and a feedback export. If no model provider is configured, Codingape Office stays in Demo Only and clearly says that no AI call was made.
+The first task is intentionally small. Codingape Office is local-first and works only with the project folder you choose.
+
+You can review the context preview, plan, proposed diff, and verification results before any change is applied. No code is written until you review the diff and approve the Human Gate.
+
+If no model provider is configured, Codingape Office stays in Demo Only mode and clearly indicates that no AI call was made.
 
 ## Model Provider Modes
 
