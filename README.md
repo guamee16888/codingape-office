@@ -2,6 +2,8 @@
 
 **A safe AI coding worker for your Mac.**
 
+Public project page language: English.
+
 Codingape Office helps a developer turn a task into evidence, a plan, a patch, verification, a human approval gate, and a rollback-ready report before any code is written to the project.
 
 ![Codingape Office demo](docs/media/codingape-office-demo.gif)

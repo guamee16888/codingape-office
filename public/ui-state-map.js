@@ -108,24 +108,24 @@ export function flowStatusForNode(task, node) {
 }
 
 export const COMPACT_MISSION_FLOW_NODES = [
-  { id: "task", label: "任务" },
-  { id: "evidence", label: "证据" },
-  { id: "verification", label: "验证" },
-  { id: "judge", label: "审核" },
-  { id: "apply", label: "写入闸门" }
+  { id: "task", label: "Task" },
+  { id: "evidence", label: "Evidence" },
+  { id: "verification", label: "Verification" },
+  { id: "judge", label: "Judge Review" },
+  { id: "apply", label: "Apply Gate" }
 ];
 
 export const PREMIUM_MISSION_FLOW_NODES = [
-  { id: "task", label: "任务" },
-  { id: "evidence", label: "证据" },
-  { id: "proposal", label: "方案" },
-  { id: "verification", label: "验证" },
-  { id: "judge", label: "审核" },
-  { id: "human", label: "人工确认" },
-  { id: "patch", label: "沙盒补丁" },
-  { id: "diff", label: "Diff 预览" },
-  { id: "apply", label: "写入闸门" },
-  { id: "report", label: "报告" }
+  { id: "task", label: "Task" },
+  { id: "evidence", label: "Evidence" },
+  { id: "proposal", label: "Proposal" },
+  { id: "verification", label: "Verification" },
+  { id: "judge", label: "Judge Review" },
+  { id: "human", label: "Human Gate" },
+  { id: "patch", label: "Sandbox Patch" },
+  { id: "diff", label: "Diff Preview" },
+  { id: "apply", label: "Apply Gate" },
+  { id: "report", label: "Report" }
 ];
 
 const COMPACT_FOCUS_ALIASES = {

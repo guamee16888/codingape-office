@@ -51,11 +51,11 @@ test("external tester runbook covers install, trust, logs, support, and the firs
   assert.equal(pkg.scripts["beta:diagnostics"], "bash scripts/collect-beta-diagnostics.sh");
   assert.equal(pkg.scripts["beta:first-order"], "bash scripts/ten-minute-first-order-trial.sh");
   assert.match(runbook, /Developer ID/);
-  assert.match(runbook, /公证/);
+  assert.match(runbook, /notarization/);
   assert.match(runbook, /CodingYuanOffice-0\.5\.0-beta-mac\.zip/);
   assert.match(runbook, /CodingYuanOffice-0\.5\.0-beta-mac\.dmg/);
   assert.match(runbook, /First Run Onboarding/);
-  assert.match(runbook, /跑第一单/);
+  assert.match(runbook, /Run First Task/);
   assert.match(runbook, /Project Root Guard/);
   assert.match(runbook, /Human Gate/);
   assert.match(runbook, /Apply Gate/);
@@ -73,7 +73,7 @@ test("diagnostics and ten-minute trial scripts preserve human-gated apply", asyn
   assert.match(diagnostics, /service\.err\.log/);
   assert.match(diagnostics, /DiagnosticReports/);
   assert.match(firstOrder, /safeFirstOrder/);
-  assert.match(firstOrder, /给 README 增加一个 Coding猿 Beta 测试段落/);
+  assert.match(firstOrder, /Add a Codingape beta testing paragraph to README/);
   assert.match(firstOrder, /\/api\/local-projects/);
   assert.match(firstOrder, /\/coding-loop/);
   assert.match(firstOrder, /Project files are still protected until you explicitly confirm Apply Approved Patch/);

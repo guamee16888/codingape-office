@@ -143,7 +143,7 @@ export const DEFAULT_WORKER_ASSET_MANIFEST = Object.freeze({
       name: "CodingYuan",
       role: "local coding worker",
       model: "/assets/workers/coding-ape.glb",
-      fallbackAvatar: "猿",
+      fallbackAvatar: "C",
       accent: "#30e0c6"
     },
     {
@@ -151,7 +151,7 @@ export const DEFAULT_WORKER_ASSET_MANIFEST = Object.freeze({
       name: "JudgeYuan",
       role: "evidence and gate reviewer",
       model: null,
-      fallbackAvatar: "审",
+      fallbackAvatar: "J",
       accent: "#8672c8"
     },
     {
@@ -159,7 +159,7 @@ export const DEFAULT_WORKER_ASSET_MANIFEST = Object.freeze({
       name: "OpsYuan",
       role: "apply and rollback operator",
       model: null,
-      fallbackAvatar: "运",
+      fallbackAvatar: "O",
       accent: "#ffb454"
     }
   ]
@@ -190,9 +190,9 @@ export function workerAnimationForState(state = "idle") {
 export function fallbackWorkerAvatar(worker = {}) {
   if (worker.fallbackAvatar) return worker.fallbackAvatar;
   if (worker.mark) return worker.mark;
-  if (worker.id === "judge-yuan") return "审";
-  if (worker.id === "ops-yuan") return "运";
-  return "猿";
+  if (worker.id === "judge-yuan") return "J";
+  if (worker.id === "ops-yuan") return "O";
+  return "C";
 }
 
 function uniqueValues(values) {

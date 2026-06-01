@@ -2,7 +2,7 @@
 
 ## Product
 
-- App name: Coding猿 Office
+- App name: Codingape Office
 - Default MAS Bundle ID: `com.geoaifactory.codingyuan-office`
 - Default version: `1.0.0`
 - Default build number: `1`
@@ -32,7 +32,7 @@ npm run build:mac-app-store
 
 Expected output:
 
-- `dist/mac/Coding猿 Office.app`
+- `dist/mac/Codingape Office.app`
 - `dist/mac-app-store/CodingYuanOffice-1.0.0-1-mas.pkg`
 - `dist/mac-app-store/mac-app-store-report.json`
 - `dist/mas-runtime/node-runtime/mas-runtime-manifest.json`
@@ -40,7 +40,7 @@ Expected output:
 ## Verification
 
 ```bash
-codesign --verify --deep --strict --verbose=2 "dist/mac/Coding猿 Office.app"
+codesign --verify --deep --strict --verbose=2 "dist/mac/Codingape Office.app"
 pkgutil --check-signature "dist/mac-app-store/CodingYuanOffice-1.0.0-1-mas.pkg"
 ```
 

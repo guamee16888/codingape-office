@@ -1,16 +1,16 @@
-# Coding猿 Office Beta 外测分发 Runbook
+# Codingape Office Beta External Tester Distribution Runbook
 
-本 runbook 用于 Beta v0.4 外部测试。目标是让陌生用户能安装、首次启动、完成第一单，出错时能生成诊断材料。
+This runbook is for Beta v0.4 external testing. The goal is to help a first-time tester install the app, launch it, complete the first task, and generate diagnostics when something fails.
 
-## 1. 构建分发包
+## 1. Build The Distribution Package
 
-无 Apple 凭证时可生成 unsigned 测试包：
+Without Apple credentials, generate an unsigned test package:
 
 ```sh
 npm run build:mac-distribution
 ```
 
-有 Developer ID 和公证凭证时：
+With Developer ID and notarization credentials:
 
 ```sh
 export CODEX_OFFICE_DEVELOPER_ID_APPLICATION="Developer ID Application: Your Name (TEAMID)"
@@ -18,7 +18,7 @@ export CODEX_OFFICE_NOTARY_PROFILE="codingyuan-notary"
 npm run build:mac-distribution
 ```
 
-也可使用 Apple ID 三元组：
+You can also use the Apple ID credential set:
 
 ```sh
 export CODEX_OFFICE_DEVELOPER_ID_APPLICATION="Developer ID Application: Your Name (TEAMID)"
@@ -28,104 +28,104 @@ export CODEX_OFFICE_APP_PASSWORD="app-specific-password"
 npm run build:mac-distribution
 ```
 
-产物位置：
+Output paths:
 
 ```text
-dist/mac/Coding猿 Office.app
+dist/mac/Codingape Office.app
 dist/mac-distribution/CodingYuanOffice-0.5.0-beta-mac.zip
 dist/mac-distribution/CodingYuanOffice-0.5.0-beta-mac.dmg
 dist/mac-distribution/distribution-report.json
 ```
 
-## 2. 外测安装说明
+## 2. External Tester Install Steps
 
-1. 安装 Git、Node.js LTS 和 npm。
-2. 打开 `CodingYuanOffice-0.5.0-beta-mac.dmg`。
-3. 将 `Coding猿 Office.app` 拖到 Applications。
-4. 打开 App，进入 `/office`。
-5. First Run Onboarding 中选择一个本地代码项目目录。
-6. 点击“跑第一单”。
-7. 审查 Evidence Pack、Diff Preview、Verification、Human Gate 和 Apply Gate。
-8. 只有在确认 diff 正确时，才输入精确确认语应用补丁。
+1. Install Git, Node.js LTS, and npm.
+2. Open `CodingYuanOffice-0.5.0-beta-mac.dmg`.
+3. Drag `Codingape Office.app` into Applications.
+4. Open the app and go to `/office`.
+5. In First Run Onboarding, choose a local code project directory.
+6. Click `Run First Task`.
+7. Review Evidence Pack, Diff Preview, Verification, Human Gate, and Apply Gate.
+8. Apply the patch only after confirming that the diff is correct and entering the exact confirmation phrase.
 
-安全承诺：
+Safety promise:
 
-- 不默认扫描全盘。
-- 所有读写绑定用户授权的 project root。
-- Project Root Guard 阻断路径穿越和 root 外写入。
-- Apply 前必须具备 diff、verification、rollback snapshot、human approval。
-- 默认 human-gated，不自动写入项目文件。
+- No default full-disk scanning.
+- All reads and writes are bound to the user-authorized project root.
+- Project Root Guard blocks path traversal and writes outside the selected root.
+- Apply requires a diff, verification, rollback snapshot, and human approval.
+- The default flow is human-gated and does not write project files automatically.
 
-## 3. 限制
+## 3. Limits
 
-- Beta v0.4 仍要求测试机安装 Node.js LTS。
-- AIWC 集中日志未配置时只显示 warning，不阻断本地 beta。
-- 建议第一单选择小型 Git repo；非 Git repo 会给出 warning。
-- 跨仓库、大体积二进制、依赖目录、敏感配置文件不适合作为第一单。
+- Beta v0.4 still requires Node.js LTS on the tester machine.
+- Missing AIWC centralized logging is shown as a warning and does not block local beta use.
+- Use a small Git repo for the first task; non-Git repos show a warning.
+- Cross-repo tasks, large binaries, dependency folders, and sensitive config files are not good first-task targets.
 
-## 4. 日志、崩溃与支持包
+## 4. Logs, Crashes, And Support Bundles
 
-App 服务日志：
+App service logs:
 
 ```text
 ~/Library/Logs/CodingYuanOffice/service.out.log
 ~/Library/Logs/CodingYuanOffice/service.err.log
 ```
 
-旧 launchd 预览日志：
+Legacy launchd preview logs:
 
 ```text
 ~/Library/Logs/com.geoaifactory.codex-office.out.log
 ~/Library/Logs/com.geoaifactory.codex-office.err.log
 ```
 
-崩溃报告：
+Crash reports:
 
 ```text
 ~/Library/Logs/DiagnosticReports/CodingYuanOffice*.crash
-~/Library/Logs/DiagnosticReports/Coding猿 Office*.crash
+~/Library/Logs/DiagnosticReports/Codingape Office*.crash
 ```
 
-支持包：
+Support bundles:
 
 ```text
 ~/Library/Application Support/CodingYuan Office/data/support-bundles
 ```
 
-一键收集诊断：
+One-command diagnostics:
 
 ```sh
 npm run beta:diagnostics
 ```
 
-## 5. 陌生用户 10 分钟第一单
+## 5. Ten-Minute First Task For A New Tester
 
-开发者本地或外测陪跑时可以用脚本 rehearsed end-to-end：
+For local rehearsal or guided external testing, run the end-to-end script:
 
 ```sh
 npm run beta:first-order
 ```
 
-或指定一个测试仓库：
+Or specify a test repository:
 
 ```sh
 PROJECT_ROOT=/path/to/safe/test/repo npm run beta:first-order
 ```
 
-脚本会：
+The script will:
 
-1. 检查 Git、Node、npm、curl。
-2. 启动或复用 `http://127.0.0.1:4142`。
-3. 创建或选择一个安全测试项目。
-4. 运行“给 README 增加一个 Coding猿 Beta 测试段落”。
-5. 生成 evidence、patch proposal、diff、verification、human gate、apply gate、report。
-6. 停在人工确认前，不自动 Apply。
+1. Check Git, Node, npm, and curl.
+2. Start or reuse `http://127.0.0.1:4142`.
+3. Create or select a safe test project.
+4. Run `Add a Codingape beta testing paragraph to README`.
+5. Generate evidence, patch proposal, diff, verification, human gate, apply gate, and report.
+6. Stop before human confirmation and never apply automatically.
 
-通过标准：
+Pass criteria:
 
-- `/office` 可打开。
-- Evidence Pack 有路径。
-- Diff Preview 只改 README 或创建 `README.codingape-beta.md`。
-- Verification 通过或给出可读失败建议。
-- Apply Gate 默认 human-gated。
-- 支持包可生成。
+- `/office` opens.
+- Evidence Pack has a path.
+- Diff Preview only edits README or creates `README.codingape-beta.md`.
+- Verification passes or returns a readable failure suggestion.
+- Apply Gate is human-gated by default.
+- Support bundle can be generated.

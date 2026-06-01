@@ -57,7 +57,7 @@ test("Pilot docs and README explain install, model modes, first task, support, a
   assert.match(runbook, /npm run dev/);
   assert.match(runbook, /BYO API Key/);
   assert.match(runbook, /Ollama, LM Studio/);
-  assert.match(runbook, /生成支持包/);
+  assert.match(runbook, /Generate Support Bundle/);
   assert.match(invite, /Codingape Office should not write before you explicitly approve/);
   assert.match(scorecard, /Do not fill this section with simulated data/);
   assert.match(knownIssues, /invalid unified diff headers/);

@@ -117,7 +117,7 @@ test("compact mission flow keeps the first screen focused on five durable phases
   );
   assert.deepEqual(
     COMPACT_MISSION_FLOW_NODES.map((node) => node.label),
-    ["任务", "证据", "验证", "审核", "写入闸门"]
+    ["Task", "Evidence", "Verification", "Judge Review", "Apply Gate"]
   );
   assert.equal(visibleMissionFlowNodeId("proposal"), "evidence");
   assert.equal(visibleMissionFlowNodeId("diff"), "evidence");
@@ -132,7 +132,7 @@ test("premium mission flow exposes the full paid loop without compact aliases", 
   );
   assert.deepEqual(
     PREMIUM_MISSION_FLOW_NODES.map((node) => node.label),
-    ["任务", "证据", "方案", "验证", "审核", "人工确认", "沙盒补丁", "Diff 预览", "写入闸门", "报告"]
+    ["Task", "Evidence", "Proposal", "Verification", "Judge Review", "Human Gate", "Sandbox Patch", "Diff Preview", "Apply Gate", "Report"]
   );
   assert.equal(premiumMissionFlowNodeId("proposal"), "proposal");
   assert.equal(premiumMissionFlowNodeId("diff"), "diff");

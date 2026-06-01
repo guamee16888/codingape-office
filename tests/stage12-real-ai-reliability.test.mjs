@@ -302,7 +302,7 @@ test("Context Preview and First Real Order UX are wired without auto apply", () 
 
   assert.match(html, /Run First Task: Update README/);
   assert.match(html, /id="contextPreviewPanel"/);
-  assert.match(html, /不会默认上传整个项目/);
+  assert.match(html, /does not upload the whole project by default/);
   assert.match(app, /previewAiContextForFirstRealOrder/);
   assert.match(app, /runFirstRealOrder/);
   assert.match(server, /handleAiContextPreview/);
@@ -316,12 +316,12 @@ test("failure explanations cover invalid diff, sensitive files, root escape, ver
   const script = readProjectFile("scripts/evaluate-ai-patch-worker.mjs");
   const server = readProjectFile("server.js");
 
-  assert.match(app, /模型没有返回有效 diff/);
-  assert.match(app, /触碰敏感文件/);
-  assert.match(app, /路径越过 project root/);
-  assert.match(app, /retry 后仍失败/);
-  assert.match(app, /模型未配置/);
-  assert.match(app, /context 不足/);
+  assert.match(app, /model did not return a valid diff/i);
+  assert.match(app, /patch touched a sensitive file/i);
+  assert.match(app, /escaped the project root/i);
+  assert.match(app, /retry did not recover/i);
+  assert.match(app, /model is not configured/i);
+  assert.match(app, /context was not enough/i);
   assert.match(script, /verification_failed_after_retry/);
   assert.match(script, /model_not_configured/);
   assert.match(server, /ai_patch_sandbox_verification_failed/);

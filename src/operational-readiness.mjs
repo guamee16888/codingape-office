@@ -55,49 +55,49 @@ export function buildOperationalReadiness({
   const aiwcDetail = aiwcReady
     ? aiwcHealth?.detail || "Run logs are mirrored into the integrated control plane."
     : aiwcMissing.length
-      ? `缺少配置项：${aiwcMissing.join(", ")}。`
-      : aiwcHealth?.detail || "不阻断本地 beta，但运营期建议接入集中日志。";
+      ? `Missing config items: ${aiwcMissing.join(", ")}.`
+      : aiwcHealth?.detail || "This does not block local beta use, but centralized logs are recommended for operations.";
 
   const checks = [
     serviceHealth.local?.status === "online"
-      ? okCheck("local_service", "本地服务在线", serviceHealth.local.detail || "Local server is responding.", 10)
-      : blockedCheck("local_service", "本地服务未确认", "127.0.0.1:4142 必须稳定响应。", 10),
+      ? okCheck("local_service", "Local service online", serviceHealth.local.detail || "Local server is responding.", 10)
+      : blockedCheck("local_service", "Local service not confirmed", "127.0.0.1:4142 must respond reliably.", 10),
     ["managed", "configured"].includes(serviceHealth.daemon?.status)
-      ? okCheck("daemon", "后台守护已配置", serviceHealth.daemon.detail || "macOS launchd can keep the local server alive.", 8, false)
-      : advisoryCheck("daemon", "后台守护待配置", "建议用 launchd 托管，避免关掉终端后公网入口失效。", 5),
+      ? okCheck("daemon", "Daemon configured", serviceHealth.daemon.detail || "macOS launchd can keep the local server alive.", 8, false)
+      : advisoryCheck("daemon", "Daemon not configured", "Use launchd to keep the public entry available after the terminal closes.", 5),
     ["configured", "managed"].includes(serviceHealth.publicEntry?.status)
-      ? okCheck("public_entry", "公网入口已配置", serviceHealth.publicEntry.detail || "Public home can route to the local service.", 6, false)
-      : advisoryCheck("public_entry", "公网入口待配置", "Beta 用户入口需要 geoaifactory.com 或等价公网入口。", 4),
+      ? okCheck("public_entry", "Public entry configured", serviceHealth.publicEntry.detail || "Public home can route to the local service.", 6, false)
+      : advisoryCheck("public_entry", "Public entry not configured", "Beta users need geoaifactory.com or an equivalent public entry.", 4),
     localProjects.selectedProjectId
-      ? okCheck("local_project", "已选择本地项目", localProjects.selectedPath || localProjects.selectedName || "Local project root is selected.", 10)
-      : blockedCheck("local_project", "未选择本地项目", "真实任务必须绑定明确的 project root。", 10),
+      ? okCheck("local_project", "Local project selected", localProjects.selectedPath || localProjects.selectedName || "Local project root is selected.", 10)
+      : blockedCheck("local_project", "No local project selected", "Real tasks must be bound to an explicit project root.", 10),
     latestEvidence
-      ? okCheck("evidence_pack", "Evidence Pack 已生成", latestEvidence.taskId || "Evidence exists.", 10, true, [latestEvidence.taskId].filter(Boolean))
-      : blockedCheck("evidence_pack", "缺少 Evidence Pack", "至少跑通一次只读证据采集。", 10),
+      ? okCheck("evidence_pack", "Evidence Pack generated", latestEvidence.taskId || "Evidence exists.", 10, true, [latestEvidence.taskId].filter(Boolean))
+      : blockedCheck("evidence_pack", "Evidence Pack missing", "Run at least one read-only evidence capture.", 10),
     latestProposal
-      ? okCheck("patch_proposal", "Patch Proposal 已生成", latestProposal.summary || latestProposal.taskId || "Proposal exists.", 10, true, [latestProposal.proposalPath].filter(Boolean))
-      : blockedCheck("patch_proposal", "缺少 Patch Proposal", "需要从证据生成可审计的补丁方案。", 10),
+      ? okCheck("patch_proposal", "Patch Proposal generated", latestProposal.summary || latestProposal.taskId || "Proposal exists.", 10, true, [latestProposal.proposalPath].filter(Boolean))
+      : blockedCheck("patch_proposal", "Patch Proposal missing", "Generate an auditable patch proposal from evidence.", 10),
     latestVerification?.result?.ok
-      ? okCheck("verification", "Verification 已通过", latestVerification.script || "A safe verification script passed.", 10, true, [latestVerification.verificationPath].filter(Boolean))
-      : blockedCheck("verification", "缺少通过的 Verification", "至少一次白名单验证要通过。", 10),
+      ? okCheck("verification", "Verification passed", latestVerification.script || "A safe verification script passed.", 10, true, [latestVerification.verificationPath].filter(Boolean))
+      : blockedCheck("verification", "Passing Verification missing", "At least one allowlisted verification must pass.", 10),
     latestPatchRun?.rollbackSnapshotPath
-      ? okCheck("rollback_snapshot", "Rollback Snapshot 已准备", latestPatchRun.rollbackSnapshotPath, 9, true, [latestPatchRun.rollbackSnapshotPath])
-      : blockedCheck("rollback_snapshot", "缺少 Rollback Snapshot", "Apply 前必须能回退。", 9),
+      ? okCheck("rollback_snapshot", "Rollback Snapshot ready", latestPatchRun.rollbackSnapshotPath, 9, true, [latestPatchRun.rollbackSnapshotPath])
+      : blockedCheck("rollback_snapshot", "Rollback Snapshot missing", "Rollback must be available before Apply.", 9),
     latestApply
-      ? okCheck("apply_gate", "Apply Gate 已检查", latestApply.status || "Apply gate evidence exists.", 9, true, [latestApply.applyPath].filter(Boolean))
-      : blockedCheck("apply_gate", "缺少 Apply Gate 证据", "需要至少一次写入闸门检查。", 9),
+      ? okCheck("apply_gate", "Apply Gate checked", latestApply.status || "Apply gate evidence exists.", 9, true, [latestApply.applyPath].filter(Boolean))
+      : blockedCheck("apply_gate", "Apply Gate evidence missing", "Run at least one Apply Gate check.", 9),
     latestReport || completedTasks
-      ? okCheck("company_report", "Company Report 可用", latestReport?.reportPath || `${completedTasks} completed task(s).`, 8, true, [latestReport?.reportPath].filter(Boolean))
-      : blockedCheck("company_report", "缺少任务报告", "完成任务后必须生成用户能看懂的报告。", 8),
+      ? okCheck("company_report", "Company Report available", latestReport?.reportPath || `${completedTasks} completed task(s).`, 8, true, [latestReport?.reportPath].filter(Boolean))
+      : blockedCheck("company_report", "Task report missing", "Completed tasks must generate a user-readable report.", 8),
     hasSupportBundle
-      ? okCheck("support_bundle", "支持包可生成", "Support bundle endpoint is available for beta support.", 6, false)
-      : advisoryCheck("support_bundle", "支持包待生成", "运营需要能导出脱敏日志和最近任务状态。", 4),
+      ? okCheck("support_bundle", "Support bundle available", "Support bundle endpoint is available for beta support.", 6, false)
+      : advisoryCheck("support_bundle", "Support bundle not generated", "Operations need exportable redacted logs and recent task state.", 4),
     stableTag
-      ? okCheck("git_checkpoint", "Git 回退点存在", stableTag, 5, false)
-      : advisoryCheck("git_checkpoint", "Git 回退点待确认", "建议每个运营里程碑都打 stable tag。", 4),
+      ? okCheck("git_checkpoint", "Git rollback point exists", stableTag, 5, false)
+      : advisoryCheck("git_checkpoint", "Git rollback point not confirmed", "Create a stable tag for each operational milestone.", 4),
     aiwcReady
-      ? okCheck("aiwc_ingestion", "AIWC 日志已接入", aiwcDetail, 5, false, [aiwcHealth?.runIdExternal].filter(Boolean))
-      : advisoryCheck("aiwc_ingestion", "AIWC 日志未连通", aiwcDetail, 3)
+      ? okCheck("aiwc_ingestion", "AIWC logs connected", aiwcDetail, 5, false, [aiwcHealth?.runIdExternal].filter(Boolean))
+      : advisoryCheck("aiwc_ingestion", "AIWC logs not connected", aiwcDetail, 3)
   ];
 
   const maxScore = checks.reduce((sum, check) => sum + check.weight, 0);
@@ -114,14 +114,14 @@ export function buildOperationalReadiness({
     version: "v1",
     generatedAt: new Date().toISOString(),
     status,
-    statusLabel: status === "operational" ? "可运营" : status === "beta_ready" ? "Beta 可运营" : "未可运营",
+    statusLabel: status === "operational" ? "Operational" : status === "beta_ready" ? "Beta ready" : "Not operational",
     score,
     maxScore: 100,
     summary: blockers.length
-      ? `距离可运营还差 ${blockers.length} 个硬阻断：${blockers.slice(0, 3).map((check) => check.label).join("、")}。`
+      ? `${blockers.length} hard blocker(s) remain before operational readiness: ${blockers.slice(0, 3).map((check) => check.label).join(", ")}.`
       : advisories.length
-        ? `付费闭环已具备 beta 运营条件，还有 ${advisories.length} 个运营增强项。`
-        : "本地闭环、证据、回滚、报告、服务和支持能力都已具备。",
+        ? `The paid loop is beta-ready, with ${advisories.length} operational enhancement(s) remaining.`
+        : "Local loop, evidence, rollback, reports, service health, and support capability are ready.",
     checks,
     blockers,
     advisories,

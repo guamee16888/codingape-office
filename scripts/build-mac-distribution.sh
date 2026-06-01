@@ -2,7 +2,7 @@
 set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-APP_NAME="Coding猿 Office"
+APP_NAME="Codingape Office"
 VERSION="${CODEX_OFFICE_APP_VERSION:-0.5.0-beta}"
 BUNDLE_VERSION="${CODEX_OFFICE_BUNDLE_VERSION:-0.5.0}"
 DIST_ROOT="$ROOT_DIR/dist/mac-distribution"
@@ -84,7 +84,7 @@ node --input-type=module <<'NODE'
 import { writeFileSync } from "node:fs";
 
 const report = {
-  product: "Coding猿 Office",
+      product: "Codingape Office",
   channel: "Mac Beta",
   version: process.env.VERSION,
   bundleVersion: process.env.BUNDLE_VERSION,

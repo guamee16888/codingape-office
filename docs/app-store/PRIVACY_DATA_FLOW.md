@@ -2,11 +2,11 @@
 
 ## Local Data
 
-Coding猿 Office stores operational state locally under the app support data directory. Local state can include selected project metadata, task records, evidence summaries, patch proposals, verification results, rollback metadata, apply reports, and support bundle metadata.
+Codingape Office stores operational state locally under the app support data directory. Local state can include selected project metadata, task records, evidence summaries, patch proposals, verification results, rollback metadata, apply reports, and support bundle metadata.
 
 ## User Project Files
 
-The user chooses a project root. Coding猿 Office should only read/write files under that selected root, and writes must pass Project Root Guard plus Human Gate.
+The user chooses a project root. Codingape Office should only read/write files under that selected root, and writes must pass Project Root Guard plus Human Gate.
 
 The app must not scan the full disk by default.
 

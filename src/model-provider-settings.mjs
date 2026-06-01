@@ -79,7 +79,7 @@ export function redactedModelProviderSettings(settings = {}) {
     apiKeyConfigured: Boolean(normalized.apiKey),
     updatedAt: normalized.updatedAt || "",
     storage: "local_gitignored_config",
-    safetyNotice: "为了生成代码修改，Coding猿 可能会把与任务相关的代码片段发送给你选择的模型服务商。不会默认上传整个项目。确认前不会写入代码。"
+    safetyNotice: "To generate code changes, Codingape may send task-relevant code snippets to the model provider you choose. It does not upload the whole project by default and will not write code before approval."
   };
 }
 

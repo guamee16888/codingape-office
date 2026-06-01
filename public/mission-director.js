@@ -2,160 +2,160 @@ import { missionModeFromTask, missionProgress, runPhaseFromTask, taskHasEvidence
 
 export const MISSION_PHASE_DIRECTIVES = {
   queued: {
-    commandMode: "沙盒排队 · 写入需人工闸门",
+    commandMode: "Sandbox queue · Human Gate required",
     focusNode: "task",
     focusWorkerId: "coding-yuan",
     inspectorTab: "mission",
-    nextAction: "把任务分配给编程猿，并先开始只读证据采集。",
-    phaseLabel: "排队中",
-    roomTitle: "任务已进入队列",
-    safetyLine: "还没有执行任何命令。",
+    nextAction: "Assign the task to Codingape and start read-only evidence collection first.",
+    phaseLabel: "Queued",
+    roomTitle: "Task is queued",
+    safetyLine: "No command has run yet.",
     sceneState: "queued",
-    workerSignal: "编程猿正在等待分配"
+    workerSignal: "Codingape is waiting for assignment"
   },
   assigned: {
-    commandMode: "沙盒已分配 · 证据优先",
+    commandMode: "Sandbox assigned · Evidence first",
     focusNode: "task",
     focusWorkerId: "coding-yuan",
     inspectorTab: "mission",
-    nextAction: "任何补丁规划前，先启动证据采集。",
-    phaseLabel: "已分配",
-    roomTitle: "编程猿正在阅读任务",
-    safetyLine: "当前仍在规划阶段，没有项目写入。",
+    nextAction: "Start evidence collection before any patch planning.",
+    phaseLabel: "Assigned",
+    roomTitle: "Codingape is reading the task",
+    safetyLine: "This is still planning; no project write has happened.",
     sceneState: "assigned",
-    workerSignal: "编程猿正在准备工作台"
+    workerSignal: "Codingape is preparing the workstation"
   },
   evidence_collecting: {
-    commandMode: "只读证据采集",
+    commandMode: "Read-only evidence collection",
     focusNode: "evidence",
     focusWorkerId: "coding-yuan",
     inspectorTab: "evidence",
-    nextAction: "让编程猿完成命令日志和仓库证据采集。",
-    phaseLabel: "采集证据",
-    roomTitle: "编程猿正在采集证据",
-    safetyLine: "这个阶段只允许只读检查。",
+    nextAction: "Let Codingape finish command logs and repository evidence.",
+    phaseLabel: "Collecting evidence",
+    roomTitle: "Codingape is collecting evidence",
+    safetyLine: "Only read-only checks are allowed in this phase.",
     sceneState: "working",
-    workerSignal: "编程猿正在收集日志"
+    workerSignal: "Codingape is collecting logs"
   },
   proposal_generating: {
-    commandMode: "补丁蓝图 · 仅沙盒",
+    commandMode: "Patch blueprint · Sandbox only",
     focusNode: "proposal",
     focusWorkerId: "coding-yuan",
     inspectorTab: "evidence",
-    nextAction: "进入验证前，先复核补丁方案。",
-    phaseLabel: "规划补丁",
-    roomTitle: "编程猿正在起草补丁方案",
-    safetyLine: "方案只是证据产物，项目文件保持不变。",
+    nextAction: "Review the patch plan before verification.",
+    phaseLabel: "Planning patch",
+    roomTitle: "Codingape is drafting the patch plan",
+    safetyLine: "The plan is evidence only; project files stay unchanged.",
     sceneState: "working",
-    workerSignal: "编程猿正在把证据整理成补丁方案"
+    workerSignal: "Codingape is turning evidence into a patch plan"
   },
   verification_running: {
-    commandMode: "验证运行中 · 不部署",
+    commandMode: "Verification running · No deploy",
     focusNode: "verification",
     focusWorkerId: "judge-yuan",
     inspectorTab: "evidence",
-    nextAction: "等待允许的验证脚本完成。",
-    phaseLabel: "验证运行中",
-    roomTitle: "审核猿正在检查测试证据",
-    safetyLine: "验证不能部署、重启或执行外部副作用。",
+    nextAction: "Wait for the allowed verification script to finish.",
+    phaseLabel: "Verification running",
+    roomTitle: "Judgeape is checking test evidence",
+    safetyLine: "Verification cannot deploy, restart, or run external side effects.",
     sceneState: "verifying",
-    workerSignal: "审核猿正在验证证据包"
+    workerSignal: "Judgeape is verifying the Evidence Pack"
   },
   verification_failed: {
-    commandMode: "验证失败 · 需要返工",
+    commandMode: "Verification failed · Rework needed",
     focusNode: "verification",
     focusWorkerId: "judge-yuan",
     inspectorTab: "evidence",
-    nextAction: "打开证据，查看失败检查，然后要求返工。",
-    phaseLabel: "验证失败",
-    roomTitle: "审核猿驳回了证据",
-    safetyLine: "验证失败会阻止补丁继续推进。",
+    nextAction: "Open evidence, review the failed check, then request rework.",
+    phaseLabel: "Verification failed",
+    roomTitle: "Judgeape rejected the evidence",
+    safetyLine: "Failed verification stops the patch from advancing.",
     sceneState: "failed",
-    workerSignal: "审核猿正在暂停这次运行"
+    workerSignal: "Judgeape is pausing this run"
   },
   judge_review: {
-    commandMode: "审核复核 · 证据支撑",
+    commandMode: "Judge review · Evidence-backed",
     focusNode: "judge",
     focusWorkerId: "judge-yuan",
     inspectorTab: "evidence",
-    nextAction: "复核审核猿的证据摘要和风险说明。",
-    phaseLabel: "审核复核",
-    roomTitle: "审核猿正在复核证据包",
-    safetyLine: "这次运行仍在人工闸门之后。",
+    nextAction: "Review Judgeape's evidence summary and risk notes.",
+    phaseLabel: "Judge review",
+    roomTitle: "Judgeape is reviewing the Evidence Pack",
+    safetyLine: "This run is still behind the Human Gate.",
     sceneState: "reviewing",
-    workerSignal: "审核猿正在比对证据和策略"
+    workerSignal: "Judgeape is comparing evidence and policy"
   },
   human_gate: {
-    commandMode: "等你审批 · 仍未写入项目",
+    commandMode: "Waiting for approval · No project write",
     focusNode: "human",
     focusWorkerId: "judge-yuan",
     inspectorTab: "gate",
-    nextAction: "先看证据和 Diff；不确定就返工。",
-    phaseLabel: "等待你审批",
-    roomTitle: "等待你确认下一步",
-    safetyLine: "你批准前不会进入沙盒补丁预检。",
+    nextAction: "Review evidence and diff first; request rework if unsure.",
+    phaseLabel: "Waiting for approval",
+    roomTitle: "Waiting for your next decision",
+    safetyLine: "Sandbox patch preflight will not start before approval.",
     sceneState: "waiting-human",
-    workerSignal: "审核猿把证据交给你"
+    workerSignal: "Judgeape handed the evidence to you"
   },
   patch_running: {
-    commandMode: "补丁预检 · 沙盒包",
+    commandMode: "Patch preflight · Sandbox package",
     focusNode: "patch",
     focusWorkerId: "coding-yuan",
     inspectorTab: "evidence",
-    nextAction: "让编程猿打包沙盒补丁和回滚快照。",
-    phaseLabel: "补丁预检",
-    roomTitle: "编程猿正在打包沙盒补丁",
-    safetyLine: "补丁执行器只写审核产物，不写项目文件。",
+    nextAction: "Let Codingape package the sandbox patch and rollback snapshot.",
+    phaseLabel: "Patch preflight",
+    roomTitle: "Codingape is packaging the sandbox patch",
+    safetyLine: "The patch runner writes review artifacts only, not project files.",
     sceneState: "working",
-    workerSignal: "编程猿正在写入沙盒包"
+    workerSignal: "Codingape is writing the sandbox package"
   },
   diff_ready: {
-    commandMode: "沙盒差异就绪 · 仅供复核",
+    commandMode: "Sandbox diff ready · Review only",
     focusNode: "diff",
     focusWorkerId: "coding-yuan",
     inspectorTab: "evidence",
-    nextAction: "进入写入闸门前，先打开证据并检查差异预览。",
-    phaseLabel: "差异就绪",
-    roomTitle: "编程猿已准备好差异预览",
-    safetyLine: "沙盒补丁已生成，项目文件未被改动。",
+    nextAction: "Open evidence and inspect the diff preview before Apply Gate.",
+    phaseLabel: "Diff ready",
+    roomTitle: "Codingape prepared the diff preview",
+    safetyLine: "Sandbox patch is generated; project files are unchanged.",
     sceneState: "diff-ready",
-    workerSignal: "编程猿正在展示补丁档案"
+    workerSignal: "Codingape is presenting the patch archive"
   },
   apply_blocked: {
-    commandMode: "等待写入确认 · 默认不改代码",
+    commandMode: "Waiting for write confirmation · No auto-write",
     focusNode: "apply",
     focusWorkerId: "ops-yuan",
     inspectorTab: "gate",
-    nextAction: "看 Diff；确认前保持阻断。",
-    phaseLabel: "等待写入确认",
-    roomTitle: "可以检查，但还没写入",
-    safetyLine: "现在没有改项目文件；确认语通过前不会修改项目文件。",
+    nextAction: "Review the diff; keep blocked until confirmation.",
+    phaseLabel: "Waiting for write confirmation",
+    roomTitle: "Ready to inspect; nothing written yet",
+    safetyLine: "Project files have not changed; no write before the confirmation phrase passes.",
     sceneState: "blocked",
-    workerSignal: "运维猿守住 Apply Gate"
+    workerSignal: "Opsape is holding Apply Gate"
   },
   completed: {
-    commandMode: "任务完成 · 证据已归档",
+    commandMode: "Task complete · Evidence archived",
     focusNode: "report",
     focusWorkerId: "coding-yuan",
     inspectorTab: "evidence",
-    nextAction: "复核报告、Diff 和回滚位置。",
-    phaseLabel: "已完成",
-    roomTitle: "报告已生成",
-    safetyLine: "任务完成由已记录证据支撑。",
+    nextAction: "Review the report, diff, and rollback location.",
+    phaseLabel: "Completed",
+    roomTitle: "Report generated",
+    safetyLine: "Task completion is backed by recorded evidence.",
     sceneState: "completed",
-    workerSignal: "编程猿提交报告"
+    workerSignal: "Codingape submitted the report"
   },
   failed: {
-    commandMode: "任务失败 · 需要人工复核",
+    commandMode: "Task failed · Human review needed",
     focusNode: "report",
     focusWorkerId: "ops-yuan",
     inspectorTab: "gate",
-    nextAction: "检查失败证据，并保持风险动作阻断。",
-    phaseLabel: "失败",
-    roomTitle: "运维猿正在隔离失败运行",
-    safetyLine: "失败任务仍会阻断直接写入。",
+    nextAction: "Inspect the failed evidence and keep risky actions blocked.",
+    phaseLabel: "Failed",
+    roomTitle: "Opsape is isolating the failed run",
+    safetyLine: "Failed tasks still block direct writes.",
     sceneState: "failed",
-    workerSignal: "运维猿正在保存失败证据"
+    workerSignal: "Opsape is preserving failed-run evidence"
   }
 };
 
@@ -187,36 +187,36 @@ function evidenceCompleteness(task) {
 }
 
 function gateStatus(task) {
-  if (task?.result?.applyStatus === "applied") return "已写入";
-  if (task?.result?.applyStatus === "requires_confirmation") return "需要确认";
-  if (task?.result?.applyStatus === "blocked") return "已阻断";
-  if (task?.result?.humanGateStatus === "approved") return "已批准";
-  if (task?.result?.humanGateStatus === "changes_requested") return "返工";
-  return "等待中";
+  if (task?.result?.applyStatus === "applied") return "Applied";
+  if (task?.result?.applyStatus === "requires_confirmation") return "Requires confirmation";
+  if (task?.result?.applyStatus === "blocked") return "Blocked";
+  if (task?.result?.humanGateStatus === "approved") return "Approved";
+  if (task?.result?.humanGateStatus === "changes_requested") return "Rework requested";
+  return "Waiting";
 }
 
 function humanGateStatus(task) {
-  if (task?.result?.humanGateStatus === "approved") return "已批准";
-  if (task?.result?.humanGateStatus === "changes_requested") return "返工";
-  if (task?.result?.verificationStatus === "passed") return "等待中";
-  return "待处理";
+  if (task?.result?.humanGateStatus === "approved") return "Approved";
+  if (task?.result?.humanGateStatus === "changes_requested") return "Rework requested";
+  if (task?.result?.verificationStatus === "passed") return "Waiting";
+  return "Pending";
 }
 
 function applyGateStatus(task) {
-  if (task?.result?.applyStatus === "applied") return "已写入";
-  if (task?.result?.applyStatus === "requires_confirmation") return "需要确认";
-  if (task?.result?.applyStatus === "blocked") return "已阻断";
-  if (hasTaskPath(task, "applyRun", "data/patch-applies/")) return "已检查";
-  return "默认阻断";
+  if (task?.result?.applyStatus === "applied") return "Applied";
+  if (task?.result?.applyStatus === "requires_confirmation") return "Requires confirmation";
+  if (task?.result?.applyStatus === "blocked") return "Blocked";
+  if (hasTaskPath(task, "applyRun", "data/patch-applies/")) return "Checked";
+  return "Blocked by default";
 }
 
 function inspectorTitleForDirective(directive) {
   const labels = {
-    evidence: "证据检查器",
-    gate: "闸门检查器",
-    mission: "任务检查器"
+    evidence: "Evidence Inspector",
+    gate: "Gate Inspector",
+    mission: "Mission Inspector"
   };
-  return labels[directive.inspectorTab] || "任务检查器";
+  return labels[directive.inspectorTab] || "Mission Inspector";
 }
 
 export function missionDirectorForTask(task, options = {}) {
@@ -225,18 +225,18 @@ export function missionDirectorForTask(task, options = {}) {
   const modeDirective = mode === "review_only" && taskHasEvidencePath(task, "data/evidence/")
     ? {
         ...MISSION_PHASE_DIRECTIVES.evidence_collecting,
-        commandMode: "只读证据已完成 · 本次不生成补丁",
-        nextAction: "打开证据包复核；如果要继续，再切换到方案或完整沙盒闭环模式。",
-        phaseLabel: "证据已采集",
-        roomTitle: "编程猿已完成只读证据采集",
-        safetyLine: "本次没有生成补丁、没有运行验证、没有修改项目文件。",
-        workerSignal: "编程猿正在把证据交给你复核"
+        commandMode: "Read-only evidence complete · No patch this run",
+        nextAction: "Open the Evidence Pack; switch to proposal or full sandbox loop if you want to continue.",
+        phaseLabel: "Evidence captured",
+        roomTitle: "Codingape completed read-only evidence collection",
+        safetyLine: "This run generated no patch, ran no verification, and modified no project files.",
+        workerSignal: "Codingape is handing you the evidence for review"
       }
     : null;
   const directive = modeDirective || MISSION_PHASE_DIRECTIVES[phase] || MISSION_PHASE_DIRECTIVES.assigned;
   const applyRunnerEnabled = Boolean(options.applyRunnerEnabled);
   const commandMode = applyRunnerEnabled && phase === "apply_blocked"
-    ? "写入执行器已准备 · 仍需要精确确认"
+    ? "Apply runner ready · Exact confirmation still required"
     : directive.commandMode;
 
   return {

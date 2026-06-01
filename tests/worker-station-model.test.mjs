@@ -36,9 +36,9 @@ test("coreWorkerState maps apply blocked work into role-specific station states"
 });
 
 test("coreWorkerAction explains the true backend phase", () => {
-  assert.equal(coreWorkerAction({ id: "coding-yuan" }, applyBlockedTask), "等待人工写入决定");
-  assert.equal(coreWorkerAction({ id: "judge-yuan" }, applyBlockedTask), "解释写入闸门阻断原因");
-  assert.equal(coreWorkerAction({ id: "ops-yuan" }, applyBlockedTask), "策略已阻断直接写入");
+  assert.equal(coreWorkerAction({ id: "coding-yuan" }, applyBlockedTask), "Waiting for human write decision");
+  assert.equal(coreWorkerAction({ id: "judge-yuan" }, applyBlockedTask), "Explaining Apply Gate blocker");
+  assert.equal(coreWorkerAction({ id: "ops-yuan" }, applyBlockedTask), "Policy blocked direct write");
 });
 
 test("workerStationTelemetry exposes evidence, rollback, and apply state", () => {
@@ -46,9 +46,9 @@ test("workerStationTelemetry exposes evidence, rollback, and apply state", () =>
   const opsTelemetry = workerStationTelemetry({ id: "ops-yuan" }, applyBlockedTask);
 
   assert.deepEqual(codingTelemetry.map((item) => item.status), ["ok", "ok", "ok"]);
-  assert.deepEqual(codingTelemetry.map((item) => item.label), ["证据", "方案", "补丁"]);
-  assert.equal(opsTelemetry.find((item) => item.label === "回滚").value, "就绪");
-  assert.equal(opsTelemetry.find((item) => item.label === "写入").status, "danger");
+  assert.deepEqual(codingTelemetry.map((item) => item.label), ["Evidence", "Plan", "Patch"]);
+  assert.equal(opsTelemetry.find((item) => item.label === "Rollback").value, "Ready");
+  assert.equal(opsTelemetry.find((item) => item.label === "Write").status, "danger");
 });
 
 test("review-only mission keeps Judge and Ops visibly on standby", () => {
@@ -63,15 +63,15 @@ test("review-only mission keeps Judge and Ops visibly on standby", () => {
   };
 
   assert.equal(coreWorkerState({ id: "coding-yuan" }, task), "working");
-  assert.equal(coreWorkerAction({ id: "coding-yuan" }, task), "只读证据已采集");
+  assert.equal(coreWorkerAction({ id: "coding-yuan" }, task), "Read-only evidence captured");
   assert.equal(coreWorkerState({ id: "judge-yuan" }, task), "idle");
-  assert.equal(coreWorkerAction({ id: "judge-yuan" }, task), "本次不参与，等待需要审查的方案");
+  assert.equal(coreWorkerAction({ id: "judge-yuan" }, task), "Standing by until a plan needs review");
   assert.equal(coreWorkerState({ id: "ops-yuan" }, task), "idle");
-  assert.equal(coreWorkerAction({ id: "ops-yuan" }, task), "本次不进入写入闸门");
+  assert.equal(coreWorkerAction({ id: "ops-yuan" }, task), "Apply Gate not used in this run");
   assert.deepEqual(workerStationTelemetry({ id: "ops-yuan" }, task).map((item) => item.value), [
-    "本次待命",
-    "本次不写",
-    "默认阻断"
+    "Standing by this run",
+    "No write this time",
+    "Blocked by default"
   ]);
 });
 
@@ -85,9 +85,9 @@ test("proposal mission brings Judge online while Ops remains gated standby", () 
   };
 
   assert.equal(coreWorkerState({ id: "judge-yuan" }, task), "reviewing");
-  assert.equal(coreWorkerAction({ id: "judge-yuan" }, task), "旁路审查方案，不触发写入");
+  assert.equal(coreWorkerAction({ id: "judge-yuan" }, task), "Reviewing plan sidecar; no write triggered");
   assert.equal(coreWorkerState({ id: "ops-yuan" }, task), "idle");
-  assert.equal(coreWorkerAction({ id: "ops-yuan" }, task), "方案阶段待命，写入仍默认阻断");
+  assert.equal(coreWorkerAction({ id: "ops-yuan" }, task), "Standing by during proposal; writes blocked by default");
 });
 
 test("workerStationModel carries latest event context without changing run state", () => {

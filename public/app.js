@@ -501,548 +501,372 @@ function escapeHtml(value = "") {
     .replaceAll("'", "&#039;");
 }
 
-const STATUS_LABELS_ZH = {
-  active: "进行中",
-  applied: "已写入",
-  apply_blocked: "写入已阻断",
-  approved: "已批准",
-  assigned: "已分配",
-  blocked: "已阻断",
-  blocked_by_default: "默认阻断",
-  blocked_by_policy: "策略阻断",
-  captured: "已采集",
-  clean: "干净",
-  checked: "已检查",
-  completed: "已完成",
-  complete: "已完成",
-  danger: "高风险",
-  diff_ready: "差异已生成",
-  draft: "草稿",
-  dry_run: "预演",
-  dry_run_ready: "预演就绪",
-  enabled: "已启用",
-  disabled: "已关闭",
-  failed: "失败",
-  generating_evidence: "采集证据",
-  generating_patch: "生成补丁",
-  gate: "闸门",
-  gate_pending: "等待闸门",
-  held: "已挂起",
-  high: "高风险",
-  human_gate: "人工闸门",
-  idle: "待命",
-  info: "信息",
-  low: "低风险",
-  live_runtime: "运行中",
-  medium: "需复核",
-  missing: "缺失",
-  next: "下一步",
-  none: "无",
-  not_autonomous: "暂不自治",
-  not_required: "不需要",
-  not_run: "未运行",
-  ok: "正常",
-  partial: "部分完成",
-  passed: "通过",
-  pending: "等待中",
-  queued: "排队中",
-  ready: "就绪",
-  requires_confirmation: "需要确认",
-  requires: "需要",
-  reporting: "生成战报",
-  reviewed: "已复核",
-  reviewing: "审核中",
-  rework: "需返工",
-  rework_requested: "已要求返工",
-  running: "运行中",
-  sandbox: "沙盒",
-  sandbox_ready: "沙盒就绪",
-  sandbox_written: "沙盒已写入",
-  supervised_only: "仅监督模式",
-  success: "成功",
-  verified: "已验证",
-  verifying: "验证中",
-  waiting: "等待中",
-  waiting_approval: "等待审批",
-  warning: "警告",
-  working: "工作中"
-};
-
-const EVENT_TYPE_LABELS_ZH = {
-  apply_gate_pending: "写入闸门待确认",
-  apply_proposal_applied: "补丁已写入",
-  approval_gate: "审批闸门",
-  file_touch: "文件活动",
-  git_signal: "代码变更信号",
-  human_gate_approved: "人工审批通过",
-  human_gate_rework: "要求返工",
-  judge_review: "审核复核",
-  patch_plan: "补丁方案",
-  project_root_guard_blocked: "项目根目录守卫阻断",
-  patch_run_blocked: "沙盒补丁被阻断",
-  patch_run_ready: "沙盒补丁已生成",
-  runtime: "运行监控",
-  task_blocked: "任务阻断",
-  task_completed: "任务完成",
-  task_evidence: "证据采集",
-  task_queued: "任务排队",
-  task_running: "任务运行",
-  verification_blocked: "验证阻断",
-  verification_failed: "验证失败",
-  verification_passed: "验证通过"
-};
-
-const TAB_LABELS_ZH = {
-  evidence: "证据",
-  gate: "闸门",
-  mission: "任务"
-};
-
 const WORKER_DOMAIN_ZH = {
-  Engineering: "工程",
-  Governance: "治理",
-  Runtime: "运行",
-  Security: "安全",
-  Markets: "市场",
-  Intel: "情报",
-  Quant: "量化",
-  Research: "研究",
-  Content: "内容",
-  Operator: "操作"
+  Engineering: "Engineering",
+  Governance: "Governance",
+  Runtime: "Runtime",
+  Security: "Security",
+  Markets: "Markets",
+  Intel: "Intel",
+  Quant: "Quant",
+  Research: "Research",
+  Content: "Content",
+  Operator: "Operator"
 };
-
-const WORKER_NAME_ZH = {
-  "Coding猿": "编程猿",
-  "Judge猿": "审核猿",
-  "Ops猿": "运维猿",
-  "Quant猿": "量化猿",
-  "Security猿": "安全猿",
-  "Hunter猿": "情报猿",
-  "coding-yuan": "编程猿",
-  "judge-yuan": "审核猿",
-  "ops-yuan": "运维猿"
-};
-
-const PROJECT_NAME_ZH = {
-  "Ai Worker Control Plane": "智能打工猿控制平面",
-  "Ai Export Compliance Agent": "AI 出口合规智能体",
-  "Ai Face Swap Mvp": "AI 换脸 MVP",
-  "Binance Futures Trader": "币安合约交易台",
-  "Cloudflare Edgetunnel Pages": "云边缘隧道页面",
-  "Cloudflare Edgetunnel Test": "云边缘隧道测试",
-  "Friend Points Betting Pro Client": "朋友积分竞猜专业版客户端",
-  "Friend Points Betting Pro": "朋友积分竞猜专业版",
-  "Gmgn Anomaly Radar": "链上异常雷达",
-  "Huangguan Clean Replica Api": "皇冠清理副本接口",
-  "Coding Yuan Sandbox Demo": "编程猿沙盒演示",
-  "coding-yuan-sandbox-demo": "编程猿沙盒演示",
-  "Stock Quant Ai": "股票量化智能体",
-  "Reserve Wallet Generator": "备用钱包生成器",
-  "Sol Light Trader": "索拉纳轻量交易台",
-  "Paperclipai": "回形针 AI",
-  "Paperclip AI": "回形针 AI",
-  "Domain Check Results": "域名检查结果"
-};
-
-const EXACT_TEXT_ZH = {
-  "3-猿 demo: Coding猿 captures evidence, Judge猿 reviews, Ops猿 keeps apply gated for Coding Yuan Sandbox Demo":
-    "三猿演示：编程猿采集证据，审核猿审核，运维猿守住写入闸门（编程猿沙盒演示）",
-  "AI Worker Control Plane": "智能打工猿控制平面",
-  "Ai Worker Control Plane": "智能打工猿控制平面",
-  "Coding Yuan Sandbox Demo": "编程猿沙盒演示",
-  "coding-yuan-sandbox-demo": "编程猿沙盒演示",
-  "Apply runner is disabled": "写入执行器默认关闭",
-  "Apply runner is disabled by default.": "写入执行器默认关闭。",
-  "No project files were modified.": "没有修改项目文件。",
-  "Project files are unchanged.": "项目文件未被改动。",
-  "Patch runner wrote sandbox patch artifacts only; project code was not modified.":
-    "补丁执行器只生成沙盒补丁产物，没有改动项目代码。",
-  "Apply runner did not write project code because confirmation, environment, rollback, or drift checks are not satisfied.":
-    "写入执行器没有写入项目代码，因为确认语、环境开关、回滚快照或漂移检查尚未全部满足。",
-  "Operator demo approval covers sandbox patch artifacts only; direct project apply remains blocked.":
-    "演示审批只覆盖沙盒补丁产物；真实写入仍然被阻断。",
-  "Patch runner ready": "补丁执行器就绪",
-  "Patch runner blocked": "补丁执行器已阻断",
-  "Sandbox patch package ready": "沙盒补丁包已生成",
-  "Sandbox patch blocked": "沙盒补丁已阻断",
-  "Apply gate checked": "写入闸门已检查",
-  "Proposal applied": "补丁已写入",
-  "No evidence attached to this event": "这个事件没有附加证据",
-  "No signals yet": "暂无信号",
-  "No worker events yet": "暂无员工事件",
-  "No queued worker tasks": "暂无排队任务",
-  "No human gates open": "暂无人工闸门",
-  "No recent files": "暂无最近文件",
-  "No git changes": "暂无 Git 变更",
-  "No package scripts": "暂无脚本",
-  "Waiting for signals": "等待信号",
-  "Waiting for mission": "等待任务",
-  "Waiting for evidence-backed work.": "等待有证据支撑的真实任务。",
-  "Workspace Core": "工作区核心",
-  "Workspace": "工作区",
-  "Worker": "员工",
-  "Human gate": "人工闸门",
-  "Current mission": "当前任务",
-  "No active run": "暂无运行",
-  "No run active": "暂无运行",
-  "Idle": "待命",
-  "Standing by": "待命",
-  "Assign a concrete task": "分配一个明确任务",
-  "Assign a mission": "分配一个任务",
-  "Review before autonomy increases.": "提升自治等级前需要复核。",
-  "No metric": "暂无指标",
-  "No report yet.": "暂无战报。",
-  "test": "测试",
-  "check": "检查",
-  "none": "无"
-};
-
-Object.assign(EXACT_TEXT_ZH, {
-  "Sandbox queued · Human-gated apply": "沙盒排队 · 写入需人工闸门",
-  "Sandbox assigned · Evidence first": "沙盒已分配 · 先采集证据",
-  "Read-only evidence capture": "只读证据采集",
-  "Patch blueprint · Sandbox only": "补丁蓝图 · 仅沙盒",
-  "Verification running · No deploy": "验证运行中 · 不部署",
-  "Verification failed · Rework required": "验证失败 · 需要返工",
-  "Judge review · Evidence-backed": "Judge猿审核 · 证据支撑",
-  "Human Gate · Approval required": "人工闸门 · 需要审批",
-  "Patch preflight · Sandbox package": "补丁预检 · 沙盒包",
-  "Sandbox diff ready · Review only": "沙盒差异已生成 · 仅供审核",
-  "Apply Gate blocked · Explicit approval required": "写入闸门已阻断 · 需要明确审批",
-  "Mission complete · Evidence archived": "任务完成 · 证据已归档",
-  "Mission failed · Human review required": "任务失败 · 需要人工复核",
-  "Apply runner armed · exact confirmation still required": "写入执行器已准备 · 仍需要精确确认",
-  "Assign the mission to Coding猿 and start read-only evidence capture.": "把任务分配给 Coding猿，并开始只读证据采集。",
-  "Start evidence capture before any patch planning.": "先采集证据，再规划补丁。",
-  "Let Coding猿 finish command logs and repository evidence.": "让 Coding猿 完成命令日志和仓库证据采集。",
-  "Review the proposed patch plan before verification.": "验证前先复核补丁方案。",
-  "Wait for the allowed verification script to finish.": "等待白名单验证脚本完成。",
-  "Open Evidence, inspect the failed check, then request rework.": "打开证据，查看失败检查，然后要求返工。",
-  "Review Judge猿's evidence summary and risk notes.": "复核 Judge猿 的证据摘要和风险说明。",
-  "Open Gate, inspect what will happen, then approve or request rework.": "打开闸门，确认会发生什么，再批准或要求返工。",
-  "Let Coding猿 package the sandbox patch and rollback snapshot.": "让 Coding猿 打包沙盒补丁和回滚快照。",
-  "Open Evidence and inspect the Diff Preview before Apply Gate.": "进入写入闸门前，先打开证据并检查差异预览。",
-  "Open Gate and keep blocked unless you explicitly approve the apply path.": "打开闸门；除非你明确批准写入路径，否则保持阻断。",
-  "Review the final evidence pack and company report.": "复核最终证据包和公司战报。",
-  "Inspect the failure evidence and keep risky actions blocked.": "检查失败证据，并保持高风险动作阻断。",
-  "Queued": "排队中",
-  "Assigned": "已分配",
-  "Collecting evidence": "采集证据中",
-  "Planning patch": "生成补丁方案",
-  "Running verification": "验证运行中",
-  "Verification failed": "验证失败",
-  "Judge review": "审核中",
-  "Waiting human gate": "等待人工确认",
-  "Patch preflight": "补丁预检",
-  "Diff ready": "差异已生成",
-  "Apply blocked": "写入已阻断",
-  "Completed": "已完成",
-  "Failed": "失败",
-  "Mission queued": "任务排队中",
-  "Coding猿 is reading the mission": "Coding猿正在读取任务",
-  "Coding猿 is capturing evidence": "Coding猿正在采集证据",
-  "Coding猿 is drafting a patch plan": "Coding猿正在起草补丁方案",
-  "Judge猿 is checking test evidence": "Judge猿正在检查测试证据",
-  "Judge猿 rejected the evidence": "Judge猿驳回了证据",
-  "Judge猿 is reviewing the pack": "Judge猿正在审核证据包",
-  "Judge猿 is waiting for you": "Judge猿正在等待你确认",
-  "Coding猿 is packaging the sandbox patch": "Coding猿正在打包沙盒补丁",
-  "Coding猿 has a diff ready": "Coding猿已准备好差异",
-  "Ops猿 is holding the safety gate": "Ops猿正在守住安全闸门",
-  "Coding猿 is reporting back": "Coding猿正在汇报",
-  "Ops猿 is isolating the failure": "Ops猿正在隔离失败",
-  "No command has run yet.": "还没有执行任何命令。",
-  "The work is still in planning, with no project writes.": "任务仍处于规划阶段，没有写入项目文件。",
-  "Only read-only checks should run in this phase.": "这个阶段只允许运行只读检查。",
-  "The plan is evidence only; project files remain unchanged.": "方案只是证据，项目文件保持不变。",
-  "Verification cannot deploy, restart, or perform external side effects.": "验证不会部署、重启，也不会产生外部副作用。",
-  "Failed verification prevents patch progression.": "验证失败会阻止补丁继续推进。",
-  "The run is still behind Human Gate.": "这次运行仍受人工闸门保护。",
-  "No sandbox patch run can proceed without human approval.": "没有人工审批，沙盒补丁运行不能继续。",
-  "Patch runner writes review artifacts only, not project files.": "补丁执行器只写审核产物，不写项目文件。",
-  "Completion is backed by recorded evidence.": "完成状态有已记录证据支撑。",
-  "Failed work remains blocked from direct apply.": "失败任务仍然禁止直接写入。",
-  "Coding猿 is waiting for assignment": "Coding猿正在等待分配",
-  "Coding猿 is preparing the workbench": "Coding猿正在准备工作台",
-  "Coding猿 is collecting logs": "Coding猿正在采集日志",
-  "Coding猿 is turning evidence into a patch plan": "Coding猿正在把证据转成补丁方案",
-  "Judge猿 is validating the evidence pack": "Judge猿正在验证证据包",
-  "Judge猿 is holding the run": "Judge猿正在暂停这次运行",
-  "Judge猿 is comparing evidence and policy": "Judge猿正在比对证据和策略",
-  "Judge猿 is pointing at the approval console": "Judge猿正在提示你审批",
-  "Coding猿 is writing the sandbox bundle": "Coding猿正在写入沙盒包",
-  "Coding猿 is presenting the patch dossier": "Coding猿正在展示补丁档案",
-  "Ops猿 is blocking direct apply": "Ops猿正在阻断直接写入",
-  "Coding猿 is filing the report": "Coding猿正在归档报告",
-  "Ops猿 is preserving failure evidence": "Ops猿正在保存失败证据",
-  "Mission Inspector": "任务检查台",
-  "Evidence Inspector": "证据检查台",
-  "Gate Inspector": "闸门检查台",
-  "Capturing command evidence": "采集命令证据",
-  "Drafting patch blueprint": "起草补丁蓝图",
-  "Running allowed verification": "运行白名单验证",
-  "Packaging sandbox patch": "打包沙盒补丁",
-  "Sandbox diff is ready": "沙盒差异已就绪",
-  "Waiting for human apply decision": "等待人工写入决定",
-  "Waiting for human approval": "等待人工审批",
-  "Explaining apply gate blockers": "解释写入闸门阻断原因",
-  "Reviewing evidence pack": "审核证据包",
-  "Checking test evidence": "检查测试证据",
-  "Apply gate blocked by policy": "写入闸门被策略阻断",
-  "Rollback snapshot ready": "回滚快照就绪",
-  "Watching patch preflight": "监控补丁预检",
-  "No mission selected": "未选择任务",
-  "Choose a mission with evidence before approving any action.": "批准任何动作前，请先选择带证据的任务。",
-  "No run": "暂无运行",
-  "Blocked by default": "默认阻断",
-  "Applied after gate checks": "闸门检查后已写入",
-  "This run passed the apply gate and wrote project files under approval.": "本次运行通过写入闸门，并在审批下写入了项目文件。",
-  "Applied": "已写入",
-  "Evidence is ready, but project writes still require exact human confirmation.": "证据已就绪，但写项目文件仍需要精确人工确认。",
-  "No direct writes": "没有直接写入",
-  "Review writes": "复核写入",
-  "Requires confirmation": "需要确认",
-  "Sandbox patch ready": "沙盒补丁已就绪",
-  "Review the diff and run the apply gate before any project write.": "写入任何项目文件前，请先审核差异并运行写入闸门。",
-  "Sandbox only": "仅沙盒",
-  "Not cleared": "未放行",
-  "Human decision needed": "需要人工决定",
-  "Judge猿 needs a human decision before patch preflight can continue.": "补丁预检继续前，Judge猿需要人工决定。",
-  "Waiting": "等待中",
-  "Blocked": "已阻断",
-  "Gate holding": "闸门保持中",
-  "The run remains in supervised mode until the next evidence gate passes.": "在下一个证据闸门通过前，这次运行保持监督模式。",
-  "Supervised": "受监督"
-});
-
-Object.assign(EXACT_TEXT_ZH, {
-  Apply: "写入",
-  "Apply Gate": "写入闸门",
-  "Attached Evidence": "关联证据",
-  Candidates: "候选文件",
-  Checks: "检查",
-  Control: "控制",
-  Drafts: "草稿",
-  Evidence: "证据",
-  Files: "文件",
-  Gate: "闸门",
-  Human: "人工闸门",
-  Judge: "审核",
-  Latest: "最新",
-  Manifest: "清单",
-  Mode: "模式",
-  Patch: "补丁",
-  Plan: "方案",
-  Progress: "进度",
-  Queue: "队列",
-  Risk: "风险",
-  Rollback: "回滚",
-  Route: "路由",
-  Run: "运行",
-  Runner: "执行器",
-  Safety: "安全",
-  Score: "分数",
-  Severity: "级别",
-  Source: "来源",
-  Status: "状态",
-  Task: "任务",
-  Verify: "验证",
-  Worker: "员工",
-  Working: "工作中",
-  Ready: "就绪",
-  Draft: "草稿",
-  Running: "运行中",
-  "Engineering": "工程",
-  "Governance": "治理",
-  "Runtime": "运行"
-});
-
-Object.assign(EXACT_TEXT_ZH, {
-  "Agent Systems": "智能体系统",
-  "Market Desk": "市场工作台",
-  "Launch crew": "核心员工",
-  "Next hire": "即将入职",
-  "Available": "可接单",
-  "Human gate": "人工闸门",
-  "Review": "复核",
-  "Markets": "市场",
-  "Intel": "情报",
-  "Apply proposal gate": "写入提案闸门",
-  "Ready for supervised customer-style evidence review.": "已准备好进行客户式监督证据审核。",
-  "AIWC run-log ingestion is not configured": "运行日志接入尚未配置",
-  "Review or hold each high-risk action before increasing autonomy.": "提升自治等级前，请复核或挂起每个高风险动作。",
-  "Evidence packs": "证据包",
-  "Apply gates": "写入闸门",
-  "Hours saved": "节省小时",
-  "Tasks done": "完成任务",
-  "Patch plans": "补丁方案",
-  "Patch runs": "补丁运行",
-  "Risks gated": "闸门阻断风险",
-  "Approved": "已批准",
-  "Verified": "已验证"
-});
 
 function zhStatus(value) {
   const raw = String(value || "");
   const normalized = raw.toLowerCase().replaceAll(" ", "_");
-  return STATUS_LABELS_ZH[normalized] || EXACT_TEXT_ZH[raw] || raw.replaceAll("_", " ");
+  const labels = {
+    active: "Active",
+    applied: "Applied",
+    apply_blocked: "Apply blocked",
+    approved: "Approved",
+    assigned: "Assigned",
+    blocked: "Blocked",
+    blocked_by_default: "Blocked by default",
+    blocked_by_policy: "Blocked by policy",
+    captured: "Captured",
+    clean: "Clean",
+    checked: "Checked",
+    completed: "Completed",
+    complete: "Complete",
+    danger: "High risk",
+    diff_ready: "Diff ready",
+    draft: "Draft",
+    dry_run: "Dry run",
+    dry_run_ready: "Dry run ready",
+    enabled: "Enabled",
+    disabled: "Disabled",
+    failed: "Failed",
+    generating_evidence: "Collecting evidence",
+    generating_patch: "Generating patch",
+    gate: "Gate",
+    gate_pending: "Gate pending",
+    held: "Held",
+    high: "High risk",
+    human_gate: "Human Gate",
+    idle: "Idle",
+    info: "Info",
+    low: "Low risk",
+    live_runtime: "Live runtime",
+    medium: "Needs review",
+    missing: "Missing",
+    next: "Next",
+    none: "None",
+    not_autonomous: "Not autonomous",
+    not_required: "Not required",
+    not_run: "Not run",
+    ok: "OK",
+    partial: "Partial",
+    passed: "Passed",
+    pending: "Pending",
+    queued: "Queued",
+    ready: "Ready",
+    requires_confirmation: "Requires confirmation",
+    requires: "Requires",
+    reporting: "Reporting",
+    reviewed: "Reviewed",
+    reviewing: "Reviewing",
+    rework: "Needs rework",
+    rework_requested: "Rework requested",
+    running: "Running",
+    sandbox: "Sandbox",
+    sandbox_ready: "Sandbox ready",
+    sandbox_written: "Sandbox written",
+    supervised_only: "Supervised only",
+    success: "Success",
+    verified: "Verified",
+    verifying: "Verifying",
+    waiting: "Waiting",
+    waiting_approval: "Waiting approval",
+    warning: "Warning",
+    working: "Working"
+  };
+  return labels[normalized] || raw.replaceAll("_", " ");
 }
 
 function zhEventType(type) {
-  return EVENT_TYPE_LABELS_ZH[type] || zhStatus(type || "event");
+  const labels = {
+    apply_gate_pending: "Apply Gate pending",
+    apply_proposal_applied: "Patch applied",
+    approval_gate: "Approval Gate",
+    file_touch: "File activity",
+    git_signal: "Git signal",
+    human_gate_approved: "Human approval granted",
+    human_gate_rework: "Rework requested",
+    judge_review: "Judge review",
+    patch_plan: "Patch plan",
+    project_root_guard_blocked: "Project Root Guard blocked",
+    patch_run_blocked: "Sandbox patch blocked",
+    patch_run_ready: "Sandbox patch ready",
+    runtime: "Runtime",
+    task_blocked: "Task blocked",
+    task_completed: "Task completed",
+    task_evidence: "Evidence collected",
+    task_queued: "Task queued",
+    task_running: "Task running",
+    verification_blocked: "Verification blocked",
+    verification_failed: "Verification failed",
+    verification_passed: "Verification passed"
+  };
+  return labels[type] || zhStatus(type || "event");
 }
 
 function zhTab(tab) {
-  return TAB_LABELS_ZH[tab] || zhStatus(tab);
+  const labels = {
+    evidence: "Evidence",
+    gate: "Gate",
+    mission: "Mission"
+  };
+  return labels[tab] || zhStatus(tab);
 }
 
 function zhText(value = "") {
   let text = String(value || "");
   if (!text) return text;
-  if (PROJECT_NAME_ZH[text]) text = PROJECT_NAME_ZH[text];
-  if (WORKER_NAME_ZH[text]) text = WORKER_NAME_ZH[text];
-  if (EXACT_TEXT_ZH[text]) text = EXACT_TEXT_ZH[text];
-
+  const exact = {
+    "编程猿": "Codingape",
+    "审核猿": "Judgeape",
+    "运维猿": "Opsape",
+    "量化猿": "Quantape",
+    "安全猿": "Securityape",
+    "情报猿": "Hunterape",
+    "编程猿沙盒演示": "Codingape Sandbox Demo",
+    "智能打工猿控制平面": "AI Worker Control Plane",
+    "运行当前任务": "Run Current Task",
+    "当前项目": "Current project",
+    "核心员工": "Core worker",
+    "暂无运行": "No run",
+    "暂无信号": "No signals yet",
+    "暂无战报。": "No report yet.",
+    "等待有证据支撑的真实任务。": "Waiting for evidence-backed real work.",
+    "待命：运行后会显示真实运行编号、阶段和闸门状态。": "Idle: after a run starts, this shows the real run ID, phase, and gate status.",
+    "还没有写入项目。": "Nothing has been written to the project.",
+    "项目文件未修改": "Project files unchanged",
+    "项目文件未被改动。": "Project files are unchanged.",
+    "没有修改项目文件。": "No project files were modified.",
+    "写入执行器默认关闭": "Apply runner is disabled by default",
+    "补丁执行器只生成沙盒补丁产物，没有改动项目代码。": "Patch runner wrote sandbox patch artifacts only; project code was not modified.",
+    "演示审批只覆盖沙盒补丁产物；真实写入仍然被阻断。": "Demo approval covers sandbox patch artifacts only; direct project apply remains blocked.",
+    "写入执行器没有写入项目代码，因为确认语、环境开关、回滚快照或漂移检查尚未全部满足。": "Apply runner did not write project code because confirmation, environment, rollback, or drift checks are not satisfied.",
+    "不修改项目文件": "No project file changes",
+    "默认阻断": "Blocked by default",
+    "需要确认": "Requires confirmation",
+    "等待人工确认": "Waiting for human approval",
+    "回滚快照就绪": "Rollback snapshot ready",
+    "缺少回滚快照": "Missing rollback snapshot",
+    "失败": "Failed",
+    "成功": "Success"
+  };
+  if (exact[text]) return exact[text];
+  const replacements = [
+    ["正在", ""],
+    ["已", ""],
+    ["未", "not "],
+    ["暂无", "No "],
+    ["待命", "Idle"],
+    ["排队中", "Queued"],
+    ["已排队", "Queued"],
+    ["已分配", "Assigned"],
+    ["进行中", "Running"],
+    ["工作中", "Working"],
+    ["运行中", "Running"],
+    ["等待中", "Waiting"],
+    ["等待", "Waiting for "],
+    ["就绪", "Ready"],
+    ["已完成", "Completed"],
+    ["完成", "Complete"],
+    ["失败", "Failed"],
+    ["阻断", "Blocked"],
+    ["已阻断", "Blocked"],
+    ["默认阻断", "Blocked by default"],
+    ["批准", "Approved"],
+    ["已批准", "Approved"],
+    ["审核", "Review"],
+    ["复核", "Review"],
+    ["审查", "Review"],
+    ["证据", "Evidence"],
+    ["证据包", "Evidence Pack"],
+    ["补丁", "Patch"],
+    ["方案", "Plan"],
+    ["差异", "Diff"],
+    ["验证", "Verification"],
+    ["人工", "Human"],
+    ["闸门", "Gate"],
+    ["写入", "Write"],
+    ["回滚", "Rollback"],
+    ["快照", "Snapshot"],
+    ["项目", "Project"],
+    ["文件", "Files"],
+    ["任务", "Task"],
+    ["运行", "Run"],
+    ["阶段", "Phase"],
+    ["状态", "Status"],
+    ["风险", "Risk"],
+    ["清单", "Manifest"],
+    ["草稿", "Draft"],
+    ["候选", "Candidate"],
+    ["可用", "Available"],
+    ["缺少", "Missing"],
+    ["不允许", "Not allowed"],
+    ["不会", "will not"],
+    ["不能", "cannot"],
+    ["需要", "Requires"],
+    ["确认语", "confirmation phrase"],
+    ["本地", "Local"],
+    ["沙盒", "Sandbox"],
+    ["只读", "Read-only"],
+    ["外部副作用", "external side effects"],
+    ["重启", "restart"],
+    ["部署", "deploy"],
+    ["支持包", "support bundle"],
+    ["诊断摘要", "diagnostic summary"],
+    ["连接", "connection"],
+    ["配置", "configuration"],
+    ["演示", "Demo"],
+    ["办公室", "Office"],
+    ["公司战报", "Company Report"],
+    ["路线图目标", "Roadmap goals"],
+    ["无", "None"],
+    ["个", ""],
+    ["项", ""],
+    ["字节", "bytes"],
+    ["秒", "sec"],
+    ["分钟", "min"],
+    ["刚刚开始", "Just started"],
+    ["请输入或粘贴 Mac Project absolute path", "Enter or paste the Mac project absolute path"],
+    ["请选择", "Choose"],
+    ["选择", "Choose"],
+    ["打开", "Open"],
+    ["生成", "Generate"],
+    ["采集", "Collect"],
+    ["起草", "Draft"],
+    ["检查", "Check"],
+    ["返回", "Back"],
+    ["保持", "Keep"],
+    ["要求返工", "Request rework"],
+    ["返工", "Rework"],
+    ["复制", "Copy"],
+    ["显示", "Show"],
+    ["取消", "Cancel"],
+    ["更改", "Change"],
+    ["绑定", "Bind"],
+    ["保存", "Save"],
+    ["目标", "Target"],
+    ["当前", "Current"],
+    ["最新", "Latest"],
+    ["流程节点", "Flow node"],
+    ["关联", "Attached"],
+    ["级别", "Severity"],
+    ["聚焦员工", "Focused worker"],
+    ["员工", "worker"],
+    ["核心", "Core"],
+    ["待上线", "Coming soon"],
+    ["本次", "This run"],
+    ["仍", "still"],
+    ["且", "and"],
+    ["与", "and"],
+    ["后", "after"],
+    ["前", "before"],
+    ["内", "inside"],
+    ["外", "outside"]
+  ];
   text = text
-    .replace(/3-猿 demo: Coding猿 captures evidence, Judge猿 reviews, Ops猿 keeps apply gated for (Coding Yuan Sandbox Demo|Coding猿沙盒演示|编程猿沙盒演示)/gi, "三猿演示：编程猿采集证据，审核猿审核，运维猿守住写入闸门（编程猿沙盒演示）")
-    .replace(/^Coding猿 close-loop: inspect (.+), capture evidence, and draft review plan$/i, (_, name) => `编程猿闭环：检查${zhText(name)}、采集证据并生成复核方案`)
-    .replace(/Coding猿 close-loop: inspect ([^,\n]+), capture evidence, and draft review plan/gi, (_, name) => `编程猿闭环：检查${zhText(name)}、采集证据并生成复核方案`)
-    .replace(/^Patch plan for (.+)$/i, (_, name) => `${zhText(name)}补丁方案`)
-    .replace(/^Coding猿 can now move from evidence capture to a human-reviewed patch plan\.$/i, "编程猿已从证据采集推进到人工复核补丁方案。")
-    .replace(/^(\d+) changed file signal found$/i, "$1 个变更文件信号已发现")
-    .replace(/^Verification scripts available: (.+)$/i, (_, scripts) => `可用验证脚本：${zhText(scripts).replaceAll("test", "测试").replaceAll("check", "检查")}`)
-    .replace(/^(\d+) sandbox patch draft ready for diff preview$/i, "$1 份沙盒补丁草稿已可预览差异")
-    .replace(/^Inspect changed files and separate intentional work from unrelated workspace noise$/i, "检查变更文件，并把本次目标变更与无关工作区噪音分开。")
-    .replace(/^Create a minimal patch scoped to the selected project and task$/i, "创建只覆盖所选项目和任务的最小补丁。")
-    .replace(/^Run approved verification: (.+)$/i, (_, scripts) => `运行已批准验证：${zhText(scripts).replaceAll("test", "测试").replaceAll("check", "检查")}`)
-    .replace(/^Attach evidence output and changed-file summary to the task trail$/i, "把证据输出和变更文件摘要附加到任务轨迹。")
-    .replace(/^This is a plan artifact only\. It does not modify files or execute project scripts\.$/i, "这只是方案产物，不会修改文件，也不会执行项目脚本。")
-    .replace(/Diff Preview\s*验证/gi, "差异预览验证")
-    .replace(/Diff Preview/gi, "差异预览")
-    .replace(/^Send confirmation "(.+)" to apply sandbox files to the project\.$/i, "发送精确确认语“$1”后，才允许把沙盒文件写入项目。")
-    .replace(/^Exact apply confirmation is required$/i, "需要精确写入确认")
-    .replace(/Your AI company completed (\d+) tasks with traceable evidence\./gi, "你的 AI 打工公司完成了 $1 个有证据记录的任务。")
-    .replace(/Your AI company is staged for the first real work loop\./gi, "你的 AI 打工公司已准备好进入第一次真实工作闭环。")
-    .replace(/Today my AI worker company completed (\d+) tasks\./gi, "今天我的 AI 打工公司完成了 $1 个任务。")
-    .replace(/Today my AI worker company completed (\d+) tasks?, produced (\d+) evidence packs?, passed (\d+) verification runs?, approved (\d+) supervised results?, ran (\d+) controlled patch preflights?, checked (\d+) apply gates?, and blocked (\d+) risks?\./gi, "今天我的 AI 打工公司完成了 $1 个任务，生成了 $2 份证据包，通过了 $3 次验证，批准了 $4 个受监督结果，完成了 $5 次受控补丁预检，检查了 $6 次写入闸门，并阻断了 $7 个风险。")
-    .replace(/Today my AI worker company completed (\d+) missions, produced (\d+) evidence packs, and gated (\d+) risks\./gi, "今天我的 AI 打工公司完成了 $1 个任务，生成了 $2 份证据包，并阻断了 $3 个风险。")
-    .replace(/^Review (.+), summarize risk, and attach evidence$/i, (_, name) => `复核${zhText(name)}，总结风险并附上证据`)
-    .replace(/^(Coding猿|Judge猿|Ops猿|Quant猿|Security猿|Hunter猿|编程猿|审核猿|运维猿|量化猿|安全猿|情报猿) is working through (\d+) local changes? in (.+)$/i, (_, worker, count, name) => `${zhText(worker)}正在处理${zhText(name)}里的 ${count} 个本地变更`)
-    .replace(/^(Coding猿|Judge猿|Ops猿|Quant猿|Security猿|Hunter猿|编程猿|审核猿|运维猿|量化猿|安全猿|情报猿) is packaging (\d+) pending changes? for review$/i, (_, worker, count) => `${zhText(worker)}正在打包 ${count} 个待复核变更`)
-    .replace(/^(Coding猿|Judge猿|Ops猿|Quant猿|Security猿|Hunter猿|编程猿|审核猿|运维猿|量化猿|安全猿|情报猿) is standing by for the next assignment$/i, (_, worker) => `${zhText(worker)}正在等待下一次分配`)
-    .replace(/^Waiting on reviews, approvals, and release evidence$/i, "等待审核、审批和发布证据")
-    .replace(/^Ask the human before deploy, trade, wallet, restart, or production writes$/i, "部署、交易、钱包、重启或生产写入前必须询问人类")
-    .replace(/^Review the diff and create an evidence summary$/i, "复核差异并生成证据摘要")
-    .replace(/^(\d+) git change signal$/i, "$1 个 Git 变更信号")
-    .replace(/^(\d+) recent file signal$/i, "$1 个最近文件信号")
-    .replace(/^Recent touch: /i, "最近改动：")
-    .replace(/^(.+) · medium risk patch plan$/i, (_, name) => `${zhText(name)} · 中风险补丁方案`)
-    .replace(/^(.+) · (\d+) read-only checks$/i, (_, name, count) => `${zhText(name)} · ${count} 项只读检查`)
-    .replace(/^(.+) · test$/i, (_, name) => `${zhText(name)} · 测试脚本`)
-    .replace(/^Evidence runner only captured read-only signals\. It did not run deploy, trade, restart, install, or write commands\.$/i, "证据执行器只采集只读信号，没有运行部署、交易、重启、安装或写入命令。")
-    .replace(/^Evidence runner only captured read-only signals\./i, "证据执行器只采集只读信号。")
-    .replace(/Coding猿 completed (\d+) missions?\./gi, "编程猿完成了 $1 个任务。")
-    .replace(/Judge猿 reviewed (\d+) evidence packs?\./gi, "审核猿复核了 $1 份证据包。")
-    .replace(/Ops猿 gated (\d+) risks?\./gi, "运维猿阻断了 $1 个风险。")
-    .replace(/The company saved about ([\\d.]+h) of operator time\./gi, "公司约节省了 $1 人工时间。")
-    .replace(/All high-risk project writes stayed behind Human Gate\./gi, "所有高风险项目写入都留在人工闸门之后。")
-    .replace(/Ai Worker Control Plane/gi, "智能打工猿控制平面")
-    .replace(/Huangguan Clean Replica Api/gi, "皇冠清理副本接口")
-    .replace(/Stock Quant Ai/gi, "股票量化智能体")
-    .replace(/Ai Export Compliance Agent/gi, "AI 出口合规智能体")
-    .replace(/Ai Face Swap Mvp/gi, "AI 换脸 MVP")
-    .replace(/Binance Futures Trader/gi, "币安合约交易台")
-    .replace(/Cloudflare Edgetunnel Pages/gi, "云边缘隧道页面")
-    .replace(/Cloudflare Edgetunnel Test/gi, "云边缘隧道测试")
-    .replace(/Friend Points Betting Pro Client/gi, "朋友积分竞猜专业版客户端")
-    .replace(/Friend Points Betting Pro/gi, "朋友积分竞猜专业版")
-    .replace(/Gmgn Anomaly Radar/gi, "链上异常雷达")
-    .replace(/Sol Light Trader/gi, "索拉纳轻量交易台")
-    .replace(/(\d+) high-risk human gates/gi, "$1 个高风险人工闸门")
-    .replace(/(\d+) local change need evidence/gi, "$1 个本地变更需要证据")
-    .replace(/(\d+) local changes/gi, "$1 个本地变更")
-    .replace(/read-only signals/gi, "只读信号")
-    .replace(/deploy, trade, restart, install, or write commands/gi, "部署、交易、重启、安装或写入命令")
-    .replace(/(\d+) local changes need evidence/gi, "$1 个本地变更需要证据")
-    .replace(/^3-猿 demo: Coding猿 captures evidence, Judge猿 reviews, Ops猿 keeps apply gated for (.+)$/i, "三猿演示：编程猿采集证据，审核猿审核，运维猿守住写入闸门（$1）")
-    .replace(/^Sandbox patch package ready: /i, "沙盒补丁包已生成：")
-    .replace(/^Sandbox patch blocked: /i, "沙盒补丁已阻断：")
-    .replace(/^Patch runner ready: /i, "补丁执行器就绪：")
-    .replace(/^Patch runner blocked: /i, "补丁执行器已阻断：")
-    .replace(/^Apply gate checked: /i, "写入闸门已检查：")
-    .replace(/^Proposal applied: /i, "提案已写入：")
-    .replace(/^Ops猿 checked apply gate: /i, "Ops猿完成写入闸门检查：")
-    .replace(/^Judge猿 approved sandbox preflight: /i, "Judge猿批准沙盒预检：")
-    .replace(/^Mission queued: /i, "任务已排队：")
-    .replace(/^Mission failed: /i, "任务失败：")
-    .replace(/^Mission complete: /i, "任务完成：")
-    .replace(/^Verification passed: /i, "验证通过：")
-    .replace(/^Verification failed: /i, "验证失败：")
-    .replace(/^Verification running: /i, "验证运行中：")
-    .replace(/^Verification gated: /i, "验证已被闸门拦住：")
-    .replace(/^Verification 通过: /i, "验证通过：")
-    .replace(/^Verification 失败: /i, "验证失败：")
-    .replace(/^Completed: /i, "已完成：")
-    .replace(/^Running: /i, "运行中：")
-    .replace(/^Queued: /i, "排队中：")
-    .replace(/^Blocked: /i, "已阻断：")
-    .replace(/\bjudge review\b/gi, "审核复核")
-    .replace(/\breview ready\b/gi, "复核就绪")
-    .replace(/\breview 就绪/gi, "复核就绪")
-    .replace(/\bmedium risk patch plan\b/gi, "中风险补丁方案")
-    .replace(/\bhigh risk patch plan\b/gi, "高风险补丁方案")
-    .replace(/\blow risk patch plan\b/gi, "低风险补丁方案")
-    .replace(/\brisk patch plan\b/gi, "风险补丁方案")
-    .replace(/\bread-only checks\b/gi, "项只读检查")
-    .replace(/\bevidence:/gi, "证据：")
-    .replace(/\bevidence\b/gi, "证据")
-    .replace(/\bVerification\b/gi, "验证")
-    .replaceAll("Coding Yuan Sandbox Demo", "Coding猿沙盒演示")
-    .replaceAll("coding-yuan-sandbox-demo", "编程猿沙盒演示")
-    .replaceAll("AIWC", "AI 打工猿控制台")
-    .replaceAll("L3 trusted operator", "L3 可信操作员")
-    .replaceAll("Apply runner is disabled", "写入执行器默认关闭")
-    .replaceAll("Set CODEX_OFFICE_ENABLE_APPLY_RUNNER=true only after approving direct project file writes.", "只有明确批准直接项目写入后，才可启用写入执行器。")
-    .replaceAll("Apply runner did not write project code because confirmation, environment, rollback, or drift checks are not satisfied.", "写入执行器没有写入项目代码，因为确认语、环境开关、回滚快照或漂移检查尚未全部满足。")
-    .replaceAll("Apply runner is enabled but still requires exact confirmation.", "写入执行器已启用，但仍需要精确确认。")
-    .replaceAll("Project files were written after gate checks.", "项目文件只在闸门检查后写入。")
-    .replaceAll("No project files are modified without explicit human approval.", "没有明确人工审批，不会修改项目文件。")
-    .replaceAll("No project files are modified without explicit approval.", "没有明确审批，不会修改项目文件。")
-    .replaceAll("No project files were modified.", "没有修改项目文件。")
-    .replaceAll("Project files are unchanged.", "项目文件未被改动。")
-    .replaceAll("Sandbox patch generated.", "沙盒补丁已生成。")
-    .replaceAll("Sandbox artifact only", "仅沙盒产物")
-    .replaceAll("Rollback snapshot ready", "回滚快照就绪")
-    .replaceAll("Rollback snapshot is available.", "回滚快照可用。")
-    .replaceAll("Rollback snapshot is missing.", "缺少回滚快照。")
-    .replaceAll("Apply requires exact human confirmation", "写入需要精确人工确认")
-    .replaceAll("Apply requires explicit approval", "写入需要明确审批")
-    .replaceAll("Exact confirmation required", "需要精确确认")
-    .replaceAll("Patch runner wrote sandbox patch artifacts only; project code was not modified.", "补丁执行器只生成沙盒补丁产物，没有改动项目代码。")
-    .replaceAll("Operator demo approval covers sandbox patch artifacts only; direct project apply remains blocked.", "演示审批只覆盖沙盒补丁产物；真实写入仍然被阻断。")
-    .replaceAll("local sandbox", "本地沙盒")
-    .replaceAll("enabled", "已启用")
-    .replaceAll("disabled", "已关闭")
-    .replaceAll("Idle", "待命")
-    .replaceAll("ready", "就绪")
-    .replaceAll("pending", "等待中")
-    .replaceAll("captured", "已采集")
-    .replaceAll("requires confirmation", "需要确认")
-    .replaceAll("sandbox written", "沙盒已写入")
-    .replaceAll("passed", "通过")
-    .replaceAll("blocked", "已阻断")
-    .replaceAll("Coding猿", "编程猿")
-    .replaceAll("Judge猿", "审核猿")
-    .replaceAll("Ops猿", "运维猿")
-    .replaceAll("Quant猿", "量化猿")
-    .replaceAll("Security猿", "安全猿")
-    .replaceAll("Hunter猿", "情报猿");
-
+    .replaceAll("Coding猿", "Codingape")
+    .replaceAll("Judge猿", "Judgeape")
+    .replaceAll("Ops猿", "Opsape")
+    .replaceAll("Quant猿", "Quantape")
+    .replaceAll("Security猿", "Securityape")
+    .replaceAll("Hunter猿", "Hunterape")
+    .replaceAll("编程猿", "Codingape")
+    .replaceAll("审核猿", "Judgeape")
+    .replaceAll("运维猿", "Opsape");
+  for (const [source, target] of replacements) {
+    text = text.replaceAll(source, target);
+  }
+  text = text
+    .replaceAll("：", ": ")
+    .replaceAll("，", ", ")
+    .replaceAll("、", ", ")
+    .replaceAll("。", ".")
+    .replaceAll("；", "; ")
+    .replaceAll("（", " (")
+    .replaceAll("）", ") ")
+    .replace(/\s{2,}/g, " ")
+    .replace(/\s+([,.:;])/g, "$1")
+    .replace(/([,.:;])([^\s])/g, "$1 $2")
+    .trim();
+  if (/\p{Script=Han}/u.test(text)) {
+    text = text.replace(/\p{Script=Han}+/gu, "").replace(/\s{2,}/g, " ").trim();
+  }
   return text;
 }
 
+function needsEnglishSurfaceNormalize(value = "") {
+  return /[\p{Script=Han}：，、。；（）]/u.test(String(value || ""));
+}
+
+function enforceEnglishSurface(root = document.body) {
+  if (!root) return;
+  const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+  const textNodes = [];
+  while (walker.nextNode()) textNodes.push(walker.currentNode);
+  textNodes.forEach((node) => {
+    if (needsEnglishSurfaceNormalize(node.nodeValue)) node.nodeValue = zhText(node.nodeValue);
+  });
+  root.querySelectorAll("[aria-label], [title], [placeholder], [value]").forEach((node) => {
+    ["aria-label", "title", "placeholder", "value"].forEach((attr) => {
+      const value = node.getAttribute?.(attr);
+      if (value && needsEnglishSurfaceNormalize(value)) node.setAttribute(attr, zhText(value));
+    });
+  });
+}
+
+let englishSurfaceObserver = null;
+let englishSurfaceGuardRunning = false;
+let englishSurfaceGuardQueued = false;
+
+function scheduleEnglishSurfaceGuard() {
+  if (englishSurfaceGuardRunning || englishSurfaceGuardQueued) return;
+  englishSurfaceGuardQueued = true;
+  queueMicrotask(() => {
+    englishSurfaceGuardQueued = false;
+    englishSurfaceGuardRunning = true;
+    enforceEnglishSurface(document.body);
+    englishSurfaceGuardRunning = false;
+  });
+}
+
+function startEnglishSurfaceGuard() {
+  if (englishSurfaceObserver || typeof MutationObserver === "undefined") {
+    enforceEnglishSurface(document.body);
+    return;
+  }
+  englishSurfaceObserver = new MutationObserver(scheduleEnglishSurfaceGuard);
+  englishSurfaceObserver.observe(document.body, {
+    attributes: true,
+    attributeFilter: ["aria-label", "title", "placeholder", "value"],
+    characterData: true,
+    childList: true,
+    subtree: true
+  });
+  enforceEnglishSurface(document.body);
+}
+
 function zhWorkerName(value = "", id = "") {
-  return WORKER_NAME_ZH[value] || WORKER_NAME_ZH[id] || zhText(value || id || "员工");
+  const names = {
+    "Coding猿": "Codingape",
+    "Judge猿": "Judgeape",
+    "Ops猿": "Opsape",
+    "Quant猿": "Quantape",
+    "Security猿": "Securityape",
+    "Hunter猿": "Hunterape",
+    "coding-yuan": "Codingape",
+    "judge-yuan": "Judgeape",
+    "ops-yuan": "Opsape"
+  };
+  return names[value] || names[id] || zhText(value || id || "Worker");
 }
 
 function zhEvidenceRef(value = "") {
@@ -1053,59 +877,59 @@ function zhEvidenceRef(value = "") {
   const compact = file
     .replace(/^task_/, "")
     .replace(/\.json$/i, "")
-    .replace(/manifest$/i, "清单");
-  const displayId = compact === "清单" && parent
-    ? `${formatRunId(parent)} 清单`
+    .replace(/manifest$/i, "manifest");
+  const displayId = compact === "manifest" && parent
+    ? `${formatRunId(parent)} manifest`
     : compact;
   const kind = text.includes("data/proposals/")
-    ? "补丁方案"
+    ? "Patch proposal"
     : text.includes("data/verifications/")
-      ? "验证结果"
+      ? "Verification result"
       : text.includes("data/patch-runs/")
-        ? "沙盒补丁包"
+        ? "Sandbox patch package"
         : text.includes("data/patch-applies/")
-          ? "写入闸门清单"
+          ? "Apply Gate manifest"
           : text.includes("data/patch-sandbox/")
-            ? "沙盒清单"
+            ? "Sandbox manifest"
             : text.includes("data/patch-snapshots/")
-              ? "回滚快照"
+              ? "Rollback snapshot"
               : text.includes("data/evidence/")
-                ? "运行证据"
+                ? "Run evidence"
                 : "";
-  return kind ? `${kind}：${displayId}` : zhText(text);
+  return kind ? `${kind}: ${displayId}` : zhText(text);
 }
 
 function formatRunId(value = "") {
   const raw = String(value || "").trim();
-  if (!raw || raw === "no active run") return "暂无运行";
+  if (!raw || raw === "no active run") return "No run";
   const compact = raw.startsWith("task_")
     ? raw.split("_").filter(Boolean).at(-1) || raw.slice(-6)
     : raw.slice(-8);
-  return `运行 #${compact}`;
+  return `Run #${compact}`;
 }
 
 function formatApprovalId(value = "") {
   const raw = String(value || "").trim();
-  if (!raw) return "审批 #待生成";
+  if (!raw) return "Approval #pending";
   const compact = raw.toLowerCase().includes("task_")
     ? raw.split("_").filter(Boolean).at(-1) || raw.slice(-6)
     : raw.slice(-6);
-  return `审批 #${compact}`;
+  return `Approval #${compact}`;
 }
 
 function compactHash(value = "") {
   const raw = String(value || "").trim();
-  if (!raw) return "无哈希";
+  if (!raw) return "No hash";
   return raw.length > 18 ? `${raw.slice(0, 10)}...${raw.slice(-6)}` : raw;
 }
 
 function confirmationLockHtml(value = "") {
-  const phrase = String(value || "").trim() || "暂无确认语";
+  const phrase = String(value || "").trim() || "No confirmation phrase";
   return `
     <div class="confirmation-lock">
-      <span>必须逐字输入</span>
+      <span>Type exactly</span>
       <code>${escapeHtml(phrase)}</code>
-      <small>当前页面只展示确认文本，不会替你确认或写入项目文件。</small>
+      <small>This page only displays the confirmation text; it will not confirm or write project files for you.</small>
     </div>
   `;
 }
@@ -1113,14 +937,14 @@ function confirmationLockHtml(value = "") {
 function zhEventTitle(event) {
   const title = zhText(event?.title || "");
   const redundantPrefixes = {
-    apply_gate_pending: /^写入闸门已检查：/,
-    human_gate_approved: /^人工审批通过：|^Judge猿批准沙盒预检：/,
-    patch_run_ready: /^沙盒补丁包已生成：|^补丁执行器就绪：/,
-    patch_run_blocked: /^沙盒补丁已阻断：|^补丁执行器已阻断：/,
-    task_completed: /^已完成：/,
-    task_running: /^运行中：/,
-    task_queued: /^排队中：/,
-    task_blocked: /^已阻断：/
+    apply_gate_pending: /^Apply Gate checked: /,
+    human_gate_approved: /^Human approval granted: |^Judgeape approved sandbox preflight: /,
+    patch_run_ready: /^Sandbox patch package ready: |^Patch runner ready: /,
+    patch_run_blocked: /^Sandbox patch blocked: |^Patch runner blocked: /,
+    task_completed: /^Completed: /,
+    task_running: /^Running: /,
+    task_queued: /^Queued: /,
+    task_blocked: /^Blocked: /
   };
   return title.replace(redundantPrefixes[event?.type] || /^$/, "").trim() || title;
 }
@@ -1130,13 +954,13 @@ function relativeTime(timestamp) {
   const value = typeof timestamp === "string" ? Date.parse(timestamp) : timestamp;
   if (!Number.isFinite(value)) return "--";
   const seconds = Math.max(1, Math.round((Date.now() - value) / 1000));
-  if (seconds < 60) return `${seconds}秒前`;
+  if (seconds < 60) return `${seconds}s ago`;
   const minutes = Math.round(seconds / 60);
-  if (minutes < 60) return `${minutes}分钟前`;
+  if (minutes < 60) return `${minutes}m ago`;
   const hours = Math.round(minutes / 60);
-  if (hours < 48) return `${hours}小时前`;
+  if (hours < 48) return `${hours}h ago`;
   const days = Math.round(hours / 24);
-  return `${days}天前`;
+  return `${days}d ago`;
 }
 
 function sortedProjects(projects) {
@@ -1151,19 +975,19 @@ function sortedProjects(projects) {
 function statusCaption(project) {
   const changes = project.repo.changeCount;
   const ports = project.runningPorts.length;
-  if (ports) return `${ports} 个端口在线`;
-  if (changes) return `${changes} 个文件信号`;
-  if (project.packages.length) return `${project.packages.length} 个包`;
-  return "安静目录";
+  if (ports) return `${ports} ports online`;
+  if (changes) return `${changes} file signals`;
+  if (project.packages.length) return `${project.packages.length} packages`;
+  return "Quiet folder";
 }
 
 function riskLabel(risk) {
   const labels = {
-    high: "人工闸门",
-    low: "低风险",
-    medium: "需复核"
+    high: "Human Gate",
+    low: "Low risk",
+    medium: "Needs review"
   };
-  return labels[risk] || "需复核";
+  return labels[risk] || "Needs review";
 }
 
 function preferredProject(snapshot) {
@@ -1361,7 +1185,7 @@ async function postJson(url, payload, options = {}) {
   });
   if (!response.ok) {
     const body = await response.json().catch(() => ({}));
-    throw new Error(body.error || `请求失败：${response.status}`);
+    throw new Error(body.error || `Request failed: ${response.status}`);
   }
   return response.json();
 }
@@ -1370,7 +1194,7 @@ async function fetchJson(url) {
   const response = await fetch(url, { cache: "no-store" });
   if (!response.ok) {
     const body = await response.json().catch(() => ({}));
-    throw new Error(body.error || `请求失败：${response.status}`);
+    throw new Error(body.error || `Request failed: ${response.status}`);
   }
   return response.json();
 }
@@ -1547,8 +1371,8 @@ function demoRunErrorMessage(error) {
   return zhText(message || "演示运行失败。安全闸门仍保持阻断。");
 }
 
-function uiErrorMessage(error, fallback = "操作失败") {
-  return zhText(String(error?.message || error || fallback || "操作失败"));
+function uiErrorMessage(error, fallback = "Operation failed") {
+  return zhText(String(error?.message || error || fallback || "Operation failed"));
 }
 
 function setLiveRunStatus(status, message = "", error = "", patch = {}) {
@@ -1625,12 +1449,12 @@ function completedRunReceiptMessage(live = {}, task = null) {
   const runLabel = task?.id ? `${formatRunId(task.id)} · ` : "";
   const mode = live.mode || missionModeFromTask(task);
   const messages = {
-    review_only: "证据包已刷新；本次未生成补丁，也未进入写入闸门",
-    proposal: "证据和方案已刷新；本次未运行验证，也未进入写入闸门",
-    verify: "证据、方案和验证已刷新；本次未进入写入闸门",
-    sandbox_patch: "证据、沙盒补丁和写入闸门已刷新"
+    review_only: "Evidence Pack refreshed; this run did not generate a patch or enter Apply Gate",
+    proposal: "Evidence and plan refreshed; this run did not run verification or enter Apply Gate",
+    verify: "Evidence, plan, and verification refreshed; this run did not enter Apply Gate",
+    sandbox_patch: "Evidence, sandbox patch, and Apply Gate refreshed"
   };
-  return `闭环完成 · ${runLabel}${messages[mode] || "运行证据已刷新"}`;
+  return `Loop complete · ${runLabel}${messages[mode] || "Run evidence refreshed"}`;
 }
 
 function startLiveRunPolling() {
@@ -1659,8 +1483,8 @@ function renderLiveRunState() {
   const buttonStates = [
     [elements.newMissionButton, "运行当前任务", "编程猿工作中"],
     [elements.assignMissionButton, missionModeActionLabel(selectedMode), missionModeRunningLabel(selectedMode)],
-    [elements.runCodingLoopButton, "运行闭环", "闭环运行中"],
-    [elements.runCodingLoopHeroButton, "运行三猿演示", "三猿工作中"]
+    [elements.runCodingLoopButton, "Run Loop", "Loop running"],
+    [elements.runCodingLoopHeroButton, "Run Three-Worker Demo", "Three workers running"]
   ].filter(([button]) => Boolean(button));
 
   for (const [button, idleLabel, runningLabel] of buttonStates) {
@@ -1693,8 +1517,8 @@ function renderLiveRunState() {
       if (elements.commandMode) {
         elements.commandMode.textContent = `${missionModeLabel(live.mode)} · ${runPhaseLabel(phase)} · ${liveRunElapsedLabel()}`;
       }
-      if (elements.commandPhase) elements.commandPhase.textContent = `阶段：${runPhaseLabel(phase)}`;
-      if (elements.commandRun) elements.commandRun.textContent = `运行：${formatRunId(task.id)}`;
+      if (elements.commandPhase) elements.commandPhase.textContent = `Phase: ${runPhaseLabel(phase)}`;
+      if (elements.commandRun) elements.commandRun.textContent = `Run: ${formatRunId(task.id)}`;
       setCommandRunReceipt("running", `真实运行已接入 · ${formatRunId(task.id)} · ${runPhaseLabel(phase)} · ${liveRunElapsedLabel()}`);
       renderCommandProgress(task, director);
       return;
@@ -1704,9 +1528,9 @@ function renderLiveRunState() {
     if (elements.stageTitle) elements.stageTitle.textContent = message;
     if (elements.roomTitle) elements.roomTitle.textContent = "三猿闭环运行中";
     if (elements.commandMode) elements.commandMode.textContent = `${missionModeLabel(live.mode)} · 真实接口运行中 · ${liveRunElapsedLabel()}`;
-    if (elements.commandPhase) elements.commandPhase.textContent = "阶段：创建运行";
-    if (elements.commandRun) elements.commandRun.textContent = "运行：等待编号";
-    setCommandRunReceipt("running", `已提交后端 · 等待真实事件 · ${liveRunElapsedLabel()}`);
+    if (elements.commandPhase) elements.commandPhase.textContent = "Phase: creating run";
+    if (elements.commandRun) elements.commandRun.textContent = "Run: waiting for ID";
+    setCommandRunReceipt("running", `Submitted to backend · waiting for real events · ${liveRunElapsedLabel()}`);
     renderCommandProgress(null, { focusNode: "task", progress: 6, phase: "queued" });
     if (elements.latestEvidenceStatus) elements.latestEvidenceStatus.textContent = "后台执行中";
     if (elements.latestEvidenceSummary) {
@@ -3181,9 +3005,9 @@ async function copyCompanyShareReport() {
       throw new Error("clipboard_unavailable");
     }
     await navigator.clipboard.writeText(card.shareText);
-    setControlStatus("战报文案已复制");
+    setControlStatus("Report copy copied");
   } catch {
-    setControlStatus("分享卡已高亮，可手动复制战报文案");
+    setControlStatus("Share card is highlighted; you can copy the report text manually");
   }
 
   window.setTimeout(() => {
@@ -3199,7 +3023,7 @@ function localJudgeProviderLabel(provider) {
     ollama: "Ollama",
     openai: "OpenAI",
     openai_compatible: "OpenAI-compatible",
-    disabled: "未启用"
+    disabled: "Disabled"
   };
   return labels[provider] || zhText(provider || "未启用");
 }
@@ -3231,35 +3055,35 @@ function localJudgeStartupCommand(localJudge = state.snapshot?.localJudge || {})
 function missionInputTitle(project) {
   const raw = elements.missionInput?.value?.trim() || "";
   if (raw) return raw.slice(0, 180);
-  return `检查${zhText(project?.name || "当前项目")}，采集证据、生成复核方案，并由运维猿守住写入闸门`;
+  return `Inspect ${zhText(project?.name || "current project")}, collect evidence, draft a review plan, and keep Apply Gate guarded by Opsape`;
 }
 
 function missionModeLabel(mode) {
   const labels = {
-    review_only: "只采集证据",
-    proposal: "只生成方案",
-    verify: "审查 + 验证",
-    sandbox_patch: "完整沙盒闭环"
+    review_only: "Evidence only",
+    proposal: "Plan only",
+    verify: "Review + verification",
+    sandbox_patch: "Full sandbox loop"
   };
   return labels[mode] || labels.sandbox_patch;
 }
 
 function missionModeActionLabel(mode) {
   const labels = {
-    review_only: "采集证据",
-    proposal: "生成方案",
-    verify: "审查验证",
-    sandbox_patch: "运行闭环"
+    review_only: "Collect Evidence",
+    proposal: "Generate Plan",
+    verify: "Review + Verify",
+    sandbox_patch: "Run Loop"
   };
   return labels[mode] || labels.sandbox_patch;
 }
 
 function missionModeRunningLabel(mode) {
   const labels = {
-    review_only: "证据采集中",
-    proposal: "方案生成中",
-    verify: "审查验证中",
-    sandbox_patch: "闭环运行中"
+    review_only: "Collecting evidence",
+    proposal: "Generating plan",
+    verify: "Reviewing and verifying",
+    sandbox_patch: "Loop running"
   };
   return labels[mode] || labels.sandbox_patch;
 }
@@ -3811,26 +3635,26 @@ async function submitPilotFeedback(event) {
 async function testLocalJudgeConnection() {
   if (!elements.testLocalJudgeButton) return;
   elements.testLocalJudgeButton.disabled = true;
-  elements.testLocalJudgeButton.textContent = "检测中";
-  setControlStatus("正在检测本地审核猿");
+  elements.testLocalJudgeButton.textContent = "Testing";
+  setControlStatus("Testing local Judge model");
 
   try {
     const result = await apiFetch("/api/local-judge/status");
     const ok = result.ok;
-    elements.localJudgeStatus.textContent = ok ? "连接正常" : "连接失败";
+    elements.localJudgeStatus.textContent = ok ? "Connected" : "Connection failed";
     elements.localJudgeStatus.className = ok ? "is-ready" : "is-warning";
     elements.localJudgeSummary.textContent = ok
-      ? `已连接 ${localJudgeProviderLabel(result.provider)}，可用模型：${(result.models || []).slice(0, 3).join("、") || zhText(result.model)}`
-      : zhText(result.error || "本地模型服务未响应。");
-    setControlStatus(ok ? "本地审核猿连接正常" : "本地审核猿连接失败");
+      ? `Connected to ${localJudgeProviderLabel(result.provider)}. Available models: ${(result.models || []).slice(0, 3).join(", ") || zhText(result.model)}`
+      : zhText(result.error || "Local model service did not respond.");
+    setControlStatus(ok ? "Local Judge model connected" : "Local Judge model connection failed");
   } catch (error) {
-    elements.localJudgeStatus.textContent = "连接失败";
+    elements.localJudgeStatus.textContent = "Connection failed";
     elements.localJudgeStatus.className = "is-warning";
-    elements.localJudgeSummary.textContent = zhText(error?.message || "检测失败");
-    setControlStatus("本地审核猿检测失败");
+    elements.localJudgeSummary.textContent = zhText(error?.message || "Test failed");
+    setControlStatus("Local Judge model test failed");
   } finally {
     elements.testLocalJudgeButton.disabled = false;
-    elements.testLocalJudgeButton.textContent = "测试连接";
+    elements.testLocalJudgeButton.textContent = "Test Connection";
   }
 }
 
@@ -3874,14 +3698,14 @@ function renderServiceHealthPanel(snapshot) {
   const warnings = items.filter((item) => ["manual", "missing"].includes(item.status));
   const managed = items.filter((item) => ["online", "managed", "configured"].includes(item.status));
 
-  elements.serviceHealthStatus.textContent = warnings.length ? "需留意" : "已托管";
+  elements.serviceHealthStatus.textContent = warnings.length ? "Needs attention" : "Managed";
   elements.serviceHealthStatus.className = warnings.length ? "is-warning" : "is-ready";
   elements.serviceHealthSummary.textContent = warnings.length
-    ? "公网或后台守护还有待确认，但主服务仍保持旁路可见。"
-    : `本地服务、公网入口、Cloudflare 隧道和后台守护已确认 ${managed.length}/${items.length}。`;
+    ? "Public entry or daemon hosting still needs confirmation, but the main service remains visible."
+    : `Local service, public entry, Cloudflare tunnel, and daemon hosting confirmed ${managed.length}/${items.length}.`;
   elements.serviceHealthList.innerHTML = items.length
     ? items.map(serviceHealthCardTemplate).join("")
-    : `<div class="service-health-item tone-warning"><strong>暂无健康快照</strong><p>请刷新页面或检查服务进程。</p></div>`;
+    : `<div class="service-health-item tone-warning"><strong>No health snapshot yet</strong><p>Refresh the page or check the service process.</p></div>`;
 }
 
 function operationalStatusTone(status) {
@@ -3903,30 +3727,30 @@ function operationalCheckTemplate(check = {}) {
 function operationalActionTemplate(action = {}) {
   return `
     <div class="ops-next-action">
-      <strong>${escapeHtml(zhText(action.title || "下一步"))}</strong>
-      <span>${escapeHtml(zhText(action.detail || "继续补齐运营条件。"))}</span>
+      <strong>${escapeHtml(zhText(action.title || "Next action"))}</strong>
+      <span>${escapeHtml(zhText(action.detail || "Continue completing operational requirements."))}</span>
     </div>
   `;
 }
 
 function compactStatusLabel(status) {
-  if (status === "passed" || status === "ready" || status === "connected") return "通过";
-  if (status === "blocked") return "阻断";
-  if (status === "warning" || status === "ready_with_warnings") return "提示";
-  if (status === "failed") return "失败";
-  return "等待";
+  if (status === "passed" || status === "ready" || status === "connected") return "Passed";
+  if (status === "blocked") return "Blocked";
+  if (status === "warning" || status === "ready_with_warnings") return "Warning";
+  if (status === "failed") return "Failed";
+  return "Waiting";
 }
 
 function aiwcConfigTemplate(item = {}) {
   const value = item.configured
     ? item.secret
-      ? "已配置，已隐藏"
-      : item.displayValue || "已配置"
-    : "缺失";
+      ? "Configured, hidden"
+      : item.displayValue || "Configured"
+    : "Missing";
   return `
     <div class="aiwc-config-item ${item.configured ? "is-configured" : "is-missing"}">
       <span>${escapeHtml(item.key || "AIWC_CONFIG")}</span>
-      <strong>${escapeHtml(zhText(item.label || "配置项"))}</strong>
+      <strong>${escapeHtml(zhText(item.label || "Config item"))}</strong>
       <small>${escapeHtml(value)}</small>
     </div>
   `;
@@ -4935,16 +4759,16 @@ function proposalInsightHtml(proposal) {
   const aiPatch = proposal.aiPatch || {};
   const aiFailureHtml = aiPatch.status === "blocked" || aiPatch.blockers?.length
     ? `
-      <h4>AI Patch 失败原因</h4>
+      <h4>AI Patch Failure Reason</h4>
       ${insightList((aiPatch.blockers || []).map((blocker) => {
         const id = blocker.id || "";
-        if (/diff_missing|diff_headers|diff_hunk|diff_file/i.test(id)) return "模型没有返回有效 diff 或 patch 格式错误";
-        if (/sensitive/i.test(id)) return "patch 触碰敏感文件，已阻断";
-        if (/outside|root|path/i.test(id)) return "路径越过 project root，已阻断";
-        if (/verification_failed/i.test(id)) return "verification 失败，retry 后仍失败";
-        if (/model|provider|api_key|demo/i.test(id)) return "模型未配置或连接失败";
-        if (/context/i.test(id)) return "context 不足，无法生成可靠 patch";
-        return blocker.title || "AI patch 未通过安全策略";
+        if (/diff_missing|diff_headers|diff_hunk|diff_file/i.test(id)) return "The model did not return a valid diff, or the patch format is invalid.";
+        if (/sensitive/i.test(id)) return "The patch touched a sensitive file and was blocked.";
+        if (/outside|root|path/i.test(id)) return "The path escaped the project root and was blocked.";
+        if (/verification_failed/i.test(id)) return "Verification failed and the retry did not recover.";
+        if (/model|provider|api_key|demo/i.test(id)) return "The model is not configured or the provider connection failed.";
+        if (/context/i.test(id)) return "The context was not enough to generate a reliable patch.";
+        return blocker.title || "AI patch did not pass the safety policy.";
       }))}
     `
     : "";
@@ -5158,6 +4982,7 @@ function render() {
   document.querySelectorAll(".filter-button").forEach((button) => {
     button.classList.toggle("is-active", button.dataset.filter === state.filter);
   });
+  enforceEnglishSurface(document.body);
 }
 
 function visibleProjects(snapshot) {
@@ -7900,6 +7725,7 @@ function attachLocalOfficeHandlers() {
 }
 
 async function bootAppMode() {
+  startEnglishSurfaceGuard();
   if (APP_MODE === AppMode.publicHome) {
     renderPublicHome();
     return;

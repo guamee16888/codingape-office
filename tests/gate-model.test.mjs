@@ -45,7 +45,7 @@ test("gateRiskExplanation explains apply confirmation blockers", () => {
     }
   };
 
-  assert.match(gateRiskExplanation(task), /精确人工确认/);
+  assert.match(gateRiskExplanation(task), /exact human confirmation/);
 });
 
 test("gateApprovalChecklistFromTask exposes approval facts without allowing writes", () => {
@@ -65,10 +65,10 @@ test("gateApprovalChecklistFromTask exposes approval facts without allowing writ
 
   assert.deepEqual(checklist.affectedFiles, ["src/worker-signal.js"]);
   assert.equal(checklist.requiredConfirmation, "APPLY task_approval");
-  assert.ok(checklist.willHappen.some((line) => /预检/.test(line)));
-  assert.ok(checklist.willNotHappen.some((line) => /不会绕过人工闸门/.test(line)));
-  assert.ok(checklist.blockers.some((line) => /确认语/.test(line)));
-  assert.ok(checklist.blockers.some((line) => /项目文件写入保持阻断/.test(line)));
+  assert.ok(checklist.willHappen.some((line) => /preflight/.test(line)));
+  assert.ok(checklist.willNotHappen.some((line) => /Human Gate/.test(line)));
+  assert.ok(checklist.blockers.some((line) => /confirmation/.test(line)));
+  assert.ok(checklist.blockers.some((line) => /Project file writes remain blocked/.test(line)));
 });
 
 test("gate proof summary counts the full auditable close loop", () => {
@@ -114,7 +114,7 @@ test("gate verdict makes blocked apply the first-class safety message", () => {
   const verdict = gateVerdictFromTask(task);
 
   assert.equal(verdict.tone, "blocked");
-  assert.equal(verdict.headline, "写入已阻断");
+  assert.equal(verdict.headline, "Write Is Blocked");
   assert.equal(verdict.proofLabel, "6/6");
-  assert.equal(verdict.applyLabel, "需要确认");
+  assert.equal(verdict.applyLabel, "Requires confirmation");
 });

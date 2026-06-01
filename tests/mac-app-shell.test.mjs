@@ -14,7 +14,7 @@ test("Mac app shell builds a minimal installable development app", async () => {
   const swift = await readProjectFile("mac-app/CodingYuanOffice.swift");
 
   assert.equal(pkg.scripts["build:mac-app"], "bash scripts/build-mac-app.sh");
-  assert.match(script, /APP_NAME="Coding猿 Office"/);
+  assert.match(script, /APP_NAME="Codingape Office"/);
   assert.match(script, /APP_DIR="\$ROOT_DIR\/dist\/mac\/\$APP_NAME\.app"/);
   assert.match(script, /swiftc/);
   assert.match(script, /repo-root\.txt/);
@@ -25,8 +25,8 @@ test("Mac app shell builds a minimal installable development app", async () => {
   assert.ok(swift.includes(String.raw`URL(string: "http://127.0.0.1:\(port)/office")`));
   assert.match(swift, /process\.terminate\(\)/);
   assert.match(swift, /portOwnerDescription\(\)/);
-  assert.match(swift, /4142 端口被占用/);
-  assert.match(swift, /Node\.js 未找到/);
+  assert.match(swift, /Port 4142 is already in use/);
+  assert.match(swift, /Node\.js not found/);
   assert.match(swift, /renderStartupFailurePage\(\)/);
   assert.match(swift, /WKScriptMessageHandler/);
   assert.match(swift, /codingYuanOffice/);

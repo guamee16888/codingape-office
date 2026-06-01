@@ -28,9 +28,9 @@ test("missionDirectorForTask routes apply blocked work to Ops and Gate", () => {
   assert.equal(director.focusWorkerId, "ops-yuan");
   assert.equal(director.inspectorTab, "gate");
   assert.equal(director.evidenceCompleteness.label, "6/6");
-  assert.equal(director.humanGateStatus, "已批准");
-  assert.equal(director.applyGateStatus, "需要确认");
-  assert.match(director.safetyLine, /不会修改项目文件/);
+  assert.equal(director.humanGateStatus, "Approved");
+  assert.equal(director.applyGateStatus, "Requires confirmation");
+  assert.match(director.safetyLine, /no write before the confirmation phrase/i);
 });
 
 test("missionDirectorForTask keeps sandbox diff in Evidence before apply gate", () => {
@@ -57,8 +57,8 @@ test("missionDirectorForTask keeps sandbox diff in Evidence before apply gate", 
   assert.equal(director.focusWorkerId, "coding-yuan");
   assert.equal(director.inspectorTab, "evidence");
   assert.equal(director.evidenceCompleteness.label, "5/6");
-  assert.equal(director.applyGateStatus, "默认阻断");
-  assert.match(director.nextAction, /差异预览/);
+  assert.equal(director.applyGateStatus, "Blocked by default");
+  assert.match(director.nextAction, /diff preview/i);
 });
 
 test("missionDirectorForTask does not imply automatic apply when runner is armed", () => {
@@ -72,8 +72,8 @@ test("missionDirectorForTask does not imply automatic apply when runner is armed
 
   const director = missionDirectorForTask(task, { applyRunnerEnabled: true });
 
-  assert.equal(director.commandMode, "写入执行器已准备 · 仍需要精确确认");
-  assert.equal(director.gateStatus, "需要确认");
+  assert.equal(director.commandMode, "Apply runner ready · Exact confirmation still required");
+  assert.equal(director.gateStatus, "Requires confirmation");
 });
 
 test("missionDirectorForTask describes review-only missions as evidence complete", () => {
@@ -87,9 +87,9 @@ test("missionDirectorForTask describes review-only missions as evidence complete
   const director = missionDirectorForTask(task);
 
   assert.equal(director.focusNode, "evidence");
-  assert.equal(director.phaseLabel, "证据已采集");
+  assert.equal(director.phaseLabel, "Evidence captured");
   assert.equal(director.progress, 35);
-  assert.match(director.commandMode, /只读证据已完成/);
-  assert.match(director.safetyLine, /没有生成补丁/);
-  assert.match(director.safetyLine, /没有修改项目文件/);
+  assert.match(director.commandMode, /Read-only evidence complete/);
+  assert.match(director.safetyLine, /generated no patch/);
+  assert.match(director.safetyLine, /modified no project files/);
 });

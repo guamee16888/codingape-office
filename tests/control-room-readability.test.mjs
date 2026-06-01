@@ -19,17 +19,17 @@ test("control-room stylesheet loads after the legacy base stylesheet", async () 
   assert.ok(controlRoomIndex > baseIndex);
 });
 
-test("company report share button copies Chinese report text", async () => {
+test("company report share button copies English report text", async () => {
   const html = await readProjectFile("public/index.html");
   const app = await readProjectFile("public/app.js");
   const css = await readProjectFile("public/control-room.css");
 
-  assert.match(html, /id="companyShareButton"[\s\S]*?>复制战报文案<\/button>/);
+  assert.match(html, /id="companyShareButton"[\s\S]*?>Copy Report Copy<\/button>/);
   assert.match(app, /async function copyCompanyShareReport\(\)/);
   assert.match(app, /navigator\.clipboard\?\.writeText/);
   assert.match(app, /await navigator\.clipboard\.writeText\(card\.shareText\)/);
-  assert.match(app, /setControlStatus\("战报文案已复制"\)/);
-  assert.match(app, /setControlStatus\("分享卡已高亮，可手动复制战报文案"\)/);
+  assert.match(app, /setControlStatus\("Report copy copied"\)/);
+  assert.match(app, /setControlStatus\("Share card is highlighted; you can copy the report text manually"\)/);
   assert.match(app, /elements\.companyShareButton\?\.addEventListener\("click", copyCompanyShareReport\)/);
   assert.match(css, /\.company-share-card\.is-copy-ready\s*{[^}]*animation:\s*companyShareCopyPulse 1\.1s ease-in-out 2 !important/s);
 });
@@ -40,21 +40,21 @@ test("coding loop buttons show live progress and block duplicate runs", async ()
   const css = await readProjectFile("public/control-room.css");
 
   assert.match(html, /id="missionComposer" class="mission-composer"/);
-  assert.match(html, /id="missionProjectSelect"[\s\S]*?aria-label="目标项目"/);
-  assert.match(html, /id="missionModeSelect"[\s\S]*?aria-label="任务模式"/);
-  assert.match(html, /<option value="sandbox_patch">完整沙盒闭环<\/option>/);
-  assert.match(html, /<option value="verify">审查 \+ 验证<\/option>/);
-  assert.match(html, /<option value="proposal">只生成方案<\/option>/);
-  assert.match(html, /<option value="review_only">只采集证据<\/option>/);
-  assert.match(html, /id="missionInput"[\s\S]*?placeholder="输入任务，例如：检查这个项目风险并生成可审计补丁建议"/);
-  assert.match(html, /id="assignMissionButton"[\s\S]*?>交给编程猿<\/button>/);
-  assert.match(html, /<div class="command-progress" aria-label="实时运行进度">/);
+  assert.match(html, /id="missionProjectSelect"[\s\S]*?aria-label="Target project"/);
+  assert.match(html, /id="missionModeSelect"[\s\S]*?aria-label="Mission mode"/);
+  assert.match(html, /<option value="sandbox_patch">Full sandbox loop<\/option>/);
+  assert.match(html, /<option value="verify">Review \+ verification<\/option>/);
+  assert.match(html, /<option value="proposal">Plan only<\/option>/);
+  assert.match(html, /<option value="review_only">Evidence only<\/option>/);
+  assert.match(html, /id="missionInput"[\s\S]*?placeholder="Enter a task, for example: inspect project risk and draft an auditable patch proposal"/);
+  assert.match(html, /id="assignMissionButton"[\s\S]*?>Assign to Codingape<\/button>/);
+  assert.match(html, /<div class="command-progress" aria-label="Live run progress">/);
   assert.match(html, /id="commandProgressBar"/);
   assert.match(html, /id="commandProgressSteps"/);
   assert.match(html, /id="commandRunReceipt" class="command-run-receipt" data-status="idle"/);
   assert.match(app, /\[elements\.newMissionButton, "运行当前任务", "编程猿工作中"\]/);
-  assert.match(app, /\[elements\.runCodingLoopButton, "运行闭环", "闭环运行中"\]/);
-  assert.match(app, /\[elements\.runCodingLoopHeroButton, "运行三猿演示", "三猿工作中"\]/);
+  assert.match(app, /\[elements\.runCodingLoopButton, "Run Loop", "Loop running"\]/);
+  assert.match(app, /\[elements\.runCodingLoopHeroButton, "Run Three-Worker Demo", "Three workers running"\]/);
   assert.match(app, /function missionInputTitle\(project\)/);
   assert.match(app, /function taskById\(taskId, snapshot = state\.snapshot\)/);
   assert.match(app, /function selectedMissionMode\(\)/);
@@ -82,16 +82,16 @@ test("coding loop buttons show live progress and block duplicate runs", async ()
   assert.match(app, /function setCommandRunReceipt\(status, message\)/);
   assert.match(app, /function completedRunReceiptMessage\(live = \{\}, task = null\)/);
   assert.match(app, /真实运行已接入 · \$\{formatRunId\(task\.id\)\} · \$\{runPhaseLabel\(phase\)\}/);
-  assert.match(app, /已提交后端 · 等待真实事件/);
-  assert.match(app, /证据包已刷新；本次未生成补丁，也未进入写入闸门/);
-  assert.match(app, /证据、沙盒补丁和写入闸门已刷新/);
+  assert.match(app, /Submitted to backend · waiting for real events/);
+  assert.match(app, /Evidence Pack refreshed; this run did not generate a patch or enter Apply Gate/);
+  assert.match(app, /Evidence, sandbox patch, and Apply Gate refreshed/);
   assert.match(app, /COMPACT_MISSION_FLOW_NODES/);
   assert.match(app, /elements\.commandProgressBar\.style\.width = `\$\{Math\.max\(0, Math\.min\(100, progress\)\)\}%`/);
   assert.match(app, /class="status-\$\{escapeHtml\(status\)\}\$\{active\}"/);
   assert.match(app, /button\.disabled = isRunning/);
   assert.match(app, /button\.setAttribute\("aria-busy", isRunning \? "true" : "false"\)/);
-  assert.match(app, /elements\.commandPhase\) elements\.commandPhase\.textContent = `阶段：\$\{runPhaseLabel\(phase\)\}`/);
-  assert.match(app, /elements\.commandRun\) elements\.commandRun\.textContent = `运行：\$\{formatRunId\(task\.id\)\}`/);
+  assert.match(app, /elements\.commandPhase\) elements\.commandPhase\.textContent = `Phase: \$\{runPhaseLabel\(phase\)\}`/);
+  assert.match(app, /elements\.commandRun\) elements\.commandRun\.textContent = `Run: \$\{formatRunId\(task\.id\)\}`/);
   assert.match(css, /#newMissionButton\.is-running,[\s\S]*?#runCodingLoopHeroButton\.is-running\s*{[^}]*animation:\s*liveRunButtonPulse 1\.4s ease-in-out infinite !important/s);
   assert.match(css, /v18: mission composer/);
   assert.match(css, /\.top-command-bar\s*{[^}]*height:\s*auto !important/s);
@@ -194,48 +194,28 @@ test("evidence diff and gate surfaces stay readable in the floating inspector", 
   assert.match(css, /\.audit-pack-footer button,[\s\S]*?\.gate-action-dock button\s*{[^}]*min-height:\s*44px !important/s);
 });
 
-test("common project names stay Chinese-first in the operator console", async () => {
+test("operator console is guarded to render English-first copy", async () => {
   const app = await readProjectFile("public/app.js");
   const html = await readProjectFile("public/index.html");
   const server = await readProjectFile("server.js");
 
-  assert.match(app, /"Gmgn Anomaly Radar":\s*"链上异常雷达"/);
-  assert.match(app, /"Sol Light Trader":\s*"索拉纳轻量交易台"/);
-  assert.match(app, /"Stock Quant Ai":\s*"股票量化智能体"/);
-  assert.match(app, /judge_review:\s*"审核复核"/);
-  assert.match(app, /编程猿闭环：检查/);
-  assert.match(app, /编程猿已从证据采集推进到人工复核补丁方案/);
-  assert.match(app, /Mission queued: \/i, "任务已排队："/);
-  assert.match(app, /Verification 通过: \/i, "验证通过："/);
-  assert.match(app, /Verification gated: \/i, "验证已被闸门拦住："/);
-  assert.match(app, /\\bjudge review\\b\/gi, "审核复核"/);
-  assert.match(app, /\\bevidence\\b\/gi, "证据"/);
-  assert.match(app, /\\bmedium risk patch plan\\b\/gi, "中风险补丁方案"/);
-  assert.match(app, /\\bread-only checks\\b\/gi, "项只读检查"/);
-  assert.match(server, /title:\s*`任务已排队：\$\{task\.title\}`/);
-  assert.match(server, /title:\s*`Coding猿已采集证据：\$\{task\.title\}`/);
-  assert.match(server, /title:\s*`Judge猿复核就绪：\$\{task\.title\}`/);
-  assert.match(server, /title:\s*`\$\{verification\.ok \? "验证通过" : "验证失败"\}：\$\{task\.title\}`/);
-  assert.match(server, /title:\s*`Ops猿完成写入闸门检查：\$\{task\.title\}`/);
+  assert.match(app, /function enforceEnglishSurface\(root = document\.body\)/);
+  assert.match(app, /new MutationObserver\(scheduleEnglishSurfaceGuard\)/);
+  assert.match(app, /"Codingape"/);
+  assert.match(server, /title:\s*`Task queued: \$\{task\.title\}`/);
+  assert.match(server, /title:\s*`Codingape collected evidence: \$\{task\.title\}`/);
+  assert.match(server, /title:\s*`Judgeape review ready: \$\{task\.title\}`/);
+  assert.match(server, /title:\s*`\$\{verification\.ok \? "Verification passed" : "Verification failed"\}: \$\{task\.title\}`/);
+  assert.match(server, /title:\s*`Opsape completed Apply Gate check: \$\{task\.title\}`/);
   assert.match(server, /function serverErrorMessageZh\(message = ""\)/);
-  assert.match(server, /Task not found\/i\.test\(text\)\) return "没有找到这个任务"/);
-  assert.match(server, /Project not found\/i\.test\(text\)\) return "没有找到这个项目"/);
-  assert.match(server, /Method not allowed\/i\.test\(text\)\) return "这个接口不支持当前请求方式"/);
+  assert.match(server, /Task not found\/i\.test\(text\)\) return "Task not found"/);
+  assert.match(server, /Project not found\/i\.test\(text\)\) return "Project not found"/);
+  assert.match(server, /Method not allowed\/i\.test\(text\)\) return "Method not allowed"/);
   assert.match(server, /JSON\.stringify\(\{ error: serverErrorMessageZh\(message\) \}/);
-  assert.match(app, /throw new Error\(body\.error \|\| `请求失败：\$\{response\.status\}`\)/);
-  assert.match(app, /function uiErrorMessage\(error, fallback = "操作失败"\)/);
-  assert.doesNotMatch(app, /Request failed/);
-  assert.doesNotMatch(app, /error\.message \|\| "Failed"/);
-  assert.doesNotMatch(server, /title:\s*`Mission queued:/);
-  assert.doesNotMatch(server, /title:\s*`Verification passed/);
-  assert.doesNotMatch(server, /title:\s*`Judge猿 review ready/);
-  assert.match(app, /待命：运行后会显示真实运行编号、阶段和闸门状态/);
-  assert.match(html, /待命：运行后会显示真实运行编号、阶段和闸门状态/);
-  assert.match(app, /暂无差异统计/);
-  assert.doesNotMatch(html, /run id/);
-  assert.doesNotMatch(app, /"Gmgn Anomaly Radar":\s*"GMGN 异常雷达"/);
-  assert.doesNotMatch(app, /"Sol Light Trader":\s*"Sol 轻量交易台"/);
-  assert.doesNotMatch(app, /"No diff stat"/);
+  assert.match(app, /throw new Error\(body\.error \|\| `Request failed: \$\{response\.status\}`\)/);
+  assert.match(app, /function uiErrorMessage\(error, fallback = "Operation failed"\)/);
+  assert.match(html, /Idle: after a run starts, this shows the real run ID, phase, and gate status/);
+  assert.doesNotMatch(html, /[\p{Script=Han}]/u);
 });
 
 test("diff review entry points open the evidence inspector at the diff section", async () => {
@@ -287,9 +267,9 @@ test("Stage-9 first-order screen reduces visual conversion friction", async () =
   assert.match(css, /body\[data-app-mode="local_office"\] \.active-mission-strip > h2\s*{[^}]*display:\s*block !important/s);
   assert.match(css, /\.station-meta\s*{[^}]*grid-template-columns:\s*repeat\(3, minmax\(0, 1fr\)\) !important/s);
   assert.match(css, /\.mission-flow-rail\.is-premium\s*{[^}]*grid-template-columns:\s*repeat\(10, minmax\(84px, 1fr\)\) !important/s);
-  assert.match(director, /等待写入确认 · 默认不改代码/);
-  assert.match(director, /可以检查，但还没写入/);
-  assert.match(director, /现在没有改项目文件；确认语通过前不会修改项目文件/);
+  assert.match(director, /Waiting for write confirmation · No auto-write/);
+  assert.match(director, /Ready to inspect; nothing written yet/);
+  assert.match(director, /Project files have not changed; no write before the confirmation phrase passes/);
   assert.match(audit, /No new business loop behavior/);
 });
 
@@ -394,8 +374,8 @@ test("operator console includes local model setup and connection test", async ()
   const css = await readProjectFile("public/control-room.css");
 
   assert.match(html, /<article class="local-model-panel">/);
-  assert.match(html, /id="testLocalJudgeButton"[\s\S]*?>测试连接<\/button>/);
-  assert.match(html, /id="copyLocalJudgeCommandButton"[\s\S]*?>复制启动命令<\/button>/);
+  assert.match(html, /id="testLocalJudgeButton"[\s\S]*?>Test Connection<\/button>/);
+  assert.match(html, /id="copyLocalJudgeCommandButton"[\s\S]*?>Copy Launch Command<\/button>/);
   assert.match(app, /async function testLocalJudgeConnection\(\)/);
   assert.match(app, /apiFetch\("\/api\/local-judge\/status"\)/);
   assert.match(app, /async function copyLocalJudgeCommand\(\)/);
@@ -415,13 +395,13 @@ test("operator console exposes service health for public launch reliability", as
   assert.match(server, /const PORT = Number\(process\.env\.PORT \|\| 4142\)/);
   assert.match(server, /PUBLIC_ENTRY_URL/);
   assert.match(server, /serviceHealth,\s*\n\s*operationalReadiness,\s*\n\s*companyReport/);
-  assert.match(server, /Cloudflare 隧道/);
-  assert.match(server, /后台守护/);
+  assert.match(server, /Cloudflare tunnel/);
+  assert.match(server, /Background daemon/);
   assert.match(html, /<article class="service-health-panel"/);
-  assert.match(html, /服务健康/);
+  assert.match(html, /Service Health/);
   assert.match(html, /id="serviceHealthList"/);
   assert.match(app, /function renderServiceHealthPanel\(snapshot\)/);
-  assert.match(app, /本地服务、公网入口、Cloudflare 隧道和后台守护/);
+  assert.match(app, /Local service, public entry, Cloudflare tunnel, and daemon hosting/);
   assert.match(app, /serviceHealthCardTemplate/);
   assert.match(css, /\.service-health-panel\s*{[^}]*display:\s*grid !important/s);
   assert.match(css, /\.service-health-item\.tone-warning\s*{[^}]*rgba\(255, 180, 84, 0\.24\)/s);

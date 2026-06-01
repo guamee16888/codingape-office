@@ -27,7 +27,7 @@ for tool in git node npm curl; do
 done
 
 if ! curl -fsS "$SERVICE_URL/api/status" >/dev/null 2>&1; then
-  echo "Starting local Coding猿 Office service for the 10-minute trial..."
+  echo "Starting local Codingape Office service for the 10-minute trial..."
   mkdir -p "$ROOT_DIR/dist/external-trial"
   (cd "$ROOT_DIR" && PORT=4142 npm run dev >"$ROOT_DIR/dist/external-trial/server.out.log" 2>"$ROOT_DIR/dist/external-trial/server.err.log") &
   STARTED_SERVER_PID="$!"
@@ -47,7 +47,7 @@ fi
 PROJECT_JSON="$(PROJECT_ROOT="$PROJECT_ROOT" node --input-type=module <<'NODE'
 const body = {
   path: process.env.PROJECT_ROOT,
-  name: "Coding猿 Beta First Order",
+  name: "Codingape Beta First Order",
   selected: true
 };
 process.stdout.write(JSON.stringify(body));
@@ -67,7 +67,7 @@ NODE
 
 RUN_RESPONSE="$(curl -sS -X POST "$SERVICE_URL/api/projects/$PROJECT_ID/coding-loop" \
   -H "content-type: application/json" \
-  -d '{"mode":"sandbox_patch","title":"给 README 增加一个 Coding猿 Beta 测试段落","safeFirstOrder":true}')"
+  -d '{"mode":"sandbox_patch","title":"Add a Codingape beta testing paragraph to README","safeFirstOrder":true}')"
 
 RUN_SUMMARY="$(RUN_RESPONSE="$RUN_RESPONSE" node --input-type=module <<'NODE'
 const response = JSON.parse(process.env.RUN_RESPONSE || "{}");
@@ -90,7 +90,7 @@ NODE
 )"
 
 cat <<EOF
-Coding猿 Office 10-minute first-order trial completed.
+Codingape Office 10-minute first-order trial completed.
 
 Project root:
 $PROJECT_ROOT

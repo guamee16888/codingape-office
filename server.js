@@ -147,56 +147,56 @@ const MIME_TYPES = {
 const WORKER_BLUEPRINTS = [
   {
     id: "coding-yuan",
-    name: "Coding猿",
-    mark: "猿",
+    name: "Codingape",
+    mark: "A",
     domain: "Engineering",
     accent: "teal",
-    idleTask: "等待代码、测试和合并请求任务",
+    idleTask: "Waiting for code, test, and pull request tasks",
     tools: ["codex", "terminal", "git", "browser"]
   },
   {
     id: "quant-yuan",
-    name: "Quant猿",
-    mark: "量",
+    name: "Quantape",
+    mark: "Q",
     domain: "Markets",
     accent: "gold",
-    idleTask: "观察市场系统和策略队列",
+    idleTask: "Watching market systems and strategy queues",
     tools: ["signals", "risk", "wallet", "charts"]
   },
   {
     id: "security-yuan",
-    name: "Security猿",
-    mark: "安",
+    name: "Securityape",
+    mark: "S",
     domain: "Security",
     accent: "rose",
-    idleTask: "准备执行扫描、策略检查和攻击路径分析",
+    idleTask: "Ready to run scans, policy checks, and attack-path analysis",
     tools: ["scanner", "policy", "audit", "evidence"]
   },
   {
     id: "ops-yuan",
-    name: "Ops猿",
-    mark: "运",
+    name: "Opsape",
+    mark: "O",
     domain: "Runtime",
     accent: "mint",
-    idleTask: "监控部署、边缘服务和事故面",
+    idleTask: "Monitoring deployments, edge services, and incident surfaces",
     tools: ["cloud", "logs", "runtime", "ssh"]
   },
   {
     id: "judge-yuan",
-    name: "Judge猿",
-    mark: "审",
+    name: "Judgeape",
+    mark: "J",
     domain: "Governance",
     accent: "violet",
-    idleTask: "等待审核、审批和发布证据",
+    idleTask: "Waiting for review, approval, and release evidence",
     tools: ["review", "evals", "checks", "approvals"]
   },
   {
     id: "hunter-yuan",
-    name: "Hunter猿",
-    mark: "猎",
+    name: "Hunterape",
+    mark: "H",
     domain: "Intel",
     accent: "cyan",
-    idleTask: "扫描研究、域名和外部信号",
+    idleTask: "Scanning research, domains, and external signals",
     tools: ["browser", "search", "intel", "notes"]
   }
 ];
@@ -524,44 +524,44 @@ function inferProjectTask({ projectName, workerName, status, repo, runningPorts,
   }
 
   if (status.key === "active") {
-    return `${workerName}正在处理${projectName}中的 ${repo.changeCount} 个本地变更`;
+    return `${workerName} is working through ${repo.changeCount} local change(s) in ${projectName}`;
   }
 
   if (status.key === "draft") {
-    return `${workerName}正在打包 ${repo.changeCount} 个待复核变更`;
+    return `${workerName} is packaging ${repo.changeCount} pending change(s) for review`;
   }
 
   const scripts = scriptNames(packages);
   const verificationScripts = scripts.filter((script) => /test|check|lint|type|verify|qa/i.test(script));
   if (status.key === "ready" && verificationScripts.length) {
-    return `${workerName}已有可运行验证：${verificationScripts.slice(0, 3).join(", ")}`;
+    return `${workerName} has runnable verification: ${verificationScripts.slice(0, 3).join(", ")}`;
   }
 
-  return `${workerName}正在等待下一次任务分配`;
+  return `${workerName} is standing by for the next assignment`;
 }
 
 function inferNextAction({ packages, repo, risk, status }) {
   if (risk.requiresApproval) {
-    return "部署、交易、钱包、重启或生产写入前必须人工确认";
+    return "Ask the human before deploy, trade, wallet, restart, or production writes";
   }
 
   if (hasScript(packages, /test|check|lint|type|verify|qa/i)) {
-    return status.key === "idle" ? "收到任务后运行验证" : "运行验证并附加证据";
+    return status.key === "idle" ? "Run verification after assignment" : "Run verification and attach evidence";
   }
 
   if (repo.changeCount > 0) {
-    return "复核差异并生成证据摘要";
+    return "Review the diff and create an evidence summary";
   }
 
-  return "分配明确任务，或接入实时运行环境";
+  return "Assign a concrete task or connect a live runtime";
 }
 
 function projectSignal(project) {
-  if (project.runningPorts.length) return `${project.runningPorts.length} 个端口在线信号`;
-  if (project.repo.changeCount) return `${project.repo.changeCount} 个 Git 变更信号`;
-  if (project.activity.recentFiles.length) return `${project.activity.recentFiles.length} 个最近文件信号`;
-  if (project.packages.length) return `${project.packages.length} 个包信号`;
-  return "安静工作区信号";
+  if (project.runningPorts.length) return `${project.runningPorts.length} port signal(s) online`;
+  if (project.repo.changeCount) return `${project.repo.changeCount} Git change signal(s)`;
+  if (project.activity.recentFiles.length) return `${project.activity.recentFiles.length} recent file signal(s)`;
+  if (project.packages.length) return `${project.packages.length} package signal(s)`;
+  return "Quiet workspace signal";
 }
 
 function buildWorkers(projects, tasks = []) {
@@ -591,22 +591,22 @@ function buildWorkers(projects, tasks = []) {
     );
 
     let status = "available";
-    let statusLabel = "可接单";
+    let statusLabel = "Available";
     if (hasBlockedTask) {
       status = "blocked";
-      statusLabel = "已阻断";
+      statusLabel = "Blocked";
     } else if (hasRunning) {
       status = "running";
-      statusLabel = "运行中";
+      statusLabel = "Running";
     } else if (hasWorking || assignedTasks.length) {
       status = "working";
-      statusLabel = "工作中";
+      statusLabel = "Working";
     } else if (hasReady) {
       status = "ready";
-      statusLabel = "就绪";
+      statusLabel = "Ready";
     } else if (assignedProjects.length) {
       status = "watching";
-      statusLabel = "观察中";
+      statusLabel = "Watching";
     }
 
     return {
@@ -616,7 +616,7 @@ function buildWorkers(projects, tasks = []) {
       domain: blueprint.domain,
       accent: blueprint.accent,
       launchTier: LAUNCH_CORE_WORKER_IDS.has(blueprint.id) ? "core" : "bench",
-      launchLabel: LAUNCH_CORE_WORKER_IDS.has(blueprint.id) ? "核心员工" : "即将入职",
+      launchLabel: LAUNCH_CORE_WORKER_IDS.has(blueprint.id) ? "Core worker" : "Next hire",
       status,
       statusLabel,
       queue: liveProjects.length + assignedTasks.length,
@@ -652,7 +652,7 @@ function normalizeManualEvent(event) {
     projectId: event.projectId || "",
     type: event.type || "operator_event",
     title: event.title,
-    detail: event.detail || "操作员日志",
+    detail: event.detail || "Operator log",
     risk: event.risk || "low",
     timestamp: event.timestamp || event.createdAt || new Date().toISOString(),
     evidence: event.evidence || []
@@ -662,12 +662,12 @@ function normalizeManualEvent(event) {
 function taskEvent(task) {
   const action =
     task.status === "completed"
-      ? "已完成"
+      ? "Completed"
       : task.status === "running"
-        ? "运行中"
+        ? "Running"
         : task.status === "blocked"
-          ? "已阻断"
-          : "排队中";
+          ? "Blocked"
+          : "Queued";
   return {
     id: `evt_${task.id}`,
     taskId: task.id,
@@ -678,7 +678,7 @@ function taskEvent(task) {
     projectId: task.projectId || "",
     type: `task_${task.status || "queued"}`,
     title: `${action}: ${task.title}`,
-    detail: task.projectName || "员工任务",
+    detail: task.projectName || "Worker task",
     risk: task.risk || "low",
     timestamp: task.updatedAt || task.createdAt,
     evidence: task.evidence || []
@@ -686,15 +686,15 @@ function taskEvent(task) {
 }
 
 function approvalEvent(approval) {
-  const statusText = approval.status === "pending" ? "需要审批" : `审批状态：${gateStatusLabel(approval.status)}`;
+  const statusText = approval.status === "pending" ? "Approval required" : `Approval status: ${gateStatusLabel(approval.status)}`;
   return {
     id: `evt_${approval.id}`,
     workerId: approval.workerId,
     workerName: approval.workerName,
     projectId: approval.projectId,
     type: "approval_gate",
-    title: `${statusText}：${approval.title}`,
-    detail: approval.projectName || "人工闸门",
+    title: `${statusText}: ${approval.title}`,
+    detail: approval.projectName || "Human Gate",
     risk: approval.risk,
     timestamp: approval.updatedAt || approval.createdAt,
     evidence: approval.evidence || []
@@ -716,7 +716,7 @@ function buildScanEvents(projects) {
         workerName: worker.name,
         projectId: project.id,
         type: "runtime",
-        title: `${worker.name}正在监控端口 ${project.runningPorts.map((port) => `:${port}`).join(", ")}`,
+        title: `${worker.name} is monitoring port(s) ${project.runningPorts.map((port) => `:${port}`).join(", ")}`,
         detail: project.name,
         risk: project.risk.key,
         timestamp: new Date(Date.now() - index * 1100).toISOString(),
@@ -731,7 +731,7 @@ function buildScanEvents(projects) {
         workerName: worker.name,
         projectId: project.id,
         type: "git_signal",
-        title: `${project.repo.changeCount} 个本地变更需要证据`,
+        title: `${project.repo.changeCount} local change(s) need evidence`,
         detail: project.name,
         risk: project.risk.key,
         timestamp: eventTimestamp(project, index * 1700),
@@ -746,7 +746,7 @@ function buildScanEvents(projects) {
         workerName: worker.name,
         projectId: project.id,
         type: "file_touch",
-        title: `最近改动：${project.activity.recentFiles[0].path}`,
+        title: `Recent touch: ${project.activity.recentFiles[0].path}`,
         detail: project.name,
         risk: "low",
         timestamp: eventTimestamp(project, 900 + index * 1300),
@@ -762,7 +762,7 @@ function buildScanEvents(projects) {
         workerName: worker.name,
         projectId: project.id,
         type: "verification",
-        title: `验证路径就绪：${verificationScripts.slice(0, 2).join(", ")}`,
+        title: `Verification path ready: ${verificationScripts.slice(0, 2).join(", ")}`,
         detail: project.name,
         risk: "low",
         timestamp: eventTimestamp(project, 2600 + index * 1500),
@@ -811,22 +811,22 @@ function taskIdFromCloseLoopApprovalId(approvalId = "") {
 
 function gateStatusLabel(status = "pending") {
   const labels = {
-    approved: "已批准",
-    changes_requested: "已要求返工",
-    held: "已挂起",
-    pending: "等待审批",
-    reviewed: "已复核"
+    approved: "Approved",
+    changes_requested: "Rework requested",
+    held: "Held",
+    pending: "Pending approval",
+    reviewed: "Reviewed"
   };
-  return labels[status] || "等待审批";
+  return labels[status] || "Pending approval";
 }
 
 function gateRiskLabel(risk = "medium") {
   const labels = {
-    high: "高风险",
-    low: "低风险",
-    medium: "中风险"
+    high: "High risk",
+    low: "Low risk",
+    medium: "Medium risk"
   };
-  return labels[risk] || "中风险";
+  return labels[risk] || "Medium risk";
 }
 
 function buildApprovalQueue(projects, tasks = [], decisions = []) {
@@ -867,9 +867,9 @@ function buildApprovalQueue(projects, tasks = [], decisions = []) {
       workerId: worker.id,
       workerName: worker.name,
       projectId: task.projectId,
-      projectName: task.projectName || "员工任务",
+      projectName: task.projectName || "Worker task",
       title: task.title,
-      reason: "高风险排队任务执行前必须经过人工闸门",
+      reason: "High-risk queued tasks must pass Human Gate before execution",
       risk: "high",
       status: decision?.status || "pending",
       gateType: "task_execution",
@@ -891,11 +891,11 @@ function buildApprovalQueue(projects, tasks = [], decisions = []) {
       workerId: "judge-yuan",
       workerName: eventWorkerName("judge-yuan"),
       projectId: task.projectId,
-      projectName: task.projectName || "员工任务",
-      title: `审核闸门：${task.title}`,
+      projectName: task.projectName || "Worker task",
+      title: `Review Gate: ${task.title}`,
       reason: verificationPassed
-        ? "验证已通过；人类可以批准这个受监督闭环结果。"
-        : "证据已存在，但验证未通过；请继续保持人工监督。",
+        ? "Verification passed; a human can approve this supervised loop result."
+        : "Evidence exists, but verification did not pass; keep human supervision in place.",
       risk: verificationPassed ? "medium" : "high",
       status,
       gateType: "close_loop",
@@ -992,8 +992,8 @@ function getRepoStatus(projectPath, rootChanges) {
   const changes = rootChanges.get(key) || [];
 
   return {
-    kind: "工作区",
-    branch: "工作区",
+    kind: "Workspace",
+    branch: "Workspace",
     changeCount: changes.length,
     changes: changes.slice(0, 6).map((change) => `${change.code} ${change.path}`),
     lastCommit: ""
@@ -1003,11 +1003,11 @@ function getRepoStatus(projectPath, rootChanges) {
 function statusFor({ repo, packages, activity, runningPorts }) {
   const minutesSinceTouch = activity.latest ? (Date.now() - activity.latest) / 60000 : Infinity;
 
-  if (runningPorts.length) return { key: "running", label: "运行中", tone: "live" };
-  if (repo.changeCount > 0 && minutesSinceTouch < 90) return { key: "active", label: "工作中", tone: "hot" };
-  if (repo.changeCount > 0) return { key: "draft", label: "草稿", tone: "warm" };
-  if (packages.some((pkg) => pkg.scripts?.test || pkg.scripts?.check)) return { key: "ready", label: "就绪", tone: "cool" };
-  return { key: "idle", label: "待命", tone: "quiet" };
+  if (runningPorts.length) return { key: "running", label: "Running", tone: "live" };
+  if (repo.changeCount > 0 && minutesSinceTouch < 90) return { key: "active", label: "Working", tone: "hot" };
+  if (repo.changeCount > 0) return { key: "draft", label: "Draft", tone: "warm" };
+  if (packages.some((pkg) => pkg.scripts?.test || pkg.scripts?.check)) return { key: "ready", label: "Ready", tone: "cool" };
+  return { key: "idle", label: "Idle", tone: "quiet" };
 }
 
 function buildProjectFromPath({ id, folder, name, projectPath, index, rootChanges, listeningPorts, source = "workspace", selected = false }) {
@@ -1182,28 +1182,28 @@ function buildAiwcConfigStatus(env = process.env) {
   const items = [
     {
       key: "AIWC_BASE_URL",
-      label: "控制平面地址",
+      label: "Control plane URL",
       configured: Boolean(config.baseUrl),
       secret: false,
       displayValue: config.baseUrl || ""
     },
     {
       key: "AIWC_INGESTION_API_KEY",
-      label: "接入密钥",
+      label: "Ingestion key",
       configured: Boolean(config.ingestionApiKey),
       secret: true,
-      displayValue: config.ingestionApiKey ? "已配置，已隐藏" : ""
+      displayValue: config.ingestionApiKey ? "Configured, hidden" : ""
     },
     {
       key: "AIWC_PROJECT_ID",
-      label: "项目编号",
+      label: "Project ID",
       configured: Boolean(config.projectId),
       secret: false,
       displayValue: config.projectId || ""
     },
     {
       key: "AIWC_AGENT_ID",
-      label: "员工编号",
+      label: "Agent ID",
       configured: Boolean(config.agentId),
       secret: false,
       displayValue: config.agentId || ""
@@ -1236,22 +1236,22 @@ function buildAiwcHealthSnapshot() {
     ok,
     status,
     statusLabel: status === "connected"
-      ? "已连接"
+      ? "Connected"
       : status === "not_tested"
-        ? "未测试"
+        ? "Not tested"
         : status === "failed"
-          ? "连接失败"
-          : "缺少配置",
+          ? "Connection failed"
+          : "Missing config",
     missing: config.missing,
     items: config.items,
     lastCheckedAt: latest?.checkedAt || "",
     lastError: ok ? "" : latest?.error || "",
     runIdExternal: latest?.runIdExternal || "",
     detail: ok
-      ? "AIWC health-check 成功，运行日志可写入集成控制平面。"
+      ? "AIWC health-check succeeded; run logs can be mirrored into the integrated control plane."
       : config.missing.length
-        ? `缺少 ${config.missing.length} 个配置项。`
-        : latest?.error || "配置已填写，尚未完成 health-check。"
+        ? `${config.missing.length} config item(s) missing.`
+        : latest?.error || "Config is present, but health-check has not completed yet."
   };
 }
 
@@ -1306,99 +1306,99 @@ function buildAutonomyReadiness({ tasks = [], approvals = [], evidencePacks = []
   if (!hasEvidence) {
     hardBlockers.push({
       id: "evidence_required",
-      title: "还没有完整证据包",
-      owner: "Coding猿",
+      title: "No complete Evidence Pack yet",
+      owner: "Codingape",
       severity: "high",
-      remediation: "先运行编程猿闭环演示，或对排队任务采集证据。"
+      remediation: "Run the Codingape closed-loop demo first, or collect evidence for a queued task."
     });
   }
 
   if (!hasProposal) {
     hardBlockers.push({
       id: "proposal_required",
-      title: "还没有补丁或复核方案",
-      owner: "Judge猿",
+      title: "No patch or review proposal yet",
+      owner: "Judgeape",
       severity: "medium",
-      remediation: "先从证据生成补丁方案，再宣称具备自治能力。"
+      remediation: "Generate a patch proposal from evidence before claiming autonomy readiness."
     });
   }
 
   if (!hasWriteRunner) {
     hardBlockers.push({
       id: "write_runner_gated",
-      title: "代码写入执行器仍处于关闭状态",
-      owner: "Judge猿",
+      title: "Code write runner is still disabled",
+      owner: "Judgeape",
       severity: "high",
-      remediation: "在命令白名单、测试、回滚和审批检查齐备前，继续保持写入受闸门保护。"
+      remediation: "Keep writes gated until command allowlists, tests, rollback, and approval checks are ready."
     });
   }
 
   if (pendingHighRiskApprovals) {
     hardBlockers.push({
       id: "human_gates_pending",
-      title: `${pendingHighRiskApprovals} 个高风险人工闸门待处理`,
-      owner: "Judge猿",
+      title: `${pendingHighRiskApprovals} high-risk Human Gate item(s) pending`,
+      owner: "Judgeape",
       severity: "high",
-      remediation: "提升自治等级前，请逐一复核或挂起高风险动作。"
+      remediation: "Review or hold each high-risk action before increasing autonomy."
     });
   }
 
   const objectives = [
     {
       id: "coding_loop",
-      label: "编程猿闭环演示",
+      label: "Codingape closed-loop demo",
       status: hasEvidence && hasProposal ? "complete" : "next",
-      metric: `${evidencePacks.length} 份证据 / ${proposalPacks.length} 个方案`
+      metric: `${evidencePacks.length} evidence pack(s) / ${proposalPacks.length} proposal(s)`
     },
     {
       id: "judge_gate",
-      label: "审核猿证据复核",
+      label: "Judgeape evidence review",
       status: hasHumanGate ? "complete" : proposalPacks.length ? "active" : "blocked",
-      metric: `${approvedCloseLoopGates} 个已批准 / ${pendingHighRiskApprovals} 个高风险待处理`
+      metric: `${approvedCloseLoopGates} approved / ${pendingHighRiskApprovals} high-risk pending`
     },
     {
       id: "verification",
-      label: "白名单验证证据",
+      label: "Allowlisted verification evidence",
       status: hasVerification ? "complete" : evidencePacks.length ? "next" : "blocked",
-      metric: `${verificationPacks.filter((pack) => pack?.result?.ok).length} 次通过 / ${verificationPacks.length} 次运行`
+      metric: `${verificationPacks.filter((pack) => pack?.result?.ok).length} passed / ${verificationPacks.length} run(s)`
     },
     {
       id: "aiwc_ingestion",
-      label: "黑匣子运行日志接入",
+      label: "Run-log ingestion",
       status: hasAiWcIngestion ? "complete" : "warning",
-      metric: hasAiWcIngestion ? "已配置" : "缺少环境配置，不阻断本地 beta"
+      metric: hasAiWcIngestion ? "Configured" : "Missing env config; does not block local beta"
     },
     {
       id: "write_runner",
-      label: "受控代码编辑与测试执行器",
+      label: "Controlled code edit and test runner",
       status: hasPatchRunEvidence ? "complete" : hasWriteRunner ? "active" : "blocked",
-      metric: hasPatchRunEvidence ? `${successfulPatchRuns} 份补丁运行证据` : hasWriteRunner ? "已启用" : "已关闭"
+      metric: hasPatchRunEvidence ? `${successfulPatchRuns} patch-run evidence pack(s)` : hasWriteRunner ? "Enabled" : "Disabled"
     },
     {
       id: "apply_gate",
-      label: "写入提案闸门",
+      label: "Apply proposal gate",
       status: appliedPatchRuns ? "complete" : hasApplyGateEvidence ? "active" : hasApplyRunner ? "next" : "blocked",
-      metric: appliedPatchRuns ? `${appliedPatchRuns} 次已写入` : hasApplyGateEvidence ? `${applyGateChecks} 次闸门检查` : hasApplyRunner ? "已启用" : "已关闭"
+      metric: appliedPatchRuns ? `${appliedPatchRuns} applied` : hasApplyGateEvidence ? `${applyGateChecks} gate check(s)` : hasApplyRunner ? "Enabled" : "Disabled"
     },
     {
       id: "nightly_report",
-      label: "每日 AI 公司战报",
+      label: "Daily AI company report",
       status: hasNightlyReport ? "active" : "next",
-      metric: hasNightlyReport ? "已排程" : "本地预览"
+      metric: hasNightlyReport ? "Scheduled" : "Local preview"
     }
   ];
 
   return {
     score,
     maxScore: 100,
-    level: score >= 80 ? "L3 可信操作员" : score >= 60 ? "L2 受监督试点" : "L1 演示就绪度",
+    level: score >= 80 ? "L3 Trusted Operator" : score >= 60 ? "L2 Supervised Pilot" : "L1 Demo Readiness",
     verdict: score >= 80 ? "certification_candidate" : score >= 60 ? "supervised_only" : "not_autonomous",
     summary:
       score >= 80
-        ? "已准备好进行客户式监督证据审核。"
+        ? "Ready for customer-style supervised evidence review."
         : score >= 60
-          ? "演示闭环已经较强，但自治仍必须经过人工闸门。"
-          : "基础能力已经可见，但真实工作证据和日志接入成熟前不能放开自治。",
+          ? "The demo loop is strong, but autonomy must still pass Human Gate."
+          : "Base capability is visible, but autonomy stays gated until real work evidence and log ingestion mature.",
     hardBlockers: hardBlockers.slice(0, 5),
     objectives,
     metrics: {
@@ -1438,25 +1438,25 @@ function buildCompanyReport({ tasks = [], approvals = [], evidencePacks = [], pr
   const riskBlocked = pendingApprovals + blockedTasks;
   const latestLoop = latestArtifactSummary(evidencePacks, proposalPacks, verificationPacks, patchRunPacks, patchApplyPacks);
   const latestLoopLine = latestLoop.taskId && latestLoop.patchRunStatus === "sandbox_written"
-    ? `最新闭环“${latestLoop.title}”已生成沙盒补丁，写入闸门状态为 ${companyApplyStatusLabel(latestLoop.applyStatus)}，项目文件未被自动修改。`
+    ? `Latest loop "${latestLoop.title}" generated a sandbox patch. Apply Gate is ${companyApplyStatusLabel(latestLoop.applyStatus)}, and project files were not modified automatically.`
     : "";
 
   return {
     headline: completedTasks
-      ? `你的 AI 打工公司已完成 ${completedTasks} 个任务，并留下可追溯证据。`
-      : "你的 AI 打工公司已准备好开始第一个真实工作闭环。",
+      ? `Your AI worker company completed ${completedTasks} task(s) with traceable evidence.`
+      : "Your AI worker company is ready to start the first real work loop.",
     generatedAt: new Date().toISOString(),
     metrics: [
-      { label: "任务完成", value: completedTasks },
-      { label: "证据包", value: evidencePacks.length },
-      { label: "补丁方案", value: proposalPacks.length },
-      { label: "验证通过", value: passedVerifications },
-      { label: "人工批准", value: approvedCloseLoopGates },
-      { label: "补丁预检", value: successfulPatchRuns },
-      { label: "写入闸门", value: applyGateChecks },
-      { label: "已写入", value: appliedPatchRuns },
-      { label: "风险阻断", value: riskBlocked },
-      { label: "节省时间", value: hoursSaved }
+      { label: "Tasks done", value: completedTasks },
+      { label: "Evidence packs", value: evidencePacks.length },
+      { label: "Patch plans", value: proposalPacks.length },
+      { label: "Verifications passed", value: passedVerifications },
+      { label: "Human approvals", value: approvedCloseLoopGates },
+      { label: "Patch preflights", value: successfulPatchRuns },
+      { label: "Apply gates", value: applyGateChecks },
+      { label: "Applied", value: appliedPatchRuns },
+      { label: "Risks gated", value: riskBlocked },
+      { label: "Hours saved", value: hoursSaved }
     ],
     queue: {
       queuedTasks,
@@ -1468,23 +1468,23 @@ function buildCompanyReport({ tasks = [], approvals = [], evidencePacks = [], pr
     latestLoop,
     latestLoopLine,
     shareLine: completedTasks
-      ? `${latestLoopLine || `今天我的 AI 打工公司完成了 ${completedTasks} 个任务，生成了 ${evidencePacks.length} 份证据包，通过了 ${passedVerifications} 次验证，批准了 ${approvedCloseLoopGates} 个受监督结果，完成了 ${successfulPatchRuns} 次受控补丁预检，检查了 ${applyGateChecks} 次写入闸门，并阻断了 ${riskBlocked} 个风险。`}`
-      : "今天我的 AI 打工公司已准备好开始第一轮有证据支撑的编程猿运行。"
+      ? `${latestLoopLine || `Today my AI worker company completed ${completedTasks} task(s), produced ${evidencePacks.length} evidence pack(s), passed ${passedVerifications} verification run(s), approved ${approvedCloseLoopGates} supervised result(s), ran ${successfulPatchRuns} controlled patch preflight(s), checked ${applyGateChecks} Apply Gate(s), and blocked ${riskBlocked} risk(s).`}`
+      : "Today my AI worker company is ready to start the first evidence-backed Codingape run."
   };
 }
 
 function companyApplyStatusLabel(status = "not_run") {
   const labels = {
-    applied: "已人工写入",
-    blocked: "写入已阻断",
-    failed: "写入失败",
-    not_run: "等待写入检查",
-    requires_confirmation: "需要确认"
+    applied: "Applied by human approval",
+    blocked: "Apply blocked",
+    failed: "Apply failed",
+    not_run: "Waiting for Apply check",
+    requires_confirmation: "Requires confirmation"
   };
-  return labels[status] || "等待写入检查";
+  return labels[status] || "Waiting for Apply check";
 }
 
-function taskReportList(items = [], empty = "暂无") {
+function taskReportList(items = [], empty = "None") {
   const values = items.filter(Boolean);
   return values.length ? values.map((item) => `- ${item}`).join("\n") : `- ${empty}`;
 }
@@ -1500,63 +1500,63 @@ function writeTaskCompanyReport(task) {
   const humanGate = buildHumanGateSummary(task);
   const diffPreview = patchRun?.diffPreview
     ? ["```diff", patchRun.diffPreview.slice(0, 4000), "```"].join("\n")
-    : "暂无 diff preview。";
+    : "No diff preview yet.";
   const applied = applyRun?.status === "applied";
   const markdown = [
     `# Company Report: ${task.title}`,
     "",
-    `生成时间：${new Date().toISOString()}`,
-    `项目：${task.projectName || task.projectId || "未命名项目"}`,
-    `任务编号：${task.id}`,
+    `Generated at: ${new Date().toISOString()}`,
+    `Project: ${task.projectName || task.projectId || "Unnamed project"}`,
+    `Task ID: ${task.id}`,
     "",
-    "## 做了什么",
+    "## What Changed",
     taskReportList([
-      evidence ? `生成 Evidence Pack：${evidenceRelativePath(task.id)}` : "",
-      proposal ? `生成 Patch Proposal：${proposalRelativePath(task.id)}` : "",
-      verification ? `运行 Verification：${verificationRelativePath(task.id)} (${verification.status || "unknown"})` : "",
-      patchRun ? `生成 Diff Preview / Sandbox Patch：${patchRun.patchRunPath || patchRunRelativePath(task.id)}` : "",
-      applyRun ? `检查 Apply Gate：${applyRun.applyPath || patchApplyRelativePath(task.id)} (${companyApplyStatusLabel(applyRun.status)})` : "",
-      rollback ? `执行 Rollback：${rollback.rollbackReportPath || rollbackRelativePath(task.id)} (${rollback.status || "unknown"})` : ""
+      evidence ? `Generated Evidence Pack: ${evidenceRelativePath(task.id)}` : "",
+      proposal ? `Generated Patch Proposal: ${proposalRelativePath(task.id)}` : "",
+      verification ? `Ran Verification: ${verificationRelativePath(task.id)} (${verification.status || "unknown"})` : "",
+      patchRun ? `Generated Diff Preview / Sandbox Patch: ${patchRun.patchRunPath || patchRunRelativePath(task.id)}` : "",
+      applyRun ? `Checked Apply Gate: ${applyRun.applyPath || patchApplyRelativePath(task.id)} (${companyApplyStatusLabel(applyRun.status)})` : "",
+      rollback ? `Ran Rollback: ${rollback.rollbackReportPath || rollbackRelativePath(task.id)} (${rollback.status || "unknown"})` : ""
     ]),
     "",
-    "## 证据是什么",
+    "## Evidence",
     taskReportList([
-      evidence?.summary ? `证据摘要：${evidence.summary}` : "",
-      evidence?.commandCount ? `只读检查数量：${evidence.commandCount}` : "",
+      evidence?.summary ? `Evidence summary: ${evidence.summary}` : "",
+      evidence?.commandCount ? `Read-only check count: ${evidence.commandCount}` : "",
       ...(evidence?.commands || []).slice(0, 6).map((command) => `${command.ok ? "PASS" : "FAIL"} ${command.command}`)
     ]),
     "",
-    "## Diff 是什么",
+    "## Diff",
     diffPreview,
     "",
-    "## 测试结果",
+    "## Test Result",
     taskReportList([
-      verification?.summary?.script ? `脚本：${verification.summary.script}` : "",
-      verification?.result ? `结果：${verification.result.ok ? "通过" : "失败"}` : "",
-      verification?.summary?.result?.output ? `输出：${String(verification.summary.result.output).slice(0, 1000)}` : ""
+      verification?.summary?.script ? `Script: ${verification.summary.script}` : "",
+      verification?.result ? `Result: ${verification.result.ok ? "Passed" : "Failed"}` : "",
+      verification?.summary?.result?.output ? `Output: ${String(verification.summary.result.output).slice(0, 1000)}` : ""
     ]),
     "",
     "## Human Gate",
     taskReportList([
-      `状态：${humanGate?.label || "等待审批"}`,
-      humanGate?.note ? `备注：${humanGate.note}` : "",
-      humanGate?.decidedAt ? `时间：${humanGate.decidedAt}` : ""
+      `Status: ${humanGate?.label || "Pending approval"}`,
+      humanGate?.note ? `Note: ${humanGate.note}` : "",
+      humanGate?.decidedAt ? `Time: ${humanGate.decidedAt}` : ""
     ]),
     "",
-    "## 是否写入",
+    "## Write Status",
     taskReportList([
-      applyRun ? `Apply 状态：${companyApplyStatusLabel(applyRun.status)}` : "尚未运行 Apply Gate",
-      applied ? `已写入文件：${(applyRun.appliedFiles || []).map((file) => file.file).join(", ") || "无"}` : "项目文件未被写入",
-      applyRun?.applyReportPath ? `Apply Report：${applyRun.applyReportPath}` : ""
+      applyRun ? `Apply status: ${companyApplyStatusLabel(applyRun.status)}` : "Apply Gate has not run yet",
+      applied ? `Applied files: ${(applyRun.appliedFiles || []).map((file) => file.file).join(", ") || "none"}` : "Project files were not written",
+      applyRun?.applyReportPath ? `Apply Report: ${applyRun.applyReportPath}` : ""
     ]),
     "",
-    "## 怎么回滚",
+    "## Rollback",
     taskReportList([
       applyRun?.rollbackOption?.available || patchRun?.rollbackSnapshotPath
-        ? `可回滚快照：${applyRun?.rollbackOption?.rollbackSnapshotPath || patchRun.rollbackSnapshotPath}`
-        : "尚无可用回滚快照",
-      rollback?.rollbackReportPath ? `最近回滚报告：${rollback.rollbackReportPath}` : "",
-      rollback?.status === "rolled_back" ? "最近状态：已回滚到快照" : ""
+        ? `Rollback snapshot: ${applyRun?.rollbackOption?.rollbackSnapshotPath || patchRun.rollbackSnapshotPath}`
+        : "No rollback snapshot available yet",
+      rollback?.rollbackReportPath ? `Latest rollback report: ${rollback.rollbackReportPath}` : "",
+      rollback?.status === "rolled_back" ? "Latest status: rolled back to snapshot" : ""
     ]),
     ""
   ].join("\n");
@@ -1601,7 +1601,7 @@ function latestArtifactSummary(evidencePacks = [], proposalPacks = [], verificat
 
   return {
     taskId,
-    title: latestEvidence?.taskTitle || latestProposal?.title || "暂无证据",
+    title: latestEvidence?.taskTitle || latestProposal?.title || "No evidence yet",
     evidenceCapturedAt: latestEvidence?.capturedAt || null,
     proposalCreatedAt: latestProposal?.createdAt || null,
     checks: latestEvidence?.commands?.length || 0,
@@ -1625,15 +1625,15 @@ function buildLaunchSnapshot({ workers = [], events = [], autonomy, companyRepor
   const latestGate = approvals.find((approval) => approval.gateType === "close_loop" && approval.taskId === latestEvidence.taskId);
 
   return {
-    narrative: "我拥有一家 24/7 工作、带日志、证据、闸门和回放的 AI 打工公司。",
-    focus: "编程猿闭环演示",
+    narrative: "I run a 24/7 AI worker company with logs, evidence, gates, and replay.",
+    focus: "Codingape closed-loop demo",
     coreWorkerIds: [...LAUNCH_CORE_WORKER_IDS],
     coreWorkers,
     benchWorkers,
     latestEvidence: {
       ...latestEvidence,
       gateStatus: latestGate?.status || "pending",
-      gateLabel: latestGate ? gateStatusLabel(latestGate.status) : "等待审批",
+      gateLabel: latestGate ? gateStatusLabel(latestGate.status) : "Pending approval",
       approvalId: latestGate?.id || null
     },
     currentStage:
@@ -1795,38 +1795,38 @@ function buildServiceHealthSummary() {
   return {
     generatedAt: new Date().toISOString(),
     local: {
-      label: "本地服务",
+      label: "Local service",
       status: "online",
-      statusLabel: "在线",
+      statusLabel: "Online",
       url: localUrl,
-      detail: `当前页面由 ${localUrl} 提供，服务进程正在响应快照请求。`
+      detail: `This page is served from ${localUrl}; the service process is responding to snapshot requests.`
     },
     publicEntry: {
-      label: "公网入口",
+      label: "Public entry",
       status: tunnelConfigured ? "configured" : "missing",
-      statusLabel: tunnelConfigured ? "已配置" : "待配置",
+      statusLabel: tunnelConfigured ? "Configured" : "Pending",
       url: PUBLIC_ENTRY_URL,
       detail: tunnelConfigured
-        ? "公网域名已通过 Cloudflare 隧道指向本地办公室。"
-        : "未找到 Cloudflare 隧道配置文件。"
+        ? "The public domain points to the local office through a Cloudflare tunnel."
+        : "Cloudflare tunnel config file was not found."
     },
     tunnel: {
-      label: "Cloudflare 隧道",
+      label: "Cloudflare tunnel",
       status: tunnelConfigured && tunnelLaunchAgentInstalled ? "managed" : tunnelConfigured ? "configured" : "missing",
-      statusLabel: tunnelConfigured && tunnelLaunchAgentInstalled ? "后台托管" : tunnelConfigured ? "已配置" : "待配置",
+      statusLabel: tunnelConfigured && tunnelLaunchAgentInstalled ? "Managed" : tunnelConfigured ? "Configured" : "Pending",
       detail: tunnelConfigured
         ? tunnelLaunchAgentInstalled
-          ? "Cloudflare 隧道已配置为登录后自动运行。"
-          : "隧道配置存在，但未检测到登录自启守护。"
-        : "需要先配置 Cloudflare 隧道。"
+          ? "Cloudflare tunnel is configured to run automatically after login."
+          : "Tunnel config exists, but the login launch agent was not detected."
+        : "Configure the Cloudflare tunnel first."
     },
     daemon: {
-      label: "后台守护",
+      label: "Background daemon",
       status: appLaunchAgentInstalled ? "managed" : "manual",
-      statusLabel: appLaunchAgentInstalled ? "后台托管" : "手动运行",
+      statusLabel: appLaunchAgentInstalled ? "Managed" : "Manual",
       detail: appLaunchAgentInstalled
-        ? "编程猿办公室已交给 macOS 后台守护托管。"
-        : "当前服务可能由手动命令启动，重启后需要再次启动。"
+        ? "Codingape Office is managed by the macOS background launch agent."
+        : "The current service may have been started manually and may need to be started again after restart."
     }
   };
 }
@@ -2662,21 +2662,21 @@ function sendJson(response, payload, status = 200) {
 
 function serverErrorMessageZh(message = "") {
   const text = String(message || "");
-  if (/Task title is required/i.test(text)) return "任务标题不能为空";
-  if (/Task is already running/i.test(text)) return "任务正在运行，请稍后再试";
-  if (/Task not found/i.test(text)) return "没有找到这个任务";
-  if (/Project not found/i.test(text)) return "没有找到这个项目";
-  if (/Evidence pack not found/i.test(text)) return "没有找到证据包";
-  if (/Run evidence before verification/i.test(text)) return "请先采集证据，再运行验证";
-  if (/Run evidence before drafting a patch plan/i.test(text)) return "请先采集证据，再生成补丁方案";
-  if (/Draft a proposal before requesting human gate approval/i.test(text)) return "请先生成方案，再请求人工闸门审批";
-  if (/Event title is required/i.test(text)) return "事件标题不能为空";
-  if (/Method not allowed/i.test(text)) return "这个接口不支持当前请求方式";
-  if (/Internal server error/i.test(text)) return "服务内部错误，原业务流程未被放行";
-  if (/Verification script not found or not allowed/i.test(text)) return text.replace(/Verification script not found or not allowed:/i, "验证脚本不存在或未被允许：");
-  if (/No safe verification script found/i.test(text)) return "没有找到安全白名单内的验证脚本";
-  if (/Verification script is blocked by safety policy/i.test(text)) return text.replace(/Verification script is blocked by safety policy:/i, "验证脚本被安全策略阻断：");
-  return text || "请求失败";
+  if (/Task title is required/i.test(text)) return "Task title is required";
+  if (/Task is already running/i.test(text)) return "Task is already running. Try again after it finishes.";
+  if (/Task not found/i.test(text)) return "Task not found";
+  if (/Project not found/i.test(text)) return "Project not found";
+  if (/Evidence pack not found/i.test(text)) return "Evidence Pack not found";
+  if (/Run evidence before verification/i.test(text)) return "Run evidence collection before verification";
+  if (/Run evidence before drafting a patch plan/i.test(text)) return "Run evidence collection before drafting a patch plan";
+  if (/Draft a proposal before requesting human gate approval/i.test(text)) return "Draft a proposal before requesting Human Gate approval";
+  if (/Event title is required/i.test(text)) return "Event title is required";
+  if (/Method not allowed/i.test(text)) return "Method not allowed";
+  if (/Internal server error/i.test(text)) return "Internal server error; no business workflow was released";
+  if (/Verification script not found or not allowed/i.test(text)) return text;
+  if (/No safe verification script found/i.test(text)) return "No safe allowlisted verification script was found";
+  if (/Verification script is blocked by safety policy/i.test(text)) return text;
+  return text || "Request failed";
 }
 
 function sendError(response, status, message) {
@@ -4739,7 +4739,7 @@ async function handleRunCodingLoop(request, response, projectId) {
     workerName: task.workerName,
     projectId: task.projectId,
     type: "task_queued",
-    title: `任务已排队：${task.title}`,
+    title: `Task queued: ${task.title}`,
     detail: `${task.projectName} · ${codingLoopModeLabel(mode)}`,
     risk: task.risk,
     evidence: []
@@ -4772,8 +4772,8 @@ async function handleRunCodingLoop(request, response, projectId) {
     workerName: task.workerName,
     projectId: task.projectId,
     type: "task_evidence",
-    title: `Coding猿已采集证据：${task.title}`,
-    detail: `${task.projectName} · ${evidence.commandCount} 项只读检查`,
+    title: `Codingape collected evidence: ${task.title}`,
+    detail: `${task.projectName} · ${evidence.commandCount} read-only checks`,
     risk: task.risk,
     evidence: [evidence.evidencePath, ...evidence.changedFiles].slice(0, 10)
   });
@@ -4825,8 +4825,8 @@ async function handleRunCodingLoop(request, response, projectId) {
     workerName: eventWorkerName("judge-yuan"),
     projectId: task.projectId,
     type: "judge_review",
-    title: `Judge猿复核就绪：${task.title}`,
-    detail: `${task.projectName} · ${gateRiskLabel(proposal.risk)}补丁方案 · 本地模型${proposal.localJudgeReviewStatus === "ready" ? "已审查" : "未接入"}`,
+    title: `Judgeape review ready: ${task.title}`,
+    detail: `${task.projectName} · ${gateRiskLabel(proposal.risk)} patch plan · local model ${proposal.localJudgeReviewStatus === "ready" ? "reviewed" : "not connected"}`,
     risk: proposal.risk,
     evidence: [proposal.proposalPath, proposal.evidencePath]
   });
@@ -4885,7 +4885,7 @@ async function handleRunCodingLoop(request, response, projectId) {
       workerName: verification.ok ? task.workerName : eventWorkerName("judge-yuan"),
       projectId: task.projectId,
       type: verification.ok ? "verification_passed" : "verification_failed",
-      title: `${verification.ok ? "验证通过" : "验证失败"}：${task.title}`,
+      title: `${verification.ok ? "Verification passed" : "Verification failed"}: ${task.title}`,
       detail: `${task.projectName} · ${verification.summary.script}`,
       risk: verification.ok ? "low" : "medium",
       evidence: [verification.verificationPath, proposal.proposalPath, proposal.evidencePath]
@@ -4968,7 +4968,7 @@ async function handleRunCodingLoop(request, response, projectId) {
       workerName: eventWorkerName(patchRun.ok ? "coding-yuan" : "judge-yuan"),
       projectId: task.projectId,
       type: patchRun.ok ? "patch_run_ready" : "patch_run_blocked",
-      title: `${patchRun.ok ? "沙盒补丁包已生成" : "沙盒补丁已阻断"}：${task.title}`,
+      title: `${patchRun.ok ? "Sandbox patch package generated" : "Sandbox patch blocked"}: ${task.title}`,
       detail: patchRun.summary.blockers?.[0]?.title || patchRun.summary.note,
       risk: patchRun.ok ? "low" : "high",
       evidence: [patchRun.patchRunPath, finalTask.proposal, finalTask.verification].filter(Boolean)
@@ -5000,7 +5000,7 @@ async function handleRunCodingLoop(request, response, projectId) {
       workerName: eventWorkerName("ops-yuan"),
       projectId: task.projectId,
       type: "apply_gate_pending",
-      title: `Ops猿完成写入闸门检查：${task.title}`,
+      title: `Opsape completed Apply Gate check: ${task.title}`,
       detail: applyRun.summary.blockers?.[0]?.title || applyRun.summary.note,
       risk: applyRun.ok ? "low" : "high",
       evidence: [applyRun.applyPath, finalTask.patchRun, finalTask.proposal, finalTask.verification].filter(Boolean)
@@ -5343,7 +5343,7 @@ async function handleApplyGate(request, response, taskId) {
     workerName: applyRun.ok ? task.workerName : eventWorkerName("judge-yuan"),
     projectId: task.projectId,
     type: applyRun.ok ? "apply_proposal_applied" : "apply_gate_pending",
-    title: `${applyRun.ok ? "提案已写入" : "写入闸门已检查"}：${task.title}`,
+    title: `${applyRun.ok ? "Proposal applied" : "Apply Gate checked"}: ${task.title}`,
     detail: applyRun.summary.blockers?.[0]?.title || applyRun.summary.note,
     risk: applyRun.ok ? "low" : "high",
     evidence: [applyRun.applyPath, task.patchRun, task.proposal, task.verification].filter(Boolean)
@@ -5405,7 +5405,7 @@ async function handleRollbackTask(request, response, taskId) {
     workerName: eventWorkerName("ops-yuan"),
     projectId: task.projectId,
     type: rollback.ok ? "rollback_restored" : "rollback_blocked",
-    title: `${rollback.ok ? "已回滚" : "回滚已阻断"}：${task.title}`,
+    title: `${rollback.ok ? "Rolled back" : "Rollback blocked"}: ${task.title}`,
     detail: rollback.summary.blockers?.[0]?.title || rollback.summary.note,
     risk: rollback.ok ? "low" : "high",
     evidence: [rollback.summary.rollbackReportPath, rollback.summary.snapshotManifestPath].filter(Boolean)

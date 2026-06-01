@@ -19,8 +19,8 @@ test("Model Provider Settings UI explains BYO key, local model, and snippet priv
   assert.match(html, /Demo Only/);
   assert.match(html, /BYO API Key/);
   assert.match(html, /Local Model/);
-  assert.match(html, /不会默认上传整个项目/);
-  assert.match(html, /确认前不会写入代码/);
+  assert.match(html, /does not upload the whole project by default/);
+  assert.match(html, /will not write code before approval/);
   assert.match(app, /\/api\/model-provider\/settings/);
   assert.match(app, /\/api\/model-provider\/test/);
   assert.match(server, /MODEL_PROVIDER_SETTINGS_FILE/);

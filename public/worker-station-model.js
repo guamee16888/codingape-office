@@ -46,33 +46,33 @@ export function coreWorkerState(worker, task) {
 export function coreWorkerAction(worker, task) {
   const phase = runPhaseFromTask(task);
   const mode = missionModeFromTask(task);
-  if (!worker) return "待命";
+  if (!worker) return "Idle";
   if (worker.id === "coding-yuan") {
-    if (phase === "evidence_collecting") return mode === "review_only" ? "只读证据已采集" : "采集命令证据";
-    if (phase === "proposal_generating") return "起草补丁蓝图";
-    if (phase === "verification_running") return "运行白名单验证";
-    if (phase === "patch_running") return "打包沙盒补丁";
-    if (phase === "diff_ready") return "沙盒差异已就绪";
-    if (phase === "apply_blocked") return "等待人工写入决定";
+    if (phase === "evidence_collecting") return mode === "review_only" ? "Read-only evidence captured" : "Collecting command evidence";
+    if (phase === "proposal_generating") return "Drafting patch blueprint";
+    if (phase === "verification_running") return "Running allowlisted verification";
+    if (phase === "patch_running") return "Packaging sandbox patch";
+    if (phase === "diff_ready") return "Sandbox diff is ready";
+    if (phase === "apply_blocked") return "Waiting for human write decision";
   }
   if (worker.id === "judge-yuan") {
-    if (mode === "review_only") return "本次不参与，等待需要审查的方案";
-    if (mode === "proposal") return "旁路审查方案，不触发写入";
-    if (mode === "verify") return "审查方案并验证证据";
-    if (phase === "human_gate") return "等待人工审批";
-    if (phase === "apply_blocked") return "解释写入闸门阻断原因";
-    if (phase === "judge_review") return "审核证据包";
-    if (phase === "verification_running") return "检查测试证据";
+    if (mode === "review_only") return "Standing by until a plan needs review";
+    if (mode === "proposal") return "Reviewing plan sidecar; no write triggered";
+    if (mode === "verify") return "Reviewing plan and verifying evidence";
+    if (phase === "human_gate") return "Waiting for human approval";
+    if (phase === "apply_blocked") return "Explaining Apply Gate blocker";
+    if (phase === "judge_review") return "Reviewing Evidence Pack";
+    if (phase === "verification_running") return "Checking test evidence";
   }
   if (worker.id === "ops-yuan") {
-    if (mode === "review_only") return "本次不进入写入闸门";
-    if (mode === "proposal") return "方案阶段待命，写入仍默认阻断";
-    if (mode === "verify") return "验证阶段待命，不执行写入";
-    if (phase === "apply_blocked") return "策略已阻断直接写入";
-    if (phase === "diff_ready") return "回滚快照就绪";
-    if (phase === "patch_running") return "监控补丁预检";
+    if (mode === "review_only") return "Apply Gate not used in this run";
+    if (mode === "proposal") return "Standing by during proposal; writes blocked by default";
+    if (mode === "verify") return "Standing by during verification; no write execution";
+    if (phase === "apply_blocked") return "Policy blocked direct write";
+    if (phase === "diff_ready") return "Rollback snapshot ready";
+    if (phase === "patch_running") return "Monitoring patch preflight";
   }
-  return worker.currentTask || "待命";
+  return worker.currentTask || "Idle";
 }
 
 export function workerStationTelemetry(worker, task) {
@@ -86,46 +86,46 @@ export function workerStationTelemetry(worker, task) {
 
   if (worker?.id === "coding-yuan") {
     return [
-      { label: "证据", status: statusFromBoolean(evidenceReady), value: evidenceReady ? "已采集" : "等待中" },
-      { label: "方案", status: statusFromBoolean(proposalReady), value: proposalReady ? "就绪" : "等待中" },
-      { label: "补丁", status: patchStatus === "sandbox_written" ? "ok" : patchStatus === "blocked" ? "danger" : "pending", value: patchStatus }
+      { label: "Evidence", status: statusFromBoolean(evidenceReady), value: evidenceReady ? "Captured" : "Waiting" },
+      { label: "Plan", status: statusFromBoolean(proposalReady), value: proposalReady ? "Ready" : "Waiting" },
+      { label: "Patch", status: patchStatus === "sandbox_written" ? "ok" : patchStatus === "blocked" ? "danger" : "pending", value: patchStatus }
     ];
   }
 
   if (worker?.id === "judge-yuan") {
     if (mode === "review_only") {
       return [
-        { label: "模式", status: "info", value: "本次待命" },
-        { label: "验证", status: "pending", value: "本次不跑" },
-        { label: "写入", status: "pending", value: "本次不写" }
+        { label: "Mode", status: "info", value: "Standing by this run" },
+        { label: "Verification", status: "pending", value: "Not run this time" },
+        { label: "Write", status: "pending", value: "No write this time" }
       ];
     }
     return [
-      { label: "验证", status: verificationStatus === "passed" ? "ok" : verificationStatus === "failed" ? "danger" : "pending", value: verificationStatus },
-      { label: "人工", status: humanStatus === "approved" ? "ok" : humanStatus === "changes_requested" ? "danger" : "warn", value: humanStatus },
-      { label: "写入", status: applyStatus === "applied" ? "ok" : applyStatus === "requires_confirmation" || applyStatus === "blocked" ? "warn" : "pending", value: applyStatus }
+      { label: "Verification", status: verificationStatus === "passed" ? "ok" : verificationStatus === "failed" ? "danger" : "pending", value: verificationStatus },
+      { label: "Human", status: humanStatus === "approved" ? "ok" : humanStatus === "changes_requested" ? "danger" : "warn", value: humanStatus },
+      { label: "Write", status: applyStatus === "applied" ? "ok" : applyStatus === "requires_confirmation" || applyStatus === "blocked" ? "warn" : "pending", value: applyStatus }
     ];
   }
 
   if (worker?.id === "ops-yuan") {
     if (["review_only", "proposal", "verify"].includes(mode)) {
       return [
-        { label: "模式", status: "info", value: "本次待命" },
-        { label: "写入", status: "pending", value: "本次不写" },
-        { label: "闸门", status: "ok", value: "默认阻断" }
+        { label: "Mode", status: "info", value: "Standing by this run" },
+        { label: "Write", status: "pending", value: "No write this time" },
+        { label: "Gate", status: "ok", value: "Blocked by default" }
       ];
     }
     return [
-      { label: "回滚", status: patchStatus === "sandbox_written" ? "ok" : "pending", value: patchStatus === "sandbox_written" ? "就绪" : "等待中" },
-      { label: "写入", status: applyStatus === "applied" ? "ok" : applyStatus === "requires_confirmation" || applyStatus === "blocked" ? "danger" : "pending", value: applyStatus },
-      { label: "进度", status: "info", value: `${missionProgress(task)}%` }
+      { label: "Rollback", status: patchStatus === "sandbox_written" ? "ok" : "pending", value: patchStatus === "sandbox_written" ? "Ready" : "Waiting" },
+      { label: "Write", status: applyStatus === "applied" ? "ok" : applyStatus === "requires_confirmation" || applyStatus === "blocked" ? "danger" : "pending", value: applyStatus },
+      { label: "Progress", status: "info", value: `${missionProgress(task)}%` }
     ];
   }
 
   return [
-    { label: "队列", status: "info", value: String(worker?.queue || 0) },
-    { label: "风险", status: worker?.risk === "high" ? "warn" : "ok", value: worker?.risk || "low" },
-    { label: "运行", status: task ? "ok" : "pending", value: task ? "active" : "idle" }
+    { label: "Queue", status: "info", value: String(worker?.queue || 0) },
+    { label: "Risk", status: worker?.risk === "high" ? "warn" : "ok", value: worker?.risk || "low" },
+    { label: "Run", status: task ? "ok" : "pending", value: task ? "active" : "idle" }
   ];
 }
 
@@ -217,8 +217,8 @@ export function workerStationModel(worker, task, event = null) {
     gateStatus: stationGateStatus(task),
     id: worker?.id || "worker",
     light,
-    mark: worker?.mark || "猿",
-    name: worker?.name || "员工",
+    mark: worker?.mark || "A",
+    name: worker?.name || "Worker",
     phase,
     progress: missionProgress(task),
     riskLevel: task?.risk || worker?.risk || "low",

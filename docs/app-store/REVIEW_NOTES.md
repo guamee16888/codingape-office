@@ -1,12 +1,12 @@
 # Review Notes
 
-Coding猿 Office is a local AI coding worker for macOS. It helps a user run a guarded coding loop on a local project: evidence pack, patch proposal, diff preview, verification, Human Gate, Apply Gate, rollback, and task report.
+Codingape Office is a local AI coding worker for macOS. It helps a user run a guarded coding loop on a local project: evidence pack, patch proposal, diff preview, verification, Human Gate, Apply Gate, rollback, and task report.
 
 The app does not default-scan the user's disk. The user must explicitly choose a local project directory before evidence, diff, apply, or rollback actions are available.
 
 The local service starts with the app and is stopped when the app exits. It is used to serve the local office workflow and project-bound task state.
 
-Before any code modification, Coding猿 Office shows:
+Before any code modification, Codingape Office shows:
 
 - evidence gathered from the selected project
 - proposed diff
@@ -24,7 +24,7 @@ Support bundles are for diagnostics. They should include app state, recent error
 
 Reviewer test path:
 
-1. Launch Coding猿 Office.
+1. Launch Codingape Office.
 2. Choose a local test project folder.
 3. Configure a test API key only if the reviewer wants to exercise AI-backed patch synthesis.
 4. Run the safe first-order task.

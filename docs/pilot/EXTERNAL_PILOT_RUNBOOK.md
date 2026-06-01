@@ -31,7 +31,7 @@ If you receive a packaged Mac build, open `Codingape Office.app` and use the sam
 
 ## Choose A Project
 
-1. Click `选择本地项目目录`.
+1. Click `Choose Local Project Folder`.
 2. Pick a small local test project.
 3. Do not choose a secrets folder, wallet folder, or production-only repo for the first run.
 4. Confirm the selected project is shown in the Office header.
@@ -104,9 +104,9 @@ Feedback must not include API keys, full source files, private keys, `.env` cont
 
 If anything fails:
 
-1. Open `Beta 支持中心`.
-2. Click `生成支持包`.
-3. Click `打开支持包目录`.
+1. Open `Beta Support Center`.
+2. Click `Generate Support Bundle`.
+3. Click `Open Support Bundle Folder`.
 4. Send the generated JSON plus your feedback JSON.
 
 Support bundles are designed to redact secrets and avoid API key plaintext.

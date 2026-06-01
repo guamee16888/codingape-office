@@ -45,7 +45,7 @@ test("operational readiness reports hard blockers before beta operation", () => 
   });
 
   assert.equal(readiness.status, "blocked");
-  assert.equal(readiness.statusLabel, "未可运营");
+  assert.equal(readiness.statusLabel, "Not operational");
   assert.ok(readiness.blockers.some((check) => check.id === "local_project"));
   assert.ok(readiness.blockers.some((check) => check.id === "evidence_pack"));
   assert.ok(readiness.nextActions.length > 0);
@@ -62,7 +62,7 @@ test("operational readiness is beta-ready when critical loop exists but advisori
   }));
 
   assert.equal(readiness.status, "beta_ready");
-  assert.equal(readiness.statusLabel, "Beta 可运营");
+  assert.equal(readiness.statusLabel, "Beta ready");
   assert.equal(readiness.blockers.length, 0);
   assert.ok(readiness.advisories.some((check) => check.id === "daemon"));
   assert.ok(readiness.advisories.some((check) => check.id === "git_checkpoint"));
@@ -76,7 +76,7 @@ test("operational readiness reaches operational when AIWC health-check passes", 
   }));
 
   assert.equal(readiness.status, "operational");
-  assert.equal(readiness.statusLabel, "可运营");
+  assert.equal(readiness.statusLabel, "Operational");
   assert.equal(readiness.score, 100);
   assert.equal(readiness.blockers.length, 0);
   assert.equal(readiness.advisories.length, 0);
@@ -101,8 +101,8 @@ test("local office exposes operational readiness and support bundle controls", a
 
   assert.match(html, /id="operationalStatus"/);
   assert.match(html, /id="aiwcConfigList"/);
-  assert.match(html, /id="testAiwcHealthButton"[\s\S]*?>测试 AIWC 连接<\/button>/);
-  assert.match(html, /id="generateSupportBundleButton"[\s\S]*?>生成支持包<\/button>/);
+  assert.match(html, /id="testAiwcHealthButton"[\s\S]*?>Test AIWC Connection<\/button>/);
+  assert.match(html, /id="generateSupportBundleButton"[\s\S]*?>Generate Support Bundle<\/button>/);
   assert.match(app, /function renderOperationalReadinessPanel\(snapshot\)/);
   assert.match(app, /function testAiwcHealth\(\)/);
   assert.match(app, /function generateSupportBundle\(\)/);

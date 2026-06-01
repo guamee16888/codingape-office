@@ -15,7 +15,7 @@ test("AIWC health check exposes redacted configuration status", async () => {
 
   assert.match(server, /function buildAiwcConfigStatus\(env = process\.env\)/);
   assert.match(server, /AIWC_INGESTION_API_KEY/);
-  assert.match(server, /displayValue: config\.ingestionApiKey \? "已配置，已隐藏" : ""/);
+  assert.match(server, /displayValue: config\.ingestionApiKey \? "Configured, hidden" : ""/);
   assert.match(server, /async function handleAiwcHealthCheck/);
   assert.match(server, /recordAiWorkerRunLog\(\{/);
   assert.match(server, /run_id_external: `codex-office:aiwc-health:/);
@@ -23,7 +23,7 @@ test("AIWC health check exposes redacted configuration status", async () => {
   assert.match(html, /id="aiwcConfigList"/);
   assert.match(html, /id="aiwcHealthDetail"/);
   assert.match(app, /function aiwcConfigTemplate\(item = \{\}\)/);
-  assert.match(app, /item\.secret[\s\S]*?"已配置，已隐藏"/);
+  assert.match(app, /item\.secret[\s\S]*?"Configured, hidden"/);
   assert.match(app, /fetchJson\("\/api\/aiwc\/health-check"\)/);
 });
 
@@ -65,8 +65,8 @@ test("Beta Support Center can generate, open, copy, and inspect diagnostics", as
   assert.match(server, /url\.pathname === "\/api\/support-bundle\/open-directory"/);
   assert.match(server, /recentErrors/);
   assert.match(html, /class="beta-support-panel"/);
-  assert.match(html, /id="openSupportBundleDirectoryButton"[\s\S]*?>打开支持包目录<\/button>/);
-  assert.match(html, /id="copyDiagnosticSummaryButton"[\s\S]*?>复制诊断摘要<\/button>/);
+  assert.match(html, /id="openSupportBundleDirectoryButton"[\s\S]*?>Open Support Bundle Folder<\/button>/);
+  assert.match(html, /id="copyDiagnosticSummaryButton"[\s\S]*?>Copy Diagnostic Summary<\/button>/);
   assert.match(html, /id="recentErrorList"/);
   assert.match(html, /id="restartHintText"/);
   assert.match(app, /function renderSupportCenter\(snapshot\)/);

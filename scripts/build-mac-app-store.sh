@@ -2,7 +2,7 @@
 set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-APP_NAME="Coding猿 Office"
+APP_NAME="Codingape Office"
 VERSION="${CODEX_OFFICE_MAS_VERSION:-1.0.0}"
 BUILD_NUMBER="${CODEX_OFFICE_MAS_BUILD:-1}"
 BUNDLE_ID="${CODEX_OFFICE_MAS_BUNDLE_ID:-com.geoaifactory.codingyuan-office}"

@@ -2,7 +2,7 @@
 
 ## Goal
 
-Validate that a stranger can install Coding猿 Office, launch it, choose a project, run the first safe task, review the diff, approve through Human Gate, apply or roll back safely, and generate a support bundle.
+Validate that a stranger can install Codingape Office, launch it, choose a project, run the first safe task, review the diff, approve through Human Gate, apply or roll back safely, and generate a support bundle.
 
 ## Success Criteria
 
@@ -19,10 +19,10 @@ Validate that a stranger can install Coding猿 Office, launch it, choose a proje
 ## Tester Steps
 
 1. Install the TestFlight build.
-2. Launch Coding猿 Office.
+2. Launch Codingape Office.
 3. Choose a disposable local test project.
 4. Configure a test API key if required.
-5. Run the safe first-order task: `给 README 增加一个 Coding猿 Beta 测试段落`.
+5. Run the safe first-order task: `Add a Codingape beta testing paragraph to README`.
 6. Confirm the evidence pack and diff preview are understandable.
 7. Exercise Human Gate and Apply Gate.
 8. Apply the approved patch only if the test project is disposable.

@@ -63,7 +63,7 @@ final class CodingYuanOfficeApp: NSObject, NSApplicationDelegate, NSWindowDelega
             backing: .buffered,
             defer: false
         )
-        window.title = "Coding猿 Office"
+        window.title = "Codingape Office"
         window.center()
         window.contentView = webView
         window.delegate = self
@@ -72,8 +72,8 @@ final class CodingYuanOfficeApp: NSObject, NSApplicationDelegate, NSWindowDelega
 
         webView.loadHTMLString("""
         <html><body style="margin:0;background:#05070a;color:#f8fbff;font:15px -apple-system;padding:28px">
-        <strong>Coding猿 Office 正在启动本地服务...</strong>
-        <p>如果持续超过 20 秒，请确认 Node.js 可用。</p>
+              <strong>Codingape Office is starting the local service...</strong>
+              <p>If this takes more than 20 seconds, confirm that Node.js is available.</p>
         </body></html>
         """, baseURL: nil)
     }
@@ -103,16 +103,16 @@ final class CodingYuanOfficeApp: NSObject, NSApplicationDelegate, NSWindowDelega
 
         let nodePath = bundledResourceText("node-path") ?? "/usr/bin/env node"
         guard let launch = nodeLaunchCommand(nodePath) else {
-            startupFailureTitle = "Node.js 未找到"
-            startupFailureDetail = "Coding猿 Office 找不到可执行的 Node.js：\(nodePath)"
-            startupFailureFix = "安装 Node.js LTS；如果使用 Homebrew，请确认 /opt/homebrew/bin/node 或 /usr/local/bin/node 可用。"
+            startupFailureTitle = "Node.js not found"
+            startupFailureDetail = "Codingape Office could not find an executable Node.js at: \(nodePath)"
+            startupFailureFix = "Install Node.js LTS. If you use Homebrew, confirm that /opt/homebrew/bin/node or /usr/local/bin/node is available."
             return
         }
 
         if let owner = portOwnerDescription(), !owner.isEmpty {
-            startupFailureTitle = "4142 端口被占用"
+            startupFailureTitle = "Port 4142 is already in use"
             startupFailureDetail = owner
-            startupFailureFix = "退出旧的 Coding猿 Office 或运行 lsof -nP -iTCP:4142 -sTCP:LISTEN 找到占用进程后重试。"
+            startupFailureFix = "Quit the old Codingape Office process, or run lsof -nP -iTCP:4142 -sTCP:LISTEN to find the process and try again."
             return
         }
 
@@ -137,23 +137,23 @@ final class CodingYuanOfficeApp: NSObject, NSApplicationDelegate, NSWindowDelega
             serviceOwnedByApp = true
         } catch {
             serviceOwnedByApp = false
-            startupFailureTitle = "本地服务启动失败"
+            startupFailureTitle = "Local service failed to start"
             startupFailureDetail = error.localizedDescription
-            startupFailureFix = "请在终端运行 npm run dev 查看错误，或修复后重新打开 App。"
+            startupFailureFix = "Run npm run dev in Terminal to inspect the error, then reopen the app after fixing it."
         }
     }
 
     private func renderStartupFailurePage() {
-        let title = startupFailureTitle.isEmpty ? "本地服务启动失败" : startupFailureTitle
-        let detail = startupFailureDetail.isEmpty ? "Coding猿 Office 没有在 4142 端口拿到健康响应。" : startupFailureDetail
-        let fix = startupFailureFix.isEmpty ? "请确认 Node.js 可用、4142 端口未被占用，然后重新打开 App。" : startupFailureFix
+        let title = startupFailureTitle.isEmpty ? "Local service failed to start" : startupFailureTitle
+        let detail = startupFailureDetail.isEmpty ? "Codingape Office did not receive a healthy response on port 4142." : startupFailureDetail
+        let fix = startupFailureFix.isEmpty ? "Confirm that Node.js is available, port 4142 is free, then reopen the app." : startupFailureFix
         webView?.loadHTMLString("""
         <html><body style="margin:0;background:#05070a;color:#f8fbff;font:15px -apple-system;padding:28px;line-height:1.55">
         <strong>\(escapeHtml(title))</strong>
         <p>\(escapeHtml(detail))</p>
-        <p><b>修复建议：</b>\(escapeHtml(fix))</p>
-        <p><b>日志路径：</b>\(escapeHtml(logDirectory()))</p>
-        <p>服务启动后，可在 Beta 支持中心生成 support bundle。</p>
+              <p><b>Suggested fix:</b> \(escapeHtml(fix))</p>
+              <p><b>Log path:</b> \(escapeHtml(logDirectory()))</p>
+              <p>After the service starts, generate a support bundle from Beta Support Center.</p>
         </body></html>
         """, baseURL: nil)
     }
@@ -172,8 +172,8 @@ final class CodingYuanOfficeApp: NSObject, NSApplicationDelegate, NSWindowDelega
 
     private func chooseProjectFolder(requestId: String) {
         let panel = NSOpenPanel()
-        panel.title = "Choose a Coding猿 project folder"
-        panel.message = "Coding猿 Office will only read and write inside the project folder you choose."
+        panel.title = "Choose a Codingape project folder"
+        panel.message = "Codingape Office will only read and write inside the project folder you choose."
         panel.prompt = "Choose Project"
         panel.canChooseFiles = false
         panel.canChooseDirectories = true
