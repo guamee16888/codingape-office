@@ -5570,7 +5570,8 @@ function serveStatic(request, response) {
   }
 
   response.writeHead(200, {
-    "Content-Type": MIME_TYPES[extname(safePath)] || "application/octet-stream"
+    "Content-Type": MIME_TYPES[extname(safePath)] || "application/octet-stream",
+    "Cache-Control": "no-store"
   });
   if (request.method === "HEAD") {
     response.end();
