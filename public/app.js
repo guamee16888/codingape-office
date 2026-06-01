@@ -89,18 +89,18 @@ const state = {
 let inspectorShellHandlersAttached = false;
 
 const WORKER_ASSET_MANIFEST_URL = "/assets/workers/manifest.json";
-const FIRST_ORDER_TITLE = "给 README 增加一个 Coding猿 Beta 测试段落";
+const FIRST_ORDER_TITLE = "Add a Codingape pilot note to README";
 const FIRST_REAL_ORDER_TEMPLATES = {
   readme_usage: {
-    title: "给 README 增加使用说明",
+    title: "Add a Codingape pilot note to README",
     files: ["README.md"]
   },
   fix_test: {
-    title: "修复一个测试失败",
+    title: "Fix one failing test",
     files: ["test", "src"]
   },
   input_validation: {
-    title: "给指定函数增加输入校验",
+    title: "Add input validation to a specified function",
     files: ["src"]
   }
 };
@@ -250,6 +250,17 @@ const elements = {
   contextPreviewPanel: document.querySelector("#contextPreviewPanel"),
   contextPreviewList: document.querySelector("#contextPreviewList"),
   contextPreviewMeta: document.querySelector("#contextPreviewMeta"),
+  pilotFeedbackPanel: document.querySelector("#pilotFeedbackPanel"),
+  pilotFeedbackForm: document.querySelector("#pilotFeedbackForm"),
+  pilotTesterId: document.querySelector("#pilotTesterId"),
+  pilotUnderstoodTool: document.querySelector("#pilotUnderstoodTool"),
+  pilotNoAutoWrite: document.querySelector("#pilotNoAutoWrite"),
+  pilotBlockedAt: document.querySelector("#pilotBlockedAt"),
+  pilotTrustRealProject: document.querySelector("#pilotTrustRealProject"),
+  pilotFeedbackScore: document.querySelector("#pilotFeedbackScore"),
+  pilotWillingToPay: document.querySelector("#pilotWillingToPay"),
+  pilotFeedbackNotes: document.querySelector("#pilotFeedbackNotes"),
+  pilotFeedbackStatus: document.querySelector("#pilotFeedbackStatus"),
   commandProgressBar: document.querySelector("#commandProgressBar"),
   commandProgressSteps: document.querySelector("#commandProgressSteps"),
   commandRunReceipt: document.querySelector("#commandRunReceipt"),
@@ -3616,7 +3627,7 @@ async function testModelProvider() {
   if (!elements.testModelProviderButton) return;
   elements.testModelProviderButton.disabled = true;
   elements.testModelProviderButton.textContent = "测试中";
-  setControlStatus("正在测试模型连接...");
+  setControlStatus("Testing model connection...");
   try {
     const result = await postJson("/api/model-provider/test", modelProviderPayload());
     const status = result.result || {};
@@ -3698,10 +3709,10 @@ async function previewAiContextForFirstRealOrder(options = {}) {
     }
     if (elements.firstRealOrderSummary) {
       elements.firstRealOrderSummary.textContent = preview.providerMode === "demo_only"
-        ? "当前没有真实模型配置。请配置 BYO Key 或 Local Model 后再跑真实 AI 小任务。"
+        ? "Demo Only is active: no AI call will be made, and only the safety loop is shown. Configure BYO API Key or Local Model to generate real diffs."
         : preview.ok
-          ? "已展示将发送给模型的文件列表；下一步生成方案、Diff、验证并进入 Human Gate。"
-          : "真实 AI 小任务暂时阻断：请先修复模型配置或上下文问题。";
+          ? "The files that may be sent to the model are listed. Next: plan, diff, verification, and Human Gate."
+          : "The real AI task is blocked for now. Fix model configuration or context issues first.";
     }
     return preview;
   } catch (error) {
@@ -3717,21 +3728,84 @@ async function runFirstRealOrder() {
   const preview = await previewAiContextForFirstRealOrder({ template });
   if (!preview) return;
   if (preview.providerMode === "demo_only") {
-    setControlStatus("Demo Only 不会调用模型；请先配置 BYO Key 或 Local Model。");
+    if (elements.missionModeSelect) elements.missionModeSelect.value = "sandbox_patch";
+    if (elements.missionInput) elements.missionInput.value = FIRST_ORDER_TITLE;
+    setControlStatus("Demo Only does not call AI; it only shows the safety loop. Configure BYO API Key or Local Model to generate real diffs.");
+    await runFirstOrder();
     return;
   }
   if (!preview.ok) {
-    setControlStatus("真实 AI 小任务暂时不能开始：请先修复模型配置或上下文阻断。");
+    setControlStatus("The real AI task cannot start yet. Fix model configuration or context blockers first.");
     return;
   }
   if (elements.missionModeSelect) elements.missionModeSelect.value = "sandbox_patch";
   if (elements.missionInput) elements.missionInput.value = template.title;
-  setControlStatus("真实 AI 小任务开始：先看上下文，再生成方案和 Diff。");
+  setControlStatus("Real AI task started: preview context, then generate plan and diff.");
   await runCodingLoop({
     mode: "sandbox_patch",
     title: template.title,
     patchCandidates: template.files
   });
+  revealPilotFeedbackPanel("First task finished. You can export the pilot feedback JSON.");
+}
+
+function revealPilotFeedbackPanel(message = "After the first task, export the pilot feedback JSON.") {
+  if (!elements.pilotFeedbackPanel) return;
+  elements.pilotFeedbackPanel.hidden = false;
+  if (elements.pilotFeedbackStatus) elements.pilotFeedbackStatus.textContent = message;
+}
+
+function pilotFeedbackPayload() {
+  return {
+    testerId: elements.pilotTesterId?.value || "",
+    understoodTool: elements.pilotUnderstoodTool?.value || "unspecified",
+    understoodNoAutoWrite: elements.pilotNoAutoWrite?.value || "unspecified",
+    blockedAt: elements.pilotBlockedAt?.value || "",
+    trustRealProject: elements.pilotTrustRealProject?.value || "unspecified",
+    feedbackScore: elements.pilotFeedbackScore?.value || "",
+    willingToPay: elements.pilotWillingToPay?.value || "",
+    notes: elements.pilotFeedbackNotes?.value || "",
+    firstTaskStatus: state.taskInsight?.status || state.liveRun?.status || "unknown",
+    diffVisible: state.taskInsight?.html?.includes("diff") || state.inspectorTab === "diff" ? "yes" : "unsure",
+    humanGateUnderstood: elements.pilotNoAutoWrite?.value || "unspecified",
+    applyClicked: "unsure",
+    rollbackAvailable: state.taskInsight?.html?.includes("Rollback") || state.taskInsight?.html?.includes("回滚") ? "yes" : "unsure",
+    supportBundleGenerated: elements.supportBundleStatus?.textContent?.includes("已生成") ? "yes" : "unsure",
+    blockerCategory: elements.pilotBlockedAt?.value || ""
+  };
+}
+
+async function submitPilotFeedback(event) {
+  event.preventDefault();
+  if (!elements.pilotFeedbackForm) return;
+  const button = elements.pilotFeedbackForm.querySelector("button[type='submit']");
+  if (button) {
+    button.disabled = true;
+    button.textContent = "Exporting";
+  }
+  if (elements.pilotFeedbackStatus) elements.pilotFeedbackStatus.textContent = "Exporting redacted pilot feedback JSON...";
+  try {
+    const result = await postJson("/api/pilot/feedback", pilotFeedbackPayload(), {
+      headers: {
+        "X-Codex-Office-Local": "pilot-feedback"
+      }
+    });
+    const feedback = result.feedback || {};
+    if (elements.pilotFeedbackStatus) {
+      elements.pilotFeedbackStatus.textContent = `Exported: ${feedback.feedbackPath || "data/pilot-feedback"}`;
+    }
+    setControlStatus("Pilot feedback exported without API keys or source contents.");
+    await fetchStatus();
+  } catch (error) {
+    const message = uiErrorMessage(error, "Pilot feedback export failed");
+    if (elements.pilotFeedbackStatus) elements.pilotFeedbackStatus.textContent = message;
+    setControlStatus(message);
+  } finally {
+    if (button) {
+      button.disabled = false;
+      button.textContent = "Export Pilot Feedback JSON";
+    }
+  }
 }
 
 async function testLocalJudgeConnection() {
@@ -3932,7 +4006,7 @@ function renderFirstRunOnboarding(snapshot) {
   if (!required) return;
 
   const steps = onboarding.steps || [];
-  elements.onboardingSummary.textContent = zhText(onboarding.summary || "Coding猿 是你的 Mac 本地 AI 程序员：先拿证据，再给 diff，确认后才改代码。");
+  elements.onboardingSummary.textContent = zhText(onboarding.summary || "Codingape Office is your local AI coding worker for Mac. It shows evidence and diffs before any code write.");
   elements.onboardingStepList.innerHTML = steps.length
     ? steps.map(onboardingStepTemplate).join("")
     : `<div class="onboarding-step status-blocked"><span>等待</span><strong>选择本地项目目录</strong><small>首次启动需要授权 project root。</small></div>`;
@@ -3941,8 +4015,8 @@ function renderFirstRunOnboarding(snapshot) {
   if (elements.onboardingEnterOfficeButton) elements.onboardingEnterOfficeButton.disabled = !hasProject;
   if (elements.onboardingStatus) {
     elements.onboardingStatus.textContent = hasProject
-      ? "项目已授权，可以运行安全示例任务或进入 Office。"
-      : "请选择一个本地项目目录；系统不会默认扫描全盘。";
+      ? "Project authorized. You can run the first task; Demo Only will not call AI."
+      : "Choose a local project folder; the system will not scan the full disk by default.";
   }
 }
 
@@ -4037,9 +4111,9 @@ function renderBetaOpsPanel(snapshot) {
     }
   ];
 
-  elements.betaOpsStatus.textContent = zhText(betaOps.statusLabel || "外测阻断");
+  elements.betaOpsStatus.textContent = zhText(betaOps.statusLabel || "Pilot blocked");
   elements.betaOpsStatus.className = betaOpsStatusTone(betaOps.status);
-  elements.betaOpsSummary.textContent = zhText(betaOps.summary || "等待可信分发和 3-5 位外测记录。");
+  elements.betaOpsSummary.textContent = zhText(betaOps.summary || "Waiting for trusted distribution and 3-5 external tester records.");
   elements.betaOpsTesterCount.textContent = `${cohort.testerCount || 0}/${targetMin}-${targetMax}`;
   elements.betaOpsFirstOrderRate.textContent = `${firstOrderRate}%`;
   elements.betaOpsSupportCount.textContent = String(cohort.supportBundleCount || 0);
@@ -4049,7 +4123,7 @@ function renderBetaOpsPanel(snapshot) {
     : `<div class="beta-ops-row severity-medium"><span>0</span><strong>暂无卡点</strong><small>记录测试者结果后会自动量化。</small></div>`;
   elements.betaOpsNextActions.innerHTML = (betaOps.nextActions || []).length
     ? betaOps.nextActions.slice(0, 4).map(operationalActionTemplate).join("")
-    : `<div class="ops-next-action"><strong>外测可扩量</strong><span>继续扩大 cohort 并监控第一单成功率。</span></div>`;
+    : `<div class="ops-next-action"><strong>Pilot can expand</strong><span>Keep growing the cohort and monitor first-task success rate.</span></div>`;
 }
 
 function renderRoomOpsRibbon(snapshot) {
@@ -6547,7 +6621,7 @@ function seededDemoTask(stepIndex = DEMO_REPLAY_STEPS.length - 1) {
   const task = {
     id: "demo_mac_mvp_paid_loop",
     projectId: "demo-coding-yuan-office",
-    projectName: "Demo Data · Coding猿 Office Mac App",
+    projectName: "Demo Data · Codingape Office Mac App",
     workerId: "coding-yuan",
     workerName: "Coding猿",
     title: "Demo Data · 修复 Apply Gate 状态并生成可审计补丁",
@@ -6607,7 +6681,7 @@ function seededDemoSnapshot(stepIndex = DEMO_REPLAY_STEPS.length - 1) {
   const task = seededDemoTask(stepIndex);
   const project = {
     id: "demo-coding-yuan-office",
-    name: "Demo Data · Coding猿 Office Mac App",
+    name: "Demo Data · Codingape Office Mac App",
     path: "/Users/you/Code/coding-yuan-office-demo",
     folder: "coding-yuan-office-demo",
     role: "Mac 本地代码项目",
@@ -6723,8 +6797,8 @@ function seededDemoSnapshot(stepIndex = DEMO_REPLAY_STEPS.length - 1) {
   }));
   const companyReport = {
     generatedAt: demoIso(Math.max(7, stepIndex)),
-    headline: "Demo Data · Coding猿 Office 已跑通 Mac 本地可付费闭环。",
-    shareLine: "Demo Data · 先拿证据，再给 diff，确认后才改代码。",
+    headline: "Demo Data · Codingape Office completed the local Mac paid-loop replay.",
+    shareLine: "Demo Data · Evidence first, diff second, writes only after approval.",
     metrics: [
       { label: "完成任务", value: 1 },
       { label: "证据包", value: 1 },
@@ -7373,7 +7447,7 @@ async function runCodingLoop(options = {}) {
 
   const project = missionSelectedProject(state.snapshot);
   if (!project) {
-    const message = "请先选择一个本地项目目录。Coding猿 Office 不会默认扫描全盘。";
+    const message = "Choose a local project folder first. Codingape Office will not scan the full disk by default.";
     setControlStatus(message);
     setLiveRunStatus("failed", "", message);
     return;
@@ -7450,12 +7524,13 @@ async function runCodingLoop(options = {}) {
 async function runFirstOrder() {
   if (elements.missionModeSelect) elements.missionModeSelect.value = "sandbox_patch";
   if (elements.missionInput) elements.missionInput.value = FIRST_ORDER_TITLE;
-  setControlStatus("正在准备第一单安全闭环...");
+  setControlStatus("Preparing the first-task safety loop...");
   await runCodingLoop({
     mode: "sandbox_patch",
     title: FIRST_ORDER_TITLE,
     safeFirstOrder: true
   });
+  revealPilotFeedbackPanel("The first-task safety loop finished. You can export the pilot feedback JSON.");
 }
 
 async function viewDossier() {
@@ -7551,7 +7626,7 @@ async function openSupportBundleDirectory() {
 }
 
 async function copyDiagnosticSummary() {
-  const summary = state.snapshot?.supportCenter?.diagnosticSummary || "Coding猿 Office 诊断摘要暂不可用。";
+  const summary = state.snapshot?.supportCenter?.diagnosticSummary || "Codingape Office diagnostic summary is not available yet.";
   try {
     if (!navigator.clipboard?.writeText) throw new Error("clipboard_unavailable");
     await navigator.clipboard.writeText(summary);
@@ -7683,6 +7758,7 @@ function attachLocalOfficeHandlers() {
   elements.testModelProviderButton?.addEventListener("click", testModelProvider);
   elements.previewAiContextButton?.addEventListener("click", () => previewAiContextForFirstRealOrder());
   elements.runFirstRealOrderButton?.addEventListener("click", runFirstRealOrder);
+  elements.pilotFeedbackForm?.addEventListener("submit", submitPilotFeedback);
   elements.approvalList.addEventListener("click", (event) => {
     const button = event.target.closest("[data-approval-action]");
     if (!button) return;

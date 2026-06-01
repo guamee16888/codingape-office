@@ -95,6 +95,9 @@ const PATCH_SNAPSHOT_DIR = join(DATA_DIR, "patch-snapshots");
 const ROLLBACK_DIR = join(DATA_DIR, "rollbacks");
 const TASK_REPORT_DIR = join(DATA_DIR, "task-reports");
 const SUPPORT_BUNDLE_DIR = join(DATA_DIR, "support-bundles");
+const PILOT_FEEDBACK_DIR = join(DATA_DIR, "pilot-feedback");
+const PILOT_METRICS_DIR = join(DATA_DIR, "pilot");
+const PILOT_LATEST_FILE = join(PILOT_METRICS_DIR, "latest.json");
 const BETA_OPS_DIR = join(DATA_DIR, "beta-ops");
 const BETA_TESTER_RUNS_FILE = join(BETA_OPS_DIR, "tester-runs.jsonl");
 const BETA_SUPPORT_BUNDLE_DIR = join(BETA_OPS_DIR, "support-bundles");
@@ -114,7 +117,7 @@ const DEMO_PLAYBACK_DELAY_MS = Math.max(
   0,
   Math.min(1200, Number(process.env.CODEX_OFFICE_DEMO_PLAYBACK_DELAY_MS || 220))
 );
-const FIRST_ORDER_TITLE = "给 README 增加一个 Coding猿 Beta 测试段落";
+const FIRST_ORDER_TITLE = "Add a Codingape pilot note to README";
 
 const SKIP_DIRS = new Set([
   ".git",
@@ -1941,23 +1944,27 @@ function buildFirstRunOnboarding({ localProjects = {}, firstRunChecklist = {} } 
   const selectedPath = localProjects.selectedPath || "";
   const hasProject = Boolean(localProjects.selectedProjectId && selectedPath);
   const runtimeOk = ["git", "node", "npm"].every((id) => byId.get(id)?.status === "passed");
-  const apiKeyOk = byId.get("api_key")?.status === "passed";
+  const modelSettings = readModelSettings();
+  const provider = redactedModelProviderSettings(modelSettings);
+  const providerReady = modelProviderReady(modelSettings);
+  const modelConfigured = provider.providerMode === "demo_only" || providerReady.ok;
   const safetyOk = !firstRunChecklist.blockers?.length;
 
   return {
     required: !hasProject,
     status: hasProject ? "complete" : "needs_project",
-    title: "欢迎使用 Coding猿 Office",
-    summary: "Coding猿 是你的 Mac 本地 AI 程序员：先拿证据，再给 diff，确认后才改代码。",
+    title: "Start The Codingape Office Pilot",
+    summary: "Codingape Office is your local AI coding worker for Mac. It shows evidence and diffs before any code write.",
     selectedPath,
     safeTaskTitle: FIRST_ORDER_TITLE,
     steps: [
-      firstRunOnboardingStep("welcome", "欢迎", "passed", "本地 AI 程序员，确认后才改代码。"),
-      firstRunOnboardingStep("project_root", "选择本地项目目录", hasProject ? "passed" : "blocked", hasProject ? selectedPath : "请选择一个 project root。"),
-      firstRunOnboardingStep("runtime", "检查 Git / Node / npm", runtimeOk ? "passed" : "blocked", runtimeOk ? "运行环境可用。" : "按提示安装或修复 Git、Node、npm。"),
-      firstRunOnboardingStep("api_key", "配置 API Key 或确认 BYO key", apiKeyOk ? "passed" : "warning", apiKeyOk ? "AIWC key 已配置且不会明文显示。" : "可以继续本地 beta，集中日志会作为 warning。"),
-      firstRunOnboardingStep("self_check", "运行安全自检", safetyOk ? "passed" : "blocked", firstRunChecklist.summary || "刷新状态后会显示安全自检。"),
-      firstRunOnboardingStep("safe_task", "创建一个安全示例任务", hasProject ? "ready" : "blocked", FIRST_ORDER_TITLE)
+      firstRunOnboardingStep("welcome", "Welcome", "passed", "Local AI coding worker; writes only after approval."),
+      firstRunOnboardingStep("project_root", "Choose local project folder", hasProject ? "passed" : "blocked", hasProject ? selectedPath : "Choose one project root."),
+      firstRunOnboardingStep("runtime", "Check Git / Node / npm", runtimeOk ? "passed" : "blocked", runtimeOk ? "Runtime is available." : "Install or fix Git, Node, and npm."),
+      firstRunOnboardingStep("model_mode", "Choose model mode", "ready", "Demo Only can run the safety loop first; BYO API Key or Local Model can generate real diffs."),
+      firstRunOnboardingStep("api_key", "Test model connection", modelConfigured ? "passed" : "warning", modelConfigured ? "Model mode is available; secrets are hidden." : "Without a model, Codingape Office enters Demo Only and does not call AI."),
+      firstRunOnboardingStep("self_check", "Run safety self-check", safetyOk ? "passed" : "blocked", firstRunChecklist.summary || "Refresh status to see the safety self-check."),
+      firstRunOnboardingStep("safe_task", "Run first task", hasProject ? "ready" : "blocked", FIRST_ORDER_TITLE)
     ]
   };
 }
@@ -1979,7 +1986,7 @@ function buildErrorRecoveryGuide({ firstRunChecklist = {}, localProjects = {}, a
   const projectIsGitRepo = checks.get("git_repo")?.status === "passed";
   return [
     recoveryItem("local_service_start_failed", "本地服务启动失败", "App 无法从本机服务拿到 /office。", "先复制重启提示；如果仍失败，生成支持包并附上 ~/Library/Logs/com.geoaifactory.codex-office.err.log。", "error"),
-    recoveryItem("port_4142_busy", "4142 端口占用", "另一个进程占用了 Coding猿 Office 的默认端口。", "运行 lsof -nP -iTCP:4142 -sTCP:LISTEN 找到进程；退出旧服务后重新打开 App。", "error"),
+    recoveryItem("port_4142_busy", "Port 4142 is busy", "Another process is using the Codingape Office default port.", "Run lsof -nP -iTCP:4142 -sTCP:LISTEN, stop the old service, then reopen the app.", "error"),
     recoveryItem("node_missing", "Node/npm 缺失", checks.get("node")?.detail || checks.get("npm")?.detail || "未检测到 Node 或 npm。", "安装 Node.js LTS，或确认 /opt/homebrew/bin/node 和 npm 在 PATH 中。", checks.get("node")?.status === "passed" && checks.get("npm")?.status === "passed" ? "info" : "error"),
     recoveryItem("git_missing", "Git 缺失", checks.get("git")?.detail || "未检测到 git。", "安装 Xcode Command Line Tools，或运行 xcode-select --install。", checks.get("git")?.status === "passed" ? "info" : "error"),
     recoveryItem("api_key_missing", "API Key 缺失", aiwcHealth.missing?.length ? `缺少 ${aiwcHealth.missing.join(", ")}` : "集中日志 key 未配置。", "本地 beta 可继续；要开启 AIWC 集中日志，请在启动环境里配置 AIWC_BASE_URL、AIWC_INGESTION_API_KEY、AIWC_PROJECT_ID、AIWC_AGENT_ID。", aiwcHealth.configured ? "info" : "warning"),
@@ -2019,7 +2026,7 @@ function buildRecentErrors(events = [], tasks = [], limit = 20) {
 
 function buildDiagnosticSummary({ operationalReadiness = {}, firstRunChecklist = {}, aiwcHealth = {}, recentErrors = [] } = {}) {
   return [
-    `Coding猿 Office 诊断摘要`,
+    `Codingape Office diagnostic summary`,
     `运营状态：${operationalReadiness.statusLabel || "未知"} (${operationalReadiness.score || 0}/100)`,
     `First Run：${firstRunChecklist.statusLabel || "未知"}`,
     `AIWC：${aiwcHealth.statusLabel || "未知"}${aiwcHealth.missing?.length ? `，缺少 ${aiwcHealth.missing.join(", ")}` : ""}`,
@@ -2149,7 +2156,7 @@ function buildSupportBundle(snapshot = buildSnapshot()) {
   return {
     generatedAt: new Date().toISOString(),
     app: {
-      name: "Coding猿 Office",
+      name: "Codingape Office",
       version: "0.1.0",
       branch: run("git", ["branch", "--show-current"], __dirname) || "detached",
       commit: run("git", ["rev-parse", "--short", "HEAD"], __dirname),
@@ -2257,6 +2264,136 @@ function writeSupportBundle() {
   };
 }
 
+function pilotFeedbackRelativePath(fileName) {
+  return `data/pilot-feedback/${fileName}`;
+}
+
+function redactPilotText(value = "", maxLength = 600) {
+  const settings = readModelSettings();
+  let text = String(value || "");
+  if (settings.apiKey) text = text.split(settings.apiKey).join("[REDACTED]");
+  text = text
+    .replace(/sk-[A-Za-z0-9_-]{16,}/g, "[REDACTED]")
+    .replace(/(api[_-]?key|token|password|secret)\s*[:=]\s*["']?[^"'\s]+/gi, "$1=[REDACTED]")
+    .replace(/\s+/g, " ")
+    .trim();
+  return text.slice(0, maxLength);
+}
+
+function normalizePilotChoice(value = "") {
+  const text = redactPilotText(value, 80).toLowerCase();
+  if (["yes", "true", "understood", "safe", "ok", "1", "是"].includes(text)) return "yes";
+  if (["no", "false", "not_sure", "0", "否"].includes(text)) return "no";
+  if (["unsure", "maybe", "不确定"].includes(text)) return "unsure";
+  return text || "unspecified";
+}
+
+function normalizePilotScore(value) {
+  const score = Number(value);
+  if (!Number.isFinite(score)) return null;
+  return Math.max(1, Math.min(5, Math.round(score)));
+}
+
+function buildPilotFeedbackRecord(body = {}) {
+  const snapshot = buildSnapshot();
+  const provider = snapshot.modelProvider || modelProviderSnapshot();
+  return {
+    testerId: redactPilotText(body.testerId || `pilot-${Date.now().toString(36)}`, 80),
+    submittedAt: new Date().toISOString(),
+    understoodTool: normalizePilotChoice(body.understoodTool),
+    understoodNoAutoWrite: normalizePilotChoice(body.understoodNoAutoWrite),
+    blockedAt: redactPilotText(body.blockedAt, 320),
+    trustRealProject: normalizePilotChoice(body.trustRealProject),
+    feedbackScore: normalizePilotScore(body.feedbackScore),
+    willingToPay: redactPilotText(body.willingToPay, 160),
+    notes: redactPilotText(body.notes, 600),
+    installStatus: "local_service_reached",
+    modelConfigStatus: provider.providerMode === "demo_only"
+      ? "demo_only"
+      : provider.apiKeyConfigured || provider.providerMode === "local_model"
+        ? "configured"
+        : "missing",
+    firstTaskStatus: redactPilotText(body.firstTaskStatus || "unknown", 80),
+    diffVisible: normalizePilotChoice(body.diffVisible),
+    humanGateUnderstood: normalizePilotChoice(body.humanGateUnderstood || body.understoodNoAutoWrite),
+    applyClicked: normalizePilotChoice(body.applyClicked),
+    rollbackAvailable: normalizePilotChoice(body.rollbackAvailable),
+    supportBundleGenerated: normalizePilotChoice(body.supportBundleGenerated),
+    blockerCategory: redactPilotText(body.blockerCategory || body.blockedAt || "", 120),
+    modelProvider: {
+      providerMode: provider.providerMode,
+      provider: provider.provider,
+      model: provider.model,
+      apiKeyConfigured: Boolean(provider.apiKeyConfigured)
+    },
+    privacy: {
+      containsApiKey: false,
+      containsSourceCode: false,
+      containsSensitiveFileContent: false
+    }
+  };
+}
+
+function writePilotFeedback(body = {}) {
+  const record = buildPilotFeedbackRecord(body);
+  const fileName = `${record.submittedAt.replace(/[:.]/g, "-")}-${record.testerId.replace(/[^a-z0-9_-]/gi, "_")}.json`;
+  mkdirSync(PILOT_FEEDBACK_DIR, { recursive: true });
+  mkdirSync(PILOT_METRICS_DIR, { recursive: true });
+  writeFileSync(join(PILOT_FEEDBACK_DIR, fileName), JSON.stringify(record, null, 2), "utf8");
+  writeFileSync(PILOT_LATEST_FILE, JSON.stringify(record, null, 2), "utf8");
+  return {
+    ...record,
+    fileName,
+    feedbackPath: pilotFeedbackRelativePath(fileName),
+    metricsPath: "data/pilot/latest.json"
+  };
+}
+
+async function handlePilotFeedback(request, response) {
+  const body = await readRequestJson(request);
+  if (
+    !hostAllowsNativeFolderPicker(request.headers.host || "") ||
+    request.headers["x-codex-office-local"] !== "pilot-feedback"
+  ) {
+    sendJson(response, {
+      ok: false,
+      status: "blocked",
+      error: "Pilot feedback export is only available from localhost."
+    }, 403);
+    return;
+  }
+
+  const feedback = writePilotFeedback(body);
+  appendWorkerEvent({
+    workerId: "ops-yuan",
+    workerName: eventWorkerName("ops-yuan"),
+    projectId: selectedLocalProjectRecord(readLocalProjectRegistry(LOCAL_PROJECTS_FILE))?.id || "",
+    type: "pilot_feedback_exported",
+    title: "Pilot feedback JSON exported",
+    detail: feedback.feedbackPath,
+    risk: "low",
+    evidence: [feedback.feedbackPath, feedback.metricsPath]
+  });
+  sendJson(response, {
+    ok: true,
+    feedback: {
+      testerId: feedback.testerId,
+      submittedAt: feedback.submittedAt,
+      feedbackPath: feedback.feedbackPath,
+      metricsPath: feedback.metricsPath,
+      feedbackScore: feedback.feedbackScore,
+      blockerCategory: feedback.blockerCategory
+    }
+  });
+}
+
+async function handlePilotMetrics(_request, response) {
+  sendJson(response, {
+    ok: true,
+    pilot: readJson(PILOT_LATEST_FILE) || null
+  });
+}
+
 async function handleOperationalReadiness(_request, response) {
   sendJson(response, {
     ok: true,
@@ -2296,11 +2433,11 @@ async function handleAiwcHealthCheck(_request, response) {
     run_id_external: `codex-office:aiwc-health:${Date.now().toString(36)}`,
     input: {
       workflow: "aiwc_health_check",
-      source: "Coding猿 Office"
+      source: "Codingape Office"
     },
     output: {
       ok: true,
-      message: "AIWC health check from Coding猿 Office."
+      message: "AIWC health check from Codingape Office."
     },
     model: "codex-office-health-check",
     provider: "local",
@@ -2689,21 +2826,21 @@ function safeFirstOrderPatchDraft(project) {
   }
 
   const section = [
-    "<!-- coding-yuan-beta-test:start -->",
-    "## Coding猿 Beta 测试",
+    "<!-- coding-yuan-external-pilot:start -->",
+    "## Codingape Pilot Note",
     "",
-    "本项目已接入 Coding猿 Office Beta 的本地安全闭环：先生成 Evidence Pack，再生成 Patch Proposal 和 Diff Preview，运行 Verification，通过 Human Gate 后才允许 Apply Approved Patch。",
+    "This project has been tested with the Codingape Office pilot safety loop: Evidence Pack first, then Patch Proposal and Diff Preview, then Verification, with Apply Approved Patch allowed only after Human Gate.",
     "",
-    "- 写入前会创建 rollback snapshot。",
-    "- 所有目标文件必须在当前授权 project root 内。",
-    "- 用户确认前不会修改项目文件。",
+    "- A rollback snapshot is created before writes.",
+    "- Every target file must stay inside the authorized project root.",
+    "- Project files are not modified before user approval.",
     "",
-    "<!-- coding-yuan-beta-test:end -->",
+    "<!-- coding-yuan-external-pilot:end -->",
     ""
   ].join("\n");
   const content = targetExisted
     ? `${existing.replace(/\s*$/, "\n\n")}${section}`
-    : `# Coding猿 Beta Test\n\n${section}`;
+    : `# Codingape External Pilot\n\n${section}`;
 
   return {
     ok: true,
@@ -4803,7 +4940,7 @@ async function handleRunCodingLoop(request, response, projectId) {
       workerName: eventWorkerName("judge-yuan"),
       projectId: task.projectId,
       type: "human_gate_approved",
-      title: `${body.safeFirstOrder ? "第一单人工闸门已准备" : "Judge猿批准沙盒预检"}：${task.title}`,
+      title: `${body.safeFirstOrder ? "First-task Human Gate ready" : "Judge approved sandbox preflight"}: ${task.title}`,
       detail: decision.note,
       risk: "low",
       evidence: [...new Set([...(finalTask.evidence || []), finalTask.proposal, finalTask.verification].filter(Boolean))].slice(0, 6)
@@ -5488,6 +5625,16 @@ const server = createServer(async (request, response) => {
 
     if (url.pathname === "/api/aiwc/health-check" && request.method === "GET") {
       await handleAiwcHealthCheck(request, response);
+      return;
+    }
+
+    if (url.pathname === "/api/pilot/feedback" && request.method === "POST") {
+      await handlePilotFeedback(request, response);
+      return;
+    }
+
+    if (url.pathname === "/api/pilot/metrics" && request.method === "GET") {
+      await handlePilotMetrics(request, response);
       return;
     }
 

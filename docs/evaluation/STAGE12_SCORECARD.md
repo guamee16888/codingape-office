@@ -27,7 +27,7 @@ Status: completed.
 | Diff extraction applied | 0 |
 | Final model pass rate | 100% |
 | Safety blocked | 0 |
-| Retry recovered | 1 |
+| Retry recovered | 2 |
 | Retry recovery rate | 100% |
 | Top failure categories | none |
 | Meets external-test standard | yes |

@@ -4,8 +4,6 @@
 
 Codingape Office helps a developer turn a task into evidence, a plan, a patch, verification, a human approval gate, and a rollback-ready report before any code is written to the project.
 
-中文：你的 Mac 本地 AI 程序员。先给证据和 Diff，确认后才改代码。
-
 ![Codingape Office demo](docs/media/codingape-office-demo.gif)
 
 ## Why This Exists
@@ -82,6 +80,16 @@ npm run evaluate:ai-patch-worker
 
 If no model provider is configured, evaluation reports skipped/demo-only behavior instead of pretending that AI succeeded.
 
+## First Pilot Task
+
+For an external pilot run, open `/office`, choose a small local project folder, and click:
+
+```text
+Run First Task: Update README
+```
+
+The first task is intentionally small. It should show the context preview, plan, diff, verification, Human Gate, Apply Gate, rollback/report path, and a feedback export. If no model provider is configured, Codingape Office stays in Demo Only and clearly says that no AI call was made.
+
 ## Model Provider Modes
 
 Codingape Office can run in three modes:
@@ -93,6 +101,17 @@ Codingape Office can run in three modes:
 | Local Model | Uses a local Ollama, LM Studio, or OpenAI-compatible endpoint. |
 
 When a model is used, Codingape Office may send task-relevant code snippets to the selected provider. It does not upload the whole project by default, and it does not write code before user approval.
+
+## Pilot Feedback
+
+External pilot docs live in:
+
+- `docs/pilot/EXTERNAL_PILOT_RUNBOOK.md`
+- `docs/pilot/TESTER_INVITE_TEMPLATE.md`
+- `docs/pilot/PILOT_SCORECARD.md`
+- `docs/pilot/KNOWN_ISSUES.md`
+
+After the first task, testers can export a redacted feedback JSON under `data/pilot-feedback/`. The lightweight latest metrics file is `data/pilot/latest.json`. These files are local runtime data and are intentionally not committed.
 
 ## Safety Principles
 
@@ -176,6 +195,13 @@ The real `cloudflared-geoaifactory.yml` file is intentionally ignored because it
 ## Status
 
 This is an early open-source macOS AI coding worker. It is useful for local demos, controlled patch experiments, and safety-gated AI coding evaluation. It is not yet a polished App Store release.
+
+Known limitations:
+
+- It is not a fully autonomous developer.
+- Complex tasks can fail or produce invalid diffs.
+- Real patch quality depends on the selected model.
+- Apple signing, TestFlight, and Mac App Store account steps are handled outside this repository.
 
 ## License
 

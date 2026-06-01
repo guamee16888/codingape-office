@@ -21,9 +21,9 @@ test("First Run onboarding appears when no project root is authorized", async ()
   assert.match(app, /function renderFirstRunOnboarding\(snapshot\)/);
   assert.match(app, /Boolean\(onboarding\.required\)/);
   assert.match(server, /function buildFirstRunOnboarding/);
-  assert.match(server, /欢迎/);
-  assert.match(server, /配置 API Key 或确认 BYO key/);
-  assert.match(server, /创建一个安全示例任务/);
+  assert.match(server, /Start The Codingape Office Pilot/);
+  assert.match(server, /Choose model mode/);
+  assert.match(server, /Run first task/);
 });
 
 test("Safe Demo Task prepares README patch through guarded first-order loop", async () => {
@@ -31,11 +31,11 @@ test("Safe Demo Task prepares README patch through guarded first-order loop", as
   const app = await readProjectFile("public/app.js");
   const server = await readProjectFile("server.js");
 
-  assert.match(html, /id="runFirstOrderButton"[\s\S]*?>跑第一单<\/button>/);
-  assert.match(app, /const FIRST_ORDER_TITLE = "给 README 增加一个 Coding猿 Beta 测试段落"/);
+  assert.match(html, /id="runFirstOrderButton"[\s\S]*?>Run first task<\/button>/);
+  assert.match(app, /const FIRST_ORDER_TITLE = "Add a Codingape pilot note to README"/);
   assert.match(app, /async function runFirstOrder\(\)/);
   assert.match(app, /safeFirstOrder:\s*true/);
-  assert.match(server, /const FIRST_ORDER_TITLE = "给 README 增加一个 Coding猿 Beta 测试段落"/);
+  assert.match(server, /const FIRST_ORDER_TITLE = "Add a Codingape pilot note to README"/);
   assert.match(server, /function safeFirstOrderPatchDraft\(project\)/);
   assert.match(server, /function captureFirstOrderVerificationEvidence\(task, project, firstOrder\)/);
   assert.match(server, /coding-yuan-first-order-self-check/);

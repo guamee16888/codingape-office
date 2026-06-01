@@ -29,7 +29,7 @@ test("project discovery only uses explicitly saved local project records", async
   assert.match(server, /project_root_required/);
   assert.match(server, /project_root_not_authorized/);
   assert.match(app, /当前授权项目/);
-  assert.match(app, /Coding猿 Office 不会默认扫描全盘/);
+  assert.match(app, /Codingape Office will not scan the full disk by default/);
 });
 
 test("task and apply endpoints require the current authorized project root", async () => {

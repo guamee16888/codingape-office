@@ -300,7 +300,7 @@ test("Context Preview and First Real Order UX are wired without auto apply", () 
   const app = readProjectFile("public/app.js");
   const server = readProjectFile("server.js");
 
-  assert.match(html, /跑第一单：真实 AI 小任务/);
+  assert.match(html, /Run First Task: Update README/);
   assert.match(html, /id="contextPreviewPanel"/);
   assert.match(html, /不会默认上传整个项目/);
   assert.match(app, /previewAiContextForFirstRealOrder/);

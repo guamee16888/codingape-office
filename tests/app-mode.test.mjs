@@ -30,11 +30,11 @@ test("public beta page explains download, safety, limits, support, and demo", as
   const css = await readProjectFile("public/control-room.css");
 
   assert.match(html, /id="betaPage"/);
-  assert.match(html, /Mac Beta 下载与首次测试/);
-  assert.match(html, /安全承诺/);
-  assert.match(html, /Beta 限制/);
-  assert.match(html, /支持包与反馈/);
-  assert.match(html, /3 分钟 Demo/);
+  assert.match(html, /Mac Beta Download And First Test/);
+  assert.match(html, /Safety Promise/);
+  assert.match(html, /Beta Limits/);
+  assert.match(html, /Support And Feedback/);
+  assert.match(html, /3-minute Demo/);
   assert.match(app, /function renderPublicBeta\(\)/);
   assert.match(app, /if \(APP_MODE === AppMode\.publicBeta\)[\s\S]*?renderPublicBeta\(\);[\s\S]*?return;/);
   assert.match(css, /body\[data-app-mode="public_beta"\] \.app-shell/);
@@ -45,7 +45,7 @@ test("public home is a beta landing page instead of an empty console", async () 
   const app = await readProjectFile("public/app.js");
   const css = await readProjectFile("public/control-room.css");
 
-  assert.match(html, /你的 Mac 本地 AI 程序员，先拿证据，再给 diff，确认后才改代码。/);
+  assert.match(html, /Your local AI coding worker for Mac\. Evidence first, diff second, writes only after approval\./);
   assert.match(html, /Join Mac Beta/);
   assert.match(html, /Watch Demo/);
   assert.match(app, /if \(APP_MODE === AppMode\.publicHome\)[\s\S]*?renderPublicHome\(\);[\s\S]*?return;/);

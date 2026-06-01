@@ -5409,3 +5409,56 @@ body[data-app-mode="local_office"] .project-root-label span {
   color: rgba(232, 243, 255, 0.65);
   font-size: 0.76rem;
 }
+
+/* v27: Stage-13 external pilot feedback pack. */
+.pilot-feedback-panel {
+  border: 1px solid rgba(48, 224, 198, 0.16);
+  border-radius: 8px;
+  padding: 12px;
+  background: rgba(10, 28, 24, 0.62);
+}
+
+.pilot-feedback-panel[hidden] {
+  display: none;
+}
+
+.pilot-feedback-panel p,
+.pilot-feedback-panel small {
+  color: rgba(232, 243, 255, 0.76);
+  line-height: 1.45;
+}
+
+.pilot-feedback-form {
+  display: grid;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.pilot-feedback-form label {
+  display: grid;
+  gap: 5px;
+}
+
+.pilot-feedback-form span {
+  color: rgba(255, 255, 255, 0.62);
+  font-size: 0.68rem;
+  font-weight: 900;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.pilot-feedback-form input,
+.pilot-feedback-form select,
+.pilot-feedback-form textarea {
+  width: 100%;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 6px;
+  padding: 8px 9px;
+  background: rgba(5, 10, 16, 0.78);
+  color: #f7fbff;
+  font: inherit;
+}
+
+.pilot-feedback-form textarea {
+  resize: vertical;
+}
