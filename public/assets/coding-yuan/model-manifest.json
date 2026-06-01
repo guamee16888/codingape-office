@@ -1,0 +1,9 @@
+{
+  "model": null,
+  "clips": {
+    "idle": "idle",
+    "typing": "typing",
+    "scan": "scan",
+    "selected": "selected"
+  }
+}

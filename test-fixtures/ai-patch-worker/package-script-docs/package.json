@@ -1,0 +1,9 @@
+{
+  "name": "package-script-docs",
+  "version": "0.0.1",
+  "type": "module",
+  "scripts": {
+    "check": "node scripts/check.js",
+    "test": "npm run check"
+  }
+}

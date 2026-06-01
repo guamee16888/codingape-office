@@ -1,0 +1,893 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  createdAt DateTime @default(now()) @map("created_at")
+
+  organizations Organization[] @relation("OrganizationOwner")
+
+  @@map("users")
+}
+
+model Organization {
+  id          String   @id @default(cuid())
+  name        String
+  ownerUserId String?  @map("owner_user_id")
+  plan        String   @default("free")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  owner       User?        @relation("OrganizationOwner", fields: [ownerUserId], references: [id])
+  projects    Project[]
+  agentRuns   AgentRun[]
+  feedback    UserFeedback[]
+  auditEvents AuditEvent[]
+  apiKeys     IngestionApiKey[]
+
+  @@map("organizations")
+}
+
+model Project {
+  id          String   @id @default(cuid())
+  orgId       String   @map("org_id")
+  name        String
+  description String?
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  organization Organization @relation(fields: [orgId], references: [id])
+  agents       Agent[]
+  apiKeys      IngestionApiKey[]
+  agentRuns    AgentRun[]
+  evalCases    EvalCase[]
+  evalRuns     EvalRun[]
+  suggestions  OptimizationSuggestion[]
+  reports      Report[]
+  reliabilityScores ReliabilityScore[]
+  scoreSnapshots ScoreSnapshot[]
+  learningInsights LearningInsight[]
+  learningRules LearningRule[]
+  deliveries   ReportDelivery[]
+  subscriptions ReportSubscription[]
+  jobEvents    JobEvent[]
+  feedback     UserFeedback[]
+  policyRules  PolicyRule[]
+  policyRuleEvents PolicyRuleEvent[]
+  policyDryRuns PolicyDryRun[]
+  policyReviewTasks PolicyReviewTask[]
+  policyReviewTaskEvents PolicyReviewTaskEvent[]
+  policyRuleReviewCandidates PolicyRuleReviewCandidate[]
+  policyRuleReviewCandidateEvents PolicyRuleReviewCandidateEvent[]
+  policyReviewWorkItemEvents PolicyReviewWorkItemEvent[]
+  policyReviewWorkItemEffectiveness PolicyReviewWorkItemEffectiveness[]
+  modelRoutePolicies ModelRoutePolicy[]
+  incidentReports IncidentReport[]
+  incidentRemediationEvents IncidentRemediationEvent[]
+  auditEvidenceItems AuditEvidenceItem[]
+  prompts      PromptVersion[]
+  auditEvents  AuditEvent[]
+
+  @@map("projects")
+}
+
+model Agent {
+  id          String   @id @default(cuid())
+  projectId   String   @map("project_id")
+  name        String
+  description String?
+  environment String   @default("production")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  project     Project @relation(fields: [projectId], references: [id])
+  runs        AgentRun[]
+  evalCases   EvalCase[]
+  evalRuns    EvalRun[]
+  suggestions OptimizationSuggestion[]
+  prompts     PromptVersion[]
+  modelRoutePolicies ModelRoutePolicy[]
+  workflowVersions WorkflowVersion[]
+  agentVersions AgentVersion[]
+  reliabilityScores ReliabilityScore[]
+  incidentReports IncidentReport[]
+  auditEvidenceItems AuditEvidenceItem[]
+
+  @@map("agents")
+}
+
+model IngestionApiKey {
+  id         String    @id @default(cuid())
+  orgId      String    @map("org_id")
+  projectId  String    @map("project_id")
+  name       String
+  keyHash    String    @unique @map("key_hash")
+  keyPrefix  String    @map("key_prefix")
+  lastUsedAt DateTime? @map("last_used_at")
+  revokedAt  DateTime? @map("revoked_at")
+  createdAt  DateTime  @default(now()) @map("created_at")
+
+  organization Organization @relation(fields: [orgId], references: [id])
+  project      Project      @relation(fields: [projectId], references: [id])
+
+  @@index([projectId])
+  @@map("ingestion_api_keys")
+}
+
+model AgentRun {
+  id            String   @id @default(cuid())
+  agentId       String   @map("agent_id")
+  projectId     String   @map("project_id")
+  orgId         String   @map("org_id")
+  runIdExternal String?  @map("run_id_external")
+  input         Json
+  output        Json?
+  model         String
+  provider      String
+  toolsUsed     Json     @map("tools_used")
+  cost          Decimal  @default(0)
+  latency       Decimal  @default(0)
+  status        String
+  metadata      Json
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  agent        Agent          @relation(fields: [agentId], references: [id])
+  project      Project        @relation(fields: [projectId], references: [id])
+  organization Organization   @relation(fields: [orgId], references: [id])
+  judgement    RunJudgement?
+  failureCases FailureCase[]
+  costEvents   CostEvent[]
+  policyDryRunMatches PolicyDryRunMatch[]
+
+  @@index([projectId, createdAt])
+  @@index([agentId, createdAt])
+  @@unique([projectId, agentId, runIdExternal])
+  @@map("agent_runs")
+}
+
+model RunJudgement {
+  id                 String   @id @default(cuid())
+  agentRunId         String   @unique @map("agent_run_id")
+  successScore       Int      @map("success_score")
+  riskScore          Int      @map("risk_score")
+  costScore          Int      @map("cost_score")
+  overallStatus      String   @map("overall_status")
+  reasoningSummary   String   @map("reasoning_summary")
+  evidence           Json
+  failureCategories  Json     @map("failure_categories")
+  recommendedActions Json     @map("recommended_actions")
+  needsHumanReview   Boolean  @default(false) @map("needs_human_review")
+  rawJson            Json     @map("raw_json")
+  createdAt          DateTime @default(now()) @map("created_at")
+
+  run         AgentRun                 @relation(fields: [agentRunId], references: [id])
+  suggestions OptimizationSuggestion[]
+  policyDryRunMatches PolicyDryRunMatch[]
+
+  @@map("run_judgements")
+}
+
+model FailureCase {
+  id          String   @id @default(cuid())
+  agentRunId  String   @map("agent_run_id")
+  category    String
+  taxonomyCode String? @default("unknown_failure") @map("taxonomy_code")
+  taxonomyConfidence Decimal @default(0) @map("taxonomy_confidence")
+  taxonomyEvidenceJson Json @map("taxonomy_evidence_json")
+  severity    String
+  description String
+  suggestedFix String? @map("suggested_fix")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  run       AgentRun   @relation(fields: [agentRunId], references: [id])
+  taxonomy  FailureTaxonomy? @relation(fields: [taxonomyCode], references: [code])
+  evalCases EvalCase[]
+
+  @@map("failure_cases")
+}
+
+model FailureTaxonomy {
+  id              String   @id @default(cuid())
+  code            String   @unique
+  name            String
+  description     String
+  parentCode      String?  @map("parent_code")
+  severityDefault String   @default("medium") @map("severity_default")
+  examples        Json
+  createdAt       DateTime @default(now()) @map("created_at")
+
+  failureCases FailureCase[]
+
+  @@index([parentCode])
+  @@map("failure_taxonomies")
+}
+
+model EvalCase {
+  id                  String   @id @default(cuid())
+  projectId           String   @map("project_id")
+  agentId             String   @map("agent_id")
+  sourceFailureCaseId String?  @map("source_failure_case_id")
+  input               Json
+  expectedBehavior    String   @map("expected_behavior")
+  testType            String   @map("test_type")
+  status              String   @default("draft")
+  createdAt           DateTime @default(now()) @map("created_at")
+
+  project       Project      @relation(fields: [projectId], references: [id])
+  agent         Agent        @relation(fields: [agentId], references: [id])
+  failureCase   FailureCase? @relation(fields: [sourceFailureCaseId], references: [id])
+  replayResults ReplayResult[]
+
+  @@map("eval_cases")
+}
+
+model CostEvent {
+  id               String   @id @default(cuid())
+  agentRunId       String   @map("agent_run_id")
+  model            String
+  promptTokens     Int?     @map("prompt_tokens")
+  completionTokens Int?     @map("completion_tokens")
+  totalTokens      Int?     @map("total_tokens")
+  cost             Decimal  @default(0)
+  createdAt        DateTime @default(now()) @map("created_at")
+
+  run AgentRun @relation(fields: [agentRunId], references: [id])
+
+  @@map("cost_events")
+}
+
+model OptimizationSuggestion {
+  id                   String   @id @default(cuid())
+  projectId            String   @map("project_id")
+  agentId              String?  @map("agent_id")
+  type                 String
+  severity             String
+  title                String
+  description          String
+  expectedImpact       String?  @map("expected_impact")
+  status               String   @default("open")
+  sourceRunJudgementId String?  @map("source_run_judgement_id")
+  createdAt            DateTime @default(now()) @map("created_at")
+
+  project   Project       @relation(fields: [projectId], references: [id])
+  agent     Agent?        @relation(fields: [agentId], references: [id])
+  judgement RunJudgement? @relation(fields: [sourceRunJudgementId], references: [id])
+
+  @@map("optimization_suggestions")
+}
+
+model Report {
+  id              String   @id @default(cuid())
+  projectId       String   @map("project_id")
+  reportType      String   @map("report_type")
+  periodStart     DateTime @map("period_start")
+  periodEnd       DateTime @map("period_end")
+  contentMarkdown String   @map("content_markdown")
+  contentJson     Json     @map("content_json")
+  createdAt       DateTime @default(now()) @map("created_at")
+
+  project Project @relation(fields: [projectId], references: [id])
+  deliveries ReportDelivery[]
+  learningInsights LearningInsight[]
+  policyDryRuns PolicyDryRun[]
+  policyReviewTasks PolicyReviewTask[]
+  reliabilityScores ReliabilityScore[]
+  scoreSnapshots ScoreSnapshot[]
+
+  @@map("reports")
+}
+
+model ReliabilityScore {
+  id                         String   @id @default(cuid())
+  targetType                 String   @map("target_type")
+  targetId                   String   @map("target_id")
+  projectId                  String   @map("project_id")
+  agentId                    String?  @map("agent_id")
+  sourceReportId             String?  @map("source_report_id")
+  periodStart                DateTime? @map("period_start")
+  periodEnd                  DateTime? @map("period_end")
+  reliabilityScore           Int      @map("reliability_score")
+  autonomyReadinessScore     Int      @map("autonomy_readiness_score")
+  costEfficiencyScore        Int      @map("cost_efficiency_score")
+  riskExposureScore          Int      @map("risk_exposure_score")
+  regressionStabilityScore   Int      @map("regression_stability_score")
+  humanReviewDependencyScore Int      @map("human_review_dependency_score")
+  readinessStatus            String   @map("readiness_status")
+  scoreReasonsJson           Json     @map("score_reasons_json")
+  scoreVersion               String   @default("phase1_v1") @map("score_version")
+  createdAt                  DateTime @default(now()) @map("created_at")
+
+  project Project @relation(fields: [projectId], references: [id])
+  agent   Agent?  @relation(fields: [agentId], references: [id])
+  report  Report? @relation(fields: [sourceReportId], references: [id])
+  snapshots ScoreSnapshot[]
+
+  @@index([projectId, createdAt])
+  @@index([targetType, targetId, createdAt])
+  @@index([sourceReportId])
+  @@map("reliability_scores")
+}
+
+model ScoreSnapshot {
+  id                 String   @id @default(cuid())
+  reliabilityScoreId String   @map("reliability_score_id")
+  projectId          String   @map("project_id")
+  targetType         String   @map("target_type")
+  targetId           String   @map("target_id")
+  reportId           String?  @map("report_id")
+  periodStart        DateTime @map("period_start")
+  periodEnd          DateTime @map("period_end")
+  scoresJson         Json     @map("scores_json")
+  createdAt          DateTime @default(now()) @map("created_at")
+
+  reliabilityScore ReliabilityScore @relation(fields: [reliabilityScoreId], references: [id])
+  project          Project          @relation(fields: [projectId], references: [id])
+  report           Report?          @relation(fields: [reportId], references: [id])
+
+  @@index([projectId, createdAt])
+  @@index([targetType, targetId, createdAt])
+  @@map("score_snapshots")
+}
+
+model LearningInsight {
+  id                String   @id @default(cuid())
+  projectId         String   @map("project_id")
+  reportId          String?  @map("report_id")
+  insightType       String   @map("insight_type")
+  severity          String
+  title             String
+  description       String
+  evidenceJson      Json     @map("evidence_json")
+  recommendedAction String   @map("recommended_action")
+  status            String   @default("open")
+  createdAt         DateTime @default(now()) @map("created_at")
+
+  project Project @relation(fields: [projectId], references: [id])
+  report  Report? @relation(fields: [reportId], references: [id])
+
+  @@index([projectId, createdAt])
+  @@index([reportId])
+  @@map("learning_insights")
+}
+
+model LearningRule {
+  id                  String   @id @default(cuid())
+  projectId           String   @map("project_id")
+  ruleType            String   @map("rule_type")
+  patternKey          String   @map("pattern_key")
+  patternJson         Json     @map("pattern_json")
+  confidence          Decimal  @default(0)
+  sourceFeedbackCount Int      @default(0) @map("source_feedback_count")
+  evidenceJson        Json     @map("evidence_json")
+  status              String   @default("active")
+  createdAt           DateTime @default(now()) @map("created_at")
+  updatedAt           DateTime @updatedAt @map("updated_at")
+
+  project Project @relation(fields: [projectId], references: [id])
+
+  @@unique([projectId, ruleType, patternKey])
+  @@index([projectId, status])
+  @@map("learning_rules")
+}
+
+model ReportDelivery {
+  id                String    @id @default(cuid())
+  reportId          String    @map("report_id")
+  projectId         String    @map("project_id")
+  channel           String
+  recipient         String
+  provider          String
+  status            String
+  subject           String
+  errorMessage      String?   @map("error_message")
+  providerMessageId String?   @map("provider_message_id")
+  metadata          Json
+  attemptedAt       DateTime? @map("attempted_at")
+  deliveredAt       DateTime? @map("delivered_at")
+  retryCount        Int       @default(0) @map("retry_count")
+  nextRetryAt       DateTime? @map("next_retry_at")
+  resolvedAt        DateTime? @map("resolved_at")
+  createdAt         DateTime  @default(now()) @map("created_at")
+  updatedAt         DateTime  @updatedAt @map("updated_at")
+
+  report  Report  @relation(fields: [reportId], references: [id])
+  project Project @relation(fields: [projectId], references: [id])
+
+  @@index([reportId])
+  @@index([projectId, createdAt])
+  @@map("report_deliveries")
+}
+
+model ReportSubscription {
+  id        String   @id @default(cuid())
+  projectId String   @map("project_id")
+  channel   String
+  recipient String
+  provider  String
+  enabled   Boolean  @default(true)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  project Project @relation(fields: [projectId], references: [id])
+
+  @@index([projectId, enabled])
+  @@map("report_subscriptions")
+}
+
+model JobEvent {
+  id         String   @id @default(cuid())
+  projectId  String?  @map("project_id")
+  jobType    String   @map("job_type")
+  status     String
+  targetType String?  @map("target_type")
+  targetId   String?  @map("target_id")
+  message    String
+  metadata   Json
+  retryCount Int      @default(0) @map("retry_count")
+  nextRetryAt DateTime? @map("next_retry_at")
+  resolvedAt DateTime? @map("resolved_at")
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  project Project? @relation(fields: [projectId], references: [id])
+
+  @@index([projectId, createdAt])
+  @@index([jobType, createdAt])
+  @@map("job_events")
+}
+
+model UserFeedback {
+  id           String   @id @default(cuid())
+  orgId        String   @map("org_id")
+  projectId    String   @map("project_id")
+  targetType   String   @map("target_type")
+  targetId     String   @map("target_id")
+  feedbackType String   @map("feedback_type")
+  comment      String?
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  organization Organization @relation(fields: [orgId], references: [id])
+  project      Project      @relation(fields: [projectId], references: [id])
+
+  @@map("user_feedback")
+}
+
+model PolicyRule {
+  id         String   @id @default(cuid())
+  projectId  String   @map("project_id")
+  name       String
+  ruleType   String   @map("rule_type")
+  configJson Json     @map("config_json")
+  severity   String
+  enabled    Boolean  @default(true)
+  reviewStatus String @default("draft_review") @map("review_status")
+  version    Int      @default(1)
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime? @map("updated_at")
+
+  project Project @relation(fields: [projectId], references: [id])
+  dryRuns PolicyDryRun[]
+  events  PolicyRuleEvent[]
+  reviewTasks PolicyReviewTask[]
+  reviewTaskEvents PolicyReviewTaskEvent[]
+  reviewCandidates PolicyRuleReviewCandidate[]
+  reviewCandidateEvents PolicyRuleReviewCandidateEvent[]
+  reviewWorkItemEvents PolicyReviewWorkItemEvent[]
+  reviewWorkItemEffectiveness PolicyReviewWorkItemEffectiveness[]
+
+  @@map("policy_rules")
+}
+
+model PolicyRuleEvent {
+  id           String   @id @default(cuid())
+  policyRuleId String  @map("policy_rule_id")
+  projectId    String  @map("project_id")
+  actorType    String  @map("actor_type")
+  actorId      String? @map("actor_id")
+  fromStatus   String  @map("from_status")
+  toStatus     String  @map("to_status")
+  note         String?
+  evidenceJson Json    @map("evidence_json")
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  policyRule PolicyRule @relation(fields: [policyRuleId], references: [id])
+  project    Project    @relation(fields: [projectId], references: [id])
+
+  @@index([policyRuleId, createdAt])
+  @@index([projectId, createdAt])
+  @@map("policy_rule_events")
+}
+
+model PolicyDryRun {
+  id                 String   @id @default(cuid())
+  projectId          String   @map("project_id")
+  policyRuleId       String   @map("policy_rule_id")
+  reportId           String   @map("report_id")
+  periodStart        DateTime @map("period_start")
+  periodEnd          DateTime @map("period_end")
+  matchCount         Int      @default(0) @map("match_count")
+  highRiskMatchCount Int      @default(0) @map("high_risk_match_count")
+  summaryJson        Json     @map("summary_json")
+  status             String   @default("draft_review")
+  createdAt          DateTime @default(now()) @map("created_at")
+
+  project    Project     @relation(fields: [projectId], references: [id])
+  policyRule PolicyRule  @relation(fields: [policyRuleId], references: [id])
+  report     Report      @relation(fields: [reportId], references: [id])
+  matches    PolicyDryRunMatch[]
+  reviewTasks PolicyReviewTask[]
+
+  @@index([projectId, createdAt])
+  @@index([reportId])
+  @@index([policyRuleId])
+  @@map("policy_dry_runs")
+}
+
+model PolicyDryRunMatch {
+  id             String   @id @default(cuid())
+  policyDryRunId String   @map("policy_dry_run_id")
+  agentRunId     String   @map("agent_run_id")
+  judgementId    String?  @map("judgement_id")
+  riskScore      Int      @default(0) @map("risk_score")
+  overallStatus  String   @map("overall_status")
+  matchedTools   Json     @map("matched_tools")
+  reasonsJson    Json     @map("reasons_json")
+  createdAt      DateTime @default(now()) @map("created_at")
+
+  policyDryRun PolicyDryRun @relation(fields: [policyDryRunId], references: [id])
+  run          AgentRun     @relation(fields: [agentRunId], references: [id])
+  judgement    RunJudgement? @relation(fields: [judgementId], references: [id])
+
+  @@index([policyDryRunId])
+  @@index([agentRunId])
+  @@map("policy_dry_run_matches")
+}
+
+model PolicyReviewTask {
+  id                      String   @id @default(cuid())
+  projectId               String   @map("project_id")
+  policyRuleId            String   @map("policy_rule_id")
+  policyDryRunId          String?  @map("policy_dry_run_id")
+  reportId                String?  @map("report_id")
+  reviewReadiness         String   @map("review_readiness")
+  recommendedReviewStatus String   @map("recommended_review_status")
+  priority                Int      @default(50)
+  status                  String   @default("open")
+  taskJson                Json     @map("task_json")
+  createdAt               DateTime @default(now()) @map("created_at")
+  updatedAt               DateTime? @map("updated_at")
+
+  project      Project       @relation(fields: [projectId], references: [id])
+  policyRule   PolicyRule    @relation(fields: [policyRuleId], references: [id])
+  policyDryRun PolicyDryRun? @relation(fields: [policyDryRunId], references: [id])
+  report       Report?       @relation(fields: [reportId], references: [id])
+  events       PolicyReviewTaskEvent[]
+  reviewCandidates PolicyRuleReviewCandidate[]
+
+  @@index([projectId, status, priority, createdAt])
+  @@index([policyRuleId, status, createdAt])
+  @@map("policy_review_tasks")
+}
+
+model PolicyReviewTaskEvent {
+  id                 String   @id @default(cuid())
+  policyReviewTaskId String   @map("policy_review_task_id")
+  projectId          String   @map("project_id")
+  policyRuleId       String   @map("policy_rule_id")
+  actorType          String   @map("actor_type")
+  actorId            String?  @map("actor_id")
+  fromStatus         String   @map("from_status")
+  toStatus           String   @map("to_status")
+  note               String?
+  evidenceJson       Json     @map("evidence_json")
+  createdAt          DateTime @default(now()) @map("created_at")
+
+  task       PolicyReviewTask @relation(fields: [policyReviewTaskId], references: [id])
+  events     PolicyRuleReviewCandidateEvent[]
+  project    Project          @relation(fields: [projectId], references: [id])
+  policyRule PolicyRule       @relation(fields: [policyRuleId], references: [id])
+
+  @@index([policyReviewTaskId, createdAt])
+  @@index([projectId, createdAt])
+  @@map("policy_review_task_events")
+}
+
+model PolicyRuleReviewCandidate {
+  id                      String   @id @default(cuid())
+  projectId               String   @map("project_id")
+  policyRuleId            String   @map("policy_rule_id")
+  policyReviewTaskId      String   @unique @map("policy_review_task_id")
+  fromReviewStatus        String   @map("from_review_status")
+  recommendedReviewStatus String   @map("recommended_review_status")
+  status                  String   @default("pending")
+  candidateJson           Json     @map("candidate_json")
+  createdAt               DateTime @default(now()) @map("created_at")
+  updatedAt               DateTime? @map("updated_at")
+
+  project    Project          @relation(fields: [projectId], references: [id])
+  policyRule PolicyRule       @relation(fields: [policyRuleId], references: [id])
+  task       PolicyReviewTask @relation(fields: [policyReviewTaskId], references: [id])
+
+  @@index([projectId, status, createdAt])
+  @@index([policyRuleId, status, createdAt])
+  @@map("policy_rule_review_candidates")
+}
+
+model PolicyRuleReviewCandidateEvent {
+  id                          String   @id @default(cuid())
+  policyRuleReviewCandidateId String   @map("policy_rule_review_candidate_id")
+  projectId                   String   @map("project_id")
+  policyRuleId                String   @map("policy_rule_id")
+  actorType                   String   @map("actor_type")
+  actorId                     String?  @map("actor_id")
+  fromStatus                  String   @map("from_status")
+  toStatus                    String   @map("to_status")
+  note                        String?
+  evidenceJson                Json     @map("evidence_json")
+  createdAt                   DateTime @default(now()) @map("created_at")
+
+  candidate  PolicyRuleReviewCandidate @relation(fields: [policyRuleReviewCandidateId], references: [id])
+  project    Project                   @relation(fields: [projectId], references: [id])
+  policyRule PolicyRule                @relation(fields: [policyRuleId], references: [id])
+
+  @@index([policyRuleReviewCandidateId, createdAt])
+  @@index([projectId, createdAt])
+  @@map("policy_rule_review_candidate_events")
+}
+
+model PolicyReviewWorkItemEvent {
+  id                     String   @id @default(cuid())
+  projectId              String   @map("project_id")
+  policyRuleId           String   @map("policy_rule_id")
+  workItemId             String   @map("work_item_id")
+  actionType             String   @map("action_type")
+  actorType              String   @map("actor_type")
+  actorId                String?  @map("actor_id")
+  eventType              String   @map("event_type")
+  note                   String?
+  evidenceJson           Json     @map("evidence_json")
+  workbenchSnapshotJson  Json     @map("workbench_snapshot_json")
+  createdAt              DateTime @default(now()) @map("created_at")
+
+  project    Project    @relation(fields: [projectId], references: [id])
+  policyRule PolicyRule @relation(fields: [policyRuleId], references: [id])
+  effectiveness PolicyReviewWorkItemEffectiveness?
+
+  @@index([policyRuleId, createdAt])
+  @@index([projectId, createdAt])
+  @@map("policy_review_work_item_events")
+}
+
+model PolicyReviewWorkItemEffectiveness {
+  id                    String   @id @default(cuid())
+  projectId             String   @map("project_id")
+  policyRuleId          String   @map("policy_rule_id")
+  sourceEventId         String   @unique @map("source_event_id")
+  workItemId            String   @map("work_item_id")
+  actionType            String   @map("action_type")
+  eventType             String   @map("event_type")
+  sourceReadinessScore  Int      @default(0) @map("source_readiness_score")
+  currentReadinessScore Int      @default(0) @map("current_readiness_score")
+  readinessScoreDelta   Int      @default(0) @map("readiness_score_delta")
+  blockerCleared        Boolean  @default(false) @map("blocker_cleared")
+  effectivenessStatus   String   @map("effectiveness_status")
+  effectivenessJson     Json     @map("effectiveness_json")
+  createdAt             DateTime @default(now()) @map("created_at")
+
+  project     Project                   @relation(fields: [projectId], references: [id])
+  policyRule  PolicyRule                @relation(fields: [policyRuleId], references: [id])
+  sourceEvent PolicyReviewWorkItemEvent @relation(fields: [sourceEventId], references: [id])
+
+  @@index([policyRuleId, createdAt])
+  @@map("policy_review_work_item_effectiveness")
+}
+
+model ModelRoutePolicy {
+  id        String   @id @default(cuid())
+  projectId String   @map("project_id")
+  agentId   String?  @map("agent_id")
+  name      String
+  rulesJson Json     @map("rules_json")
+  version   Int      @default(1)
+  status    String   @default("draft")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  project Project @relation(fields: [projectId], references: [id])
+  agent   Agent?  @relation(fields: [agentId], references: [id])
+  evalRuns EvalRun[]
+  agentVersions AgentVersion[]
+
+  @@index([projectId, agentId, status])
+  @@map("model_route_policies")
+}
+
+model WorkflowVersion {
+  id         String   @id @default(cuid())
+  agentId    String   @map("agent_id")
+  version    Int
+  configJson Json     @map("config_json")
+  status     String   @default("draft")
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  agent Agent @relation(fields: [agentId], references: [id])
+  agentVersions AgentVersion[]
+
+  @@index([agentId, version])
+  @@map("workflow_versions")
+}
+
+model PromptVersion {
+  id         String   @id @default(cuid())
+  projectId  String   @map("project_id")
+  agentId    String?  @map("agent_id")
+  promptName String   @map("prompt_name")
+  content    String
+  version    Int
+  status     String   @default("draft")
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  project Project @relation(fields: [projectId], references: [id])
+  agent   Agent?  @relation(fields: [agentId], references: [id])
+  agentVersions AgentVersion[]
+  evalRuns EvalRun[]
+
+  @@map("prompt_versions")
+}
+
+model AgentVersion {
+  id                 String   @id @default(cuid())
+  agentId            String   @map("agent_id")
+  version            Int
+  promptVersionId    String?  @map("prompt_version_id")
+  workflowVersionId  String?  @map("workflow_version_id")
+  modelRoutePolicyId String?  @map("model_route_policy_id")
+  status             String   @default("draft")
+  createdAt          DateTime @default(now()) @map("created_at")
+
+  agent            Agent             @relation(fields: [agentId], references: [id])
+  promptVersion    PromptVersion?    @relation(fields: [promptVersionId], references: [id])
+  workflowVersion  WorkflowVersion?  @relation(fields: [workflowVersionId], references: [id])
+  modelRoutePolicy ModelRoutePolicy? @relation(fields: [modelRoutePolicyId], references: [id])
+
+  @@index([agentId, version])
+  @@map("agent_versions")
+}
+
+model EvalRun {
+  id                 String   @id @default(cuid())
+  projectId          String   @map("project_id")
+  agentId            String   @map("agent_id")
+  promptVersionId    String?  @map("prompt_version_id")
+  modelRoutePolicyId String?  @map("model_route_policy_id")
+  evalCaseIds        Json     @map("eval_case_ids")
+  passCount          Int      @default(0) @map("pass_count")
+  failCount          Int      @default(0) @map("fail_count")
+  regressionCount    Int      @default(0) @map("regression_count")
+  summaryJson        Json     @map("summary_json")
+  createdAt          DateTime @default(now()) @map("created_at")
+
+  project          Project           @relation(fields: [projectId], references: [id])
+  agent            Agent             @relation(fields: [agentId], references: [id])
+  promptVersion    PromptVersion?    @relation(fields: [promptVersionId], references: [id])
+  modelRoutePolicy ModelRoutePolicy? @relation(fields: [modelRoutePolicyId], references: [id])
+  replayResults    ReplayResult[]
+
+  @@index([projectId, createdAt])
+  @@index([agentId, createdAt])
+  @@map("eval_runs")
+}
+
+model ReplayResult {
+  id               String   @id @default(cuid())
+  evalRunId        String   @map("eval_run_id")
+  evalCaseId       String   @map("eval_case_id")
+  status           String
+  actualOutput     Json?    @map("actual_output")
+  expectedBehavior String   @map("expected_behavior")
+  judgeResultJson  Json     @map("judge_result_json")
+  createdAt        DateTime @default(now()) @map("created_at")
+
+  evalRun  EvalRun  @relation(fields: [evalRunId], references: [id])
+  evalCase EvalCase @relation(fields: [evalCaseId], references: [id])
+
+  @@index([evalRunId])
+  @@index([evalCaseId])
+  @@map("replay_results")
+}
+
+model IncidentReport {
+  id                String   @id @default(cuid())
+  projectId         String   @map("project_id")
+  agentId           String?  @map("agent_id")
+  severity          String
+  title             String
+  summary           String
+  relatedRunIds     Json     @map("related_run_ids")
+  rootCauseCategory String?  @map("root_cause_category")
+  remediationStatus String   @default("open") @map("remediation_status")
+  createdAt         DateTime @default(now()) @map("created_at")
+
+  project Project @relation(fields: [projectId], references: [id])
+  agent   Agent?  @relation(fields: [agentId], references: [id])
+  remediationEvents IncidentRemediationEvent[]
+
+  @@index([projectId, createdAt])
+  @@map("incident_reports")
+}
+
+model IncidentRemediationEvent {
+  id               String   @id @default(cuid())
+  incidentReportId String   @map("incident_report_id")
+  projectId        String   @map("project_id")
+  actorType        String   @default("user") @map("actor_type")
+  actorId          String?  @map("actor_id")
+  fromStatus       String   @map("from_status")
+  toStatus         String   @map("to_status")
+  note             String?
+  evidenceJson     Json     @map("evidence_json")
+  createdAt        DateTime @default(now()) @map("created_at")
+
+  incidentReport IncidentReport @relation(fields: [incidentReportId], references: [id])
+  project        Project        @relation(fields: [projectId], references: [id])
+
+  @@index([incidentReportId, createdAt])
+  @@index([projectId, createdAt])
+  @@map("incident_remediation_events")
+}
+
+model AuditEvidenceItem {
+  id           String   @id @default(cuid())
+  orgId        String   @map("org_id")
+  projectId    String   @map("project_id")
+  agentId      String?  @map("agent_id")
+  evidenceType String   @map("evidence_type")
+  targetType   String   @map("target_type")
+  targetId     String   @map("target_id")
+  summary      String
+  metadataJson Json     @map("metadata_json")
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  organization Organization @relation(fields: [orgId], references: [id])
+  project      Project      @relation(fields: [projectId], references: [id])
+  agent        Agent?       @relation(fields: [agentId], references: [id])
+
+  @@index([projectId, createdAt])
+  @@index([targetType, targetId])
+  @@map("audit_evidence_items")
+}
+
+model AnonymizedBenchmarkPattern {
+  id                 String   @id @default(cuid())
+  patternType        String   @map("pattern_type")
+  taxonomyCode       String?  @map("taxonomy_code")
+  industry           String?
+  agentType          String?  @map("agent_type")
+  modelProvider      String?  @map("model_provider")
+  aggregateStatsJson Json     @map("aggregate_stats_json")
+  privacyLevel       String   @default("aggregate_only") @map("privacy_level")
+  createdAt          DateTime @default(now()) @map("created_at")
+
+  @@index([patternType, taxonomyCode])
+  @@map("anonymized_benchmark_patterns")
+}
+
+model AuditEvent {
+  id         String   @id @default(cuid())
+  orgId      String   @map("org_id")
+  projectId  String?  @map("project_id")
+  actorType  String   @map("actor_type")
+  actorId    String?  @map("actor_id")
+  action     String
+  targetType String   @map("target_type")
+  targetId   String?  @map("target_id")
+  metadata   Json
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  organization Organization @relation(fields: [orgId], references: [id])
+  project      Project?     @relation(fields: [projectId], references: [id])
+
+  @@map("audit_events")
+}

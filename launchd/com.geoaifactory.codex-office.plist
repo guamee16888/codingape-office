@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>com.geoaifactory.codex-office</string>
+  <key>ProgramArguments</key>
+  <array>
+    <string>/bin/zsh</string>
+    <string>-lc</string>
+    <string>cd '/path/to/codingape-office' &amp;&amp; exec ${CODEX_OFFICE_NODE:-node} server.js</string>
+  </array>
+  <key>WorkingDirectory</key>
+  <string>/path/to/codingape-office</string>
+  <key>RunAtLoad</key>
+  <true/>
+  <key>KeepAlive</key>
+  <dict>
+    <key>SuccessfulExit</key>
+    <false/>
+  </dict>
+  <key>ThrottleInterval</key>
+  <integer>5</integer>
+  <key>StandardOutPath</key>
+  <string>/Users/you/Library/Logs/com.geoaifactory.codex-office.out.log</string>
+  <key>StandardErrorPath</key>
+  <string>/Users/you/Library/Logs/com.geoaifactory.codex-office.err.log</string>
+  <key>EnvironmentVariables</key>
+  <dict>
+    <key>PORT</key>
+    <string>4142</string>
+    <key>CODEX_OFFICE_LOCAL_LLM_PROVIDER</key>
+    <string>ollama</string>
+    <key>CODEX_OFFICE_LOCAL_LLM_MODEL</key>
+    <string>huihui_ai/qwen3-abliterated:8b</string>
+    <key>CODEX_OFFICE_LOCAL_LLM_TIMEOUT_MS</key>
+    <string>25000</string>
+  </dict>
+</dict>
+</plist>

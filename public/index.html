@@ -1,0 +1,758 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>编程猿办公室</title>
+    <link rel="icon" href="data:," />
+    <link rel="stylesheet" href="/styles.css" />
+    <link rel="stylesheet" href="/control-room.css" />
+  </head>
+  <body>
+    <script>
+      (() => {
+        const clean = window.location.pathname.replace(/\/+$/, "") || "/";
+        const mode = clean === "/beta" ? "public_beta" : clean === "/demo" ? "public_demo" : clean === "/office" ? "local_office" : "public_home";
+        document.documentElement.dataset.appMode = mode;
+        document.body.dataset.appMode = mode;
+      })();
+    </script>
+    <!-- public-home:start -->
+    <main id="publicHome" class="public-home" aria-label="Coding猿 Office Mac Beta">
+      <nav class="public-home-nav" aria-label="产品导航">
+        <a class="public-brand" href="/">
+          <span class="brand-mark" aria-hidden="true">猿</span>
+          <strong>Coding猿 Office</strong>
+        </a>
+        <div>
+          <a href="/beta">Mac Beta</a>
+          <a href="/demo">Watch Demo</a>
+          <a href="/office">Local Office</a>
+        </div>
+      </nav>
+      <section class="public-hero">
+        <div class="public-hero-copy">
+          <p class="eyebrow">Mac MVP Beta</p>
+          <h1>你的 Mac 本地 AI 程序员，先拿证据，再给 diff，确认后才改代码。</h1>
+          <p>
+            选择本地代码项目，输入任务，Coding猿 会生成 Evidence Pack、Patch Proposal、Verification、
+            Human Gate、Rollback 和 Company Report。项目文件默认不被写入，直到你明确批准。
+          </p>
+          <div class="public-cta-row">
+            <a class="public-cta primary" href="mailto:beta@geoaifactory.com?subject=Coding%E7%8C%BF%20Office%20Mac%20Beta">Join Mac Beta</a>
+            <a class="public-cta secondary" href="/demo">Watch Demo</a>
+          </div>
+        </div>
+        <div class="public-proof-panel" aria-label="本地闭环">
+          <span>Mac local loop</span>
+          <ol>
+            <li>选择本地代码项目</li>
+            <li>生成 Evidence Pack</li>
+            <li>生成 Patch Proposal 和 Diff Preview</li>
+            <li>跑 Verification</li>
+            <li>Human Gate 确认后才 Apply</li>
+            <li>创建 Rollback 和 Company Report</li>
+          </ol>
+        </div>
+      </section>
+    </main>
+    <!-- public-home:end -->
+    <!-- beta-page:start -->
+    <main id="betaPage" class="beta-page" aria-label="Coding猿 Office Mac Beta 下载">
+      <nav class="public-home-nav" aria-label="Beta 导航">
+        <a class="public-brand" href="/">
+          <span class="brand-mark" aria-hidden="true">猿</span>
+          <strong>Coding猿 Office</strong>
+        </a>
+        <div>
+          <a href="/demo">3 分钟 Demo</a>
+          <a href="/office">打开 Office</a>
+        </div>
+      </nav>
+      <section class="beta-download-hero">
+        <div>
+          <p class="eyebrow">External Tester Ready</p>
+          <h1>Mac Beta 下载与首次测试</h1>
+          <p>Coding猿 Office 是本地运行的 AI 程序员控制台。它只在你选择的 project root 内工作，先生成证据和 diff，确认后才允许写入。</p>
+          <div class="public-cta-row">
+            <a class="public-cta primary" href="/demo">3 分钟 Demo</a>
+            <a class="public-cta secondary" href="mailto:beta@geoaifactory.com?subject=Coding%E7%8C%BF%20Office%20Beta%20Feedback">发送反馈</a>
+          </div>
+        </div>
+        <div class="beta-download-panel">
+          <h2>安装说明</h2>
+          <ol>
+            <li>下载并打开 Coding猿 Office.app。</li>
+            <li>首次启动选择一个本地代码项目目录。</li>
+            <li>运行 First Run 安全自检。</li>
+            <li>点击“跑第一单”，审查 diff 后再决定是否 Apply。</li>
+          </ol>
+        </div>
+      </section>
+      <section class="beta-info-grid" aria-label="Beta 信息">
+        <article>
+          <h2>安全承诺</h2>
+          <p>不默认扫描全盘；所有读写绑定授权 project root；Project Root Guard 会阻断路径穿越；Apply 前必须有 diff、verification、rollback 和人工确认。</p>
+        </article>
+        <article>
+          <h2>Beta 限制</h2>
+          <p>当前是本地 Mac Beta，写入执行器默认 human-gated；AIWC 集中日志缺失只作为 warning；复杂跨仓库任务建议先拆小。</p>
+        </article>
+        <article>
+          <h2>支持包与反馈</h2>
+          <p>遇到启动、端口、Node/npm/Git、API Key、apply 或 rollback 问题，请在 Office 内生成支持包并复制诊断摘要。</p>
+        </article>
+      </section>
+    </main>
+    <!-- beta-page:end -->
+    <!-- demo-banner:start -->
+    <div id="demoModeBanner" class="demo-mode-banner" hidden>
+      <span>Demo Data · 3 分钟 Coding猿闭环演示</span>
+      <div id="demoReplayControls" class="demo-replay-controls" aria-label="Demo replay controls">
+        <strong id="demoReplayStatus">准备播放</strong>
+        <button id="demoReplayPauseButton" type="button">Pause</button>
+        <button id="demoReplayRestartButton" type="button">Replay</button>
+      </div>
+    </div>
+    <!-- demo-banner:end -->
+    <!-- app-shell:start -->
+    <div class="app-shell">
+      <section id="firstRunOnboarding" class="first-run-onboarding" hidden aria-label="First Run Onboarding">
+        <div class="onboarding-card">
+          <p class="eyebrow">First Run</p>
+          <h2>欢迎使用 Coding猿 Office</h2>
+          <p id="onboardingSummary">Coding猿 是你的 Mac 本地 AI 程序员：先拿证据，再给 diff，确认后才改代码。</p>
+          <div id="onboardingStepList" class="onboarding-step-list"></div>
+          <label class="onboarding-byo-key">
+            <input id="onboardingByoKey" type="checkbox" />
+            <span>我会使用自己的 API Key，或先以本地 beta warning 继续。</span>
+          </label>
+          <div class="onboarding-actions">
+            <button id="onboardingChooseProjectButton" type="button">选择本地项目目录</button>
+            <button id="onboardingRunSelfCheckButton" type="button">运行安全自检</button>
+            <button id="onboardingFirstOrderButton" type="button">创建安全示例任务</button>
+            <button id="onboardingEnterOfficeButton" type="button">进入 Office</button>
+          </div>
+          <small id="onboardingStatus">首次启动不会修改项目文件。</small>
+        </div>
+      </section>
+      <header class="top-command-bar" aria-label="AI 打工猿公司指挥栏">
+        <div class="command-brand">
+          <span class="brand-mark" aria-hidden="true">猿</span>
+          <div>
+            <p class="eyebrow">AI 打工公司</p>
+            <h1>编程猿办公室</h1>
+          </div>
+        </div>
+        <div class="active-mission-strip">
+          <p class="eyebrow">当前任务</p>
+          <h2 id="stageTitle">正在扫描工作区</h2>
+          <div class="command-meta">
+            <span id="commandProject">项目：--</span>
+            <span id="commandRun">运行：无</span>
+            <span id="commandPhase">阶段：待命</span>
+          </div>
+          <div class="command-progress" aria-label="实时运行进度">
+            <div class="command-progress-track"><span id="commandProgressBar"></span></div>
+            <div id="commandProgressSteps" class="command-progress-steps"></div>
+          </div>
+          <div id="commandRunReceipt" class="command-run-receipt" data-status="idle">
+            待命：运行后会显示真实运行编号、阶段和闸门状态。
+          </div>
+          <form id="missionComposer" class="mission-composer" aria-label="新任务输入">
+            <select id="missionProjectSelect" aria-label="目标项目"></select>
+            <select id="missionModeSelect" aria-label="任务模式">
+              <option value="sandbox_patch">完整沙盒闭环</option>
+              <option value="verify">审查 + 验证</option>
+              <option value="proposal">只生成方案</option>
+              <option value="review_only">只采集证据</option>
+            </select>
+            <input id="missionInput" type="text" autocomplete="off" placeholder="输入任务，例如：检查这个项目风险并生成可审计补丁建议" />
+            <button id="assignMissionButton" type="submit">交给编程猿</button>
+          </form>
+          <form id="projectRootForm" class="project-root-form" aria-label="本地项目选择器">
+            <div class="project-root-label">
+              <label for="projectRootInput">Project root</label>
+              <span id="projectRootStatus">未保存</span>
+            </div>
+            <div class="project-root-controls">
+              <button id="chooseProjectFolderButton" type="button">选择文件夹</button>
+              <input id="projectRootInput" type="text" autocomplete="off" placeholder="/Users/you/Code/your-project" />
+              <button id="saveProjectRootButton" type="submit">绑定</button>
+            </div>
+          </form>
+        </div>
+        <div class="command-status-strip" aria-label="运行状态">
+          <span class="command-badge is-live">沙盒模式</span>
+          <span id="commandRisk" class="command-badge">人工闸门</span>
+          <span id="commandIngestion" class="command-badge">本地记录</span>
+          <span id="commandPublicHealth" class="command-badge">公网检测中</span>
+          <strong id="commandReadiness">--/100</strong>
+          <span id="lastUpdated">--</span>
+          <button id="runFirstOrderButton" type="button">跑第一单</button>
+          <button id="newMissionButton" type="button">运行当前任务</button>
+          <button id="refreshButton" type="button">刷新</button>
+        </div>
+      </header>
+
+      <aside class="side-rail" aria-label="工作区概览">
+        <div class="brand-lockup">
+          <span class="brand-mark" aria-hidden="true">猿</span>
+          <div>
+            <p class="eyebrow">本地中枢</p>
+            <h1>编程猿办公室</h1>
+          </div>
+        </div>
+
+        <section class="mascot-panel" aria-label="编程猿身份">
+          <img src="/assets/coding-yuan/concept-display.jpg" alt="编程猿" />
+          <div>
+            <p class="panel-label">编程猿</p>
+            <strong>AI 操作员</strong>
+          </div>
+        </section>
+
+        <section class="pulse-panel" aria-label="工作区脉搏">
+          <div class="pulse-orbit" aria-hidden="true">
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
+          <p class="panel-label">自治就绪度</p>
+          <strong id="pulseScore">--</strong>
+          <small id="pulseCaption">正在扫描项目</small>
+        </section>
+
+        <section class="worker-universe" aria-label="AI 打工猿团队">
+          <div class="universe-head">
+            <div>
+              <p class="eyebrow">AI 打工猿公司</p>
+              <h3>核心员工</h3>
+            </div>
+            <span id="workerUniverseSignal">真实任务，可见执行</span>
+          </div>
+          <div id="workerGrid" class="worker-grid"></div>
+        </section>
+
+        <nav class="filter-stack" aria-label="项目过滤">
+          <button class="filter-button is-active" data-filter="all">全部项目</button>
+          <button class="filter-button" data-filter="running">运行中</button>
+          <button class="filter-button" data-filter="active">工作中</button>
+          <button class="filter-button" data-filter="draft">草稿</button>
+          <button class="filter-button" data-filter="ready">已就绪</button>
+        </nav>
+
+        <section class="mini-stats" aria-label="状态统计">
+          <div><span id="statRunning">0</span><small>运行中</small></div>
+          <div><span id="statActive">0</span><small>工作中</small></div>
+          <div><span id="statDraft">0</span><small>草稿</small></div>
+          <div><span id="statReady">0</span><small>就绪</small></div>
+        </section>
+      </aside>
+
+      <main class="office-stage">
+        <section class="deck-viewport" aria-label="AI 打工猿工作室">
+          <div class="room-headline">
+            <p class="eyebrow">AI 打工猿办公室</p>
+            <h2>三猿工作现场</h2>
+            <span id="commandMode">沙盒保护 · 人工确认后才能写入</span>
+          </div>
+          <div id="missionDirectorRibbon" class="mission-director-ribbon" aria-label="任务导演">
+            <div>
+              <span>当前员工</span>
+              <strong id="directorWorker">编程猿待命</strong>
+            </div>
+            <div>
+              <span>安全状态</span>
+              <strong id="directorSafety">暂无运行</strong>
+            </div>
+            <div>
+              <span>下一步</span>
+              <strong id="directorNext">分配一个任务</strong>
+            </div>
+          </div>
+          <div id="missionProofStrip" class="mission-proof-strip" aria-label="任务证据状态">
+            <div>
+              <span>证据</span>
+              <strong id="proofEvidence">0/6</strong>
+            </div>
+            <div>
+              <span>人工闸门</span>
+              <strong id="proofHumanGate">待确认</strong>
+            </div>
+            <div>
+              <span>写入闸门</span>
+              <strong id="proofApplyGate">已阻断</strong>
+            </div>
+            <div>
+              <span>进度</span>
+              <strong id="proofProgress">0%</strong>
+            </div>
+          </div>
+          <canvas id="threeDeck"></canvas>
+          <div id="workerRoomFallback" class="worker-room-fallback" hidden></div>
+          <div id="sceneLabels" class="scene-label-layer"></div>
+          <div id="coreWorkerStations" class="core-worker-stations" aria-label="核心员工工位"></div>
+          <div class="scene-metrics" aria-label="指挥台指标">
+            <div><span>总数</span><strong id="sceneTotal">--</strong></div>
+            <div><span>工作中</span><strong id="sceneWorking">--</strong></div>
+            <div><span>草稿</span><strong id="sceneDraft">--</strong></div>
+            <div><span>就绪</span><strong id="sceneReady">--</strong></div>
+          </div>
+          <div class="scene-hud" aria-hidden="true">
+            <span>编程猿拓扑</span>
+            <strong id="sceneFocus">工作区核心</strong>
+          </div>
+          <div class="room-ops-ribbon" aria-label="实时运行条">
+            <div>
+              <span>最新事件</span>
+              <strong id="roomLatestEvent">等待信号</strong>
+            </div>
+            <div>
+              <span>任务</span>
+              <strong id="roomMissions">0</strong>
+            </div>
+            <div>
+              <span>节省</span>
+              <strong id="roomSaved">0h</strong>
+            </div>
+            <div>
+              <span>阻断</span>
+              <strong id="roomBlocked">0</strong>
+            </div>
+          </div>
+        </section>
+
+        <section class="mission-flow-panel" aria-label="任务流程">
+          <div class="universe-head">
+            <div>
+              <p class="eyebrow">真实工作闭环</p>
+              <h3>任务流程</h3>
+            </div>
+            <span id="missionFlowStatus">等待任务证据</span>
+          </div>
+          <div id="missionFlowRail" class="mission-flow-rail"></div>
+        </section>
+
+        <section class="operator-console" aria-label="自治操作台">
+          <div class="operator-head">
+            <div>
+              <p class="eyebrow">操作员控制台</p>
+              <h3>可审计 AI 打工公司</h3>
+            </div>
+            <span id="launchStage">等待首次运行</span>
+          </div>
+          <div class="operator-grid">
+            <article class="readiness-panel">
+              <div class="score-ring">
+                <strong id="readinessScore">--</strong>
+                <span>/100</span>
+              </div>
+              <div class="readiness-copy">
+                <p id="readinessLevel">自治就绪度</p>
+                <h4 id="readinessVerdict">暂不自治</h4>
+                <small id="readinessSummary">等待有证据支撑的真实任务。</small>
+              </div>
+              <div class="readiness-bar" aria-hidden="true">
+                <span id="readinessBar"></span>
+              </div>
+            </article>
+
+            <article class="service-health-panel" aria-label="服务健康">
+              <div class="section-title">
+                <h3>服务健康</h3>
+                <span id="serviceHealthStatus">检测中</span>
+              </div>
+              <p id="serviceHealthSummary">正在确认本地服务、公网入口和后台守护状态。</p>
+              <div id="serviceHealthList" class="service-health-list"></div>
+            </article>
+
+            <article class="operational-readiness-panel" aria-label="运营就绪">
+              <div class="section-title">
+                <h3>运营就绪</h3>
+                <span id="operationalStatus">未可运营</span>
+              </div>
+              <div class="ops-readiness-head">
+                <strong id="operationalScore">--</strong>
+                <span>/100</span>
+                <p id="operationalSummary">正在确认真实闭环、回滚、报告和支持能力。</p>
+              </div>
+              <div id="operationalChecklist" class="ops-check-list"></div>
+              <div id="operationalNextActions" class="ops-next-actions"></div>
+              <div class="aiwc-config-box">
+                <div class="aiwc-config-head">
+                  <strong>AIWC 接入</strong>
+                  <span id="aiwcHealthStatus">未测试</span>
+                </div>
+                <div id="aiwcConfigList" class="aiwc-config-list"></div>
+                <div class="aiwc-config-actions">
+                  <button id="testAiwcHealthButton" type="button">测试 AIWC 连接</button>
+                  <small id="aiwcHealthDetail">缺失项会显示在这里，密钥不会明文展示。</small>
+                </div>
+              </div>
+            </article>
+
+            <article class="first-run-panel" aria-label="First Run Checklist">
+              <div class="section-title">
+                <h3>First Run</h3>
+                <span id="firstRunStatus">检测中</span>
+              </div>
+              <p id="firstRunSummary">检查本机启动、项目目录和基础执行器。</p>
+              <div id="firstRunList" class="first-run-list"></div>
+            </article>
+
+            <article class="beta-support-panel" aria-label="Beta Support Center">
+              <div class="section-title">
+                <h3>Beta 支持中心</h3>
+                <span id="supportCenterStatus">本地支持</span>
+              </div>
+              <div class="support-action-grid">
+                <button id="generateSupportBundleButton" type="button">生成支持包</button>
+                <button id="openSupportBundleDirectoryButton" type="button">打开支持包目录</button>
+                <button id="copyDiagnosticSummaryButton" type="button">复制诊断摘要</button>
+                <button id="copyRestartHintButton" type="button">复制重启提示</button>
+              </div>
+              <small id="supportBundleStatus">用于 beta 支持和故障排查。</small>
+              <pre id="restartHintText" class="restart-hint-text">launchctl kickstart -k gui/$(id -u)/com.geoaifactory.codex-office</pre>
+              <div class="section-title compact">
+                <h3>最近错误</h3>
+                <span id="recentErrorCount">0</span>
+              </div>
+              <div id="recentErrorList" class="recent-error-list"></div>
+            </article>
+
+            <article class="beta-ops-panel" aria-label="Beta 外测运营">
+              <div class="section-title">
+                <h3>Beta Ops</h3>
+                <span id="betaOpsStatus">未开始</span>
+              </div>
+              <p id="betaOpsSummary">等待可信分发和 3-5 位外测记录。</p>
+              <div class="beta-ops-metrics">
+                <div><span>测试者</span><strong id="betaOpsTesterCount">0/3</strong></div>
+                <div><span>第一单</span><strong id="betaOpsFirstOrderRate">0%</strong></div>
+                <div><span>支持包</span><strong id="betaOpsSupportCount">0</strong></div>
+              </div>
+              <div id="betaOpsTrustList" class="beta-ops-list"></div>
+              <div id="betaOpsFailureList" class="beta-ops-list compact"></div>
+              <div id="betaOpsNextActions" class="ops-next-actions"></div>
+            </article>
+
+            <article class="blocker-panel">
+              <div class="section-title">
+                <h3>硬性阻断</h3>
+                <span id="blockerCount">0</span>
+              </div>
+              <div id="blockerList" class="blocker-list"></div>
+            </article>
+
+            <article class="company-report-panel">
+              <div class="section-title">
+                <h3>今日公司战报</h3>
+                <span id="companyReportStamp">实时</span>
+              </div>
+              <p id="companyReportHeadline">暂无战报。</p>
+              <div id="companyMetrics" class="company-metrics"></div>
+              <div id="companyShareCard" class="company-share-card">
+                <div class="share-card-head">
+                  <span>分享卡片</span>
+                  <strong>我的 AI 打工公司战报</strong>
+                </div>
+                <p id="companyShareLine">等待第一份有证据支撑的战报。</p>
+                <div id="companyShareMetrics" class="company-share-metrics"></div>
+                <ul id="companyShareBullets" class="company-share-bullets"></ul>
+              </div>
+              <button id="companyShareButton" class="company-share-button" type="button">复制战报文案</button>
+            </article>
+
+            <article class="launch-flow-panel">
+              <div class="section-title">
+                <h3>编程猿闭环</h3>
+              <span id="latestEvidenceStatus">暂无证据</span>
+            </div>
+            <p id="latestEvidenceSummary">运行一次带证据的真实闭环，让这个办公室真正动起来。</p>
+              <div class="launch-actions">
+                <button id="runCodingLoopHeroButton" type="button">运行三猿演示</button>
+                <button id="viewDossierButton" type="button">查看认证档案</button>
+              </div>
+            </article>
+
+            <article class="local-model-panel">
+              <div class="section-title">
+                <h3>模型提供方</h3>
+                <span id="localJudgeStatus">未检测</span>
+              </div>
+              <p id="localJudgeSummary">Demo Only 不需要 token；要生成真实代码修改，请选择 BYO API Key 或本地模型。</p>
+              <form id="modelProviderForm" class="model-provider-form">
+                <label>
+                  <span>模式</span>
+                  <select id="modelProviderMode">
+                    <option value="demo_only">Demo Only</option>
+                    <option value="byo_key">BYO API Key</option>
+                    <option value="local_model">Local Model</option>
+                  </select>
+                </label>
+                <label>
+                  <span>提供方</span>
+                  <select id="modelProviderSelect">
+                    <option value="openai">OpenAI</option>
+                    <option value="anthropic">Anthropic</option>
+                    <option value="gemini">Gemini</option>
+                    <option value="openai_compatible">OpenAI-compatible</option>
+                    <option value="ollama">Ollama</option>
+                    <option value="lm_studio">LM Studio</option>
+                  </select>
+                </label>
+                <label>
+                  <span>Endpoint</span>
+                  <input id="modelProviderEndpoint" type="text" placeholder="http://127.0.0.1:11434" autocomplete="off">
+                </label>
+                <label>
+                  <span>模型</span>
+                  <input id="modelProviderModel" type="text" placeholder="qwen2.5-coder:7b" autocomplete="off">
+                </label>
+                <label>
+                  <span>API Key</span>
+                  <input id="modelProviderApiKey" type="password" placeholder="只保存在本机 gitignored 配置" autocomplete="new-password">
+                </label>
+                <div class="model-provider-actions">
+                  <button id="saveModelProviderButton" type="submit">保存模型设置</button>
+                  <button id="testModelProviderButton" type="button">测试连接</button>
+                </div>
+              </form>
+              <p id="modelProviderNotice" class="model-provider-notice">为了生成代码修改，Coding猿 可能会把与任务相关的代码片段发送给你选择的模型服务商。不会默认上传整个项目。确认前不会写入代码。</p>
+              <div class="local-model-grid">
+                <div><span>提供方</span><strong id="localJudgeProvider">--</strong></div>
+                <div><span>模型</span><strong id="localJudgeModel">--</strong></div>
+                <div><span>最近审查</span><strong id="localJudgeLatest">--</strong></div>
+              </div>
+              <pre id="localJudgeCommand" class="local-model-command"></pre>
+              <div class="local-model-actions">
+                <button id="testLocalJudgeButton" type="button">测试连接</button>
+                <button id="copyLocalJudgeCommandButton" type="button">复制启动命令</button>
+              </div>
+            </article>
+
+            <article class="first-real-order-panel">
+              <div class="section-title">
+                <h3>跑第一单：真实 AI 小任务</h3>
+                <span id="firstRealOrderStatus">等待模型</span>
+              </div>
+              <p id="firstRealOrderSummary">选择一个小任务，先查看将发送给模型的上下文，再生成方案和 Diff。确认前不会写入项目。</p>
+              <label class="first-real-order-select">
+                <span>安全任务模板</span>
+                <select id="firstRealOrderTemplate">
+                  <option value="readme_usage">给 README 增加使用说明</option>
+                  <option value="fix_test">修复一个测试失败</option>
+                  <option value="input_validation">给指定函数增加输入校验</option>
+                </select>
+              </label>
+              <div class="first-real-order-actions">
+                <button id="previewAiContextButton" type="button">查看上下文</button>
+                <button id="runFirstRealOrderButton" type="button">生成真实 Diff</button>
+              </div>
+              <div id="contextPreviewPanel" class="context-preview-panel">
+                <strong>Context Preview</strong>
+                <p>Coding猿 只会把与任务相关的代码片段发送给你选择的模型，不会默认上传整个项目。</p>
+                <ul id="contextPreviewList"></ul>
+                <small id="contextPreviewMeta">还没有写入项目。</small>
+              </div>
+            </article>
+          </div>
+        </section>
+
+        <section class="workfeed-panel" aria-label="员工事件流">
+          <div class="feed-head">
+            <div>
+              <p class="eyebrow">实时工作流</p>
+              <h3>运行时间线</h3>
+            </div>
+            <span id="workfeedSignal">等待信号</span>
+          </div>
+          <div id="workfeedList" class="workfeed-list"></div>
+        </section>
+
+        <section class="office-floor" aria-label="项目节点列表">
+          <canvas id="deckCanvas" class="deck-canvas" aria-hidden="true"></canvas>
+          <div id="deskGrid" class="desk-grid"></div>
+        </section>
+      </main>
+
+      <button id="openInspectorButton" class="inspector-fab" type="button" aria-controls="projectDetail" aria-expanded="false">检查台</button>
+
+      <aside class="detail-panel" aria-label="项目详情">
+        <div class="inspector-shell-head">
+          <div>
+            <p id="inspectorShellMode" class="eyebrow">动态检查台</p>
+            <h2 id="inspectorShellTitle">证据 / 闸门</h2>
+          </div>
+          <button id="closeInspectorButton" type="button">关闭</button>
+        </div>
+
+        <div id="emptyDetail" class="empty-detail">
+          <p class="eyebrow">已选工位</p>
+          <h2>请选择一个项目</h2>
+          <p>办公室会持续监听任务信号。</p>
+        </div>
+
+        <article id="projectDetail" class="project-detail" hidden>
+          <figure class="coding-yuan-portrait">
+            <img src="/assets/coding-yuan/concept-display.jpg" alt="编程猿操作员" />
+          </figure>
+
+          <div class="mission-inspector-tabs" role="tablist" aria-label="任务检查台">
+            <button class="is-active" data-inspector-tab="mission" type="button">任务</button>
+            <button data-inspector-tab="evidence" type="button">证据</button>
+            <button data-inspector-tab="gate" type="button">闸门</button>
+          </div>
+
+          <section id="eventReplayPanel" class="event-replay-panel" hidden>
+            <div class="section-title">
+              <h3 id="eventReplayTitle">时间线回放</h3>
+              <span id="eventReplayStatus">已选中</span>
+            </div>
+            <div id="eventReplayBody" class="event-replay-body"></div>
+          </section>
+
+          <div class="inspector-pane is-active" data-inspector-pane="mission">
+            <div class="detail-head">
+              <span id="detailAccent" class="detail-avatar"></span>
+              <div>
+                <p id="detailRole" class="eyebrow">项目实验室</p>
+                <h2 id="detailName">项目</h2>
+                <span id="detailStatus" class="status-pill">待命</span>
+              </div>
+            </div>
+
+            <dl class="detail-list">
+              <div>
+                <dt>目录</dt>
+                <dd id="detailFolder">--</dd>
+              </div>
+              <div>
+                <dt>分支</dt>
+                <dd id="detailBranch">--</dd>
+              </div>
+              <div>
+                <dt>端口</dt>
+                <dd id="detailPorts">--</dd>
+              </div>
+              <div>
+                <dt>最近活动</dt>
+                <dd id="detailTouch">--</dd>
+              </div>
+              <div>
+                <dt>员工</dt>
+                <dd id="detailWorker">--</dd>
+              </div>
+            </dl>
+
+            <section class="task-brief">
+              <div class="section-title">
+                <h3>当前任务</h3>
+                <span id="detailRisk">--</span>
+              </div>
+              <p id="detailTask">--</p>
+              <small id="detailNextAction">--</small>
+              <div id="missionStatusGrid" class="mission-status-grid"></div>
+              <div class="mission-progress-meter" aria-label="任务进度">
+                <span id="missionProgressBar"></span>
+              </div>
+            </section>
+
+            <section class="operator-controls">
+              <div class="section-title">
+                <h3>控制</h3>
+                <span id="detailControlStatus">就绪</span>
+              </div>
+              <div class="control-actions">
+                <button id="queueReviewButton" type="button">加入审核</button>
+                <button id="markBlockedButton" type="button">标记阻断</button>
+                <button id="runCodingLoopButton" type="button">运行闭环</button>
+              </div>
+            </section>
+
+            <section class="task-queue-panel">
+              <div class="section-title">
+                <h3>员工任务</h3>
+                <span id="taskCount">0</span>
+              </div>
+              <div id="taskQueueList" class="task-queue-list"></div>
+            </section>
+          </div>
+
+          <div class="inspector-pane" data-inspector-pane="evidence">
+            <section class="task-insight-panel">
+              <div class="section-title">
+                <h3 id="taskInsightTitle">证据包</h3>
+                <span id="taskInsightStatus">待命</span>
+              </div>
+              <div id="taskInsightBody" class="task-insight-body"></div>
+            </section>
+
+            <section>
+              <div class="section-title">
+                <h3>最近文件</h3>
+              </div>
+              <ul id="recentFiles" class="compact-list"></ul>
+            </section>
+
+            <section>
+              <div class="section-title">
+                <h3>代码变更信号</h3>
+                <span id="changeCount">0</span>
+              </div>
+              <ul id="gitChanges" class="compact-list"></ul>
+            </section>
+
+            <section>
+              <div class="section-title">
+                <h3>脚本</h3>
+              </div>
+              <div id="scriptCloud" class="script-cloud"></div>
+            </section>
+          </div>
+
+          <div class="inspector-pane" data-inspector-pane="gate">
+            <section class="gate-inspector-panel">
+              <div class="section-title">
+                <h3 id="gateInsightTitle">人工闸门</h3>
+                <span id="gateInsightStatus">受保护</span>
+              </div>
+              <div id="gateInsightBody" class="task-insight-body gate-insight-body"></div>
+            </section>
+
+            <section class="approval-panel">
+              <div class="section-title">
+                <h3>审批队列</h3>
+                <span id="approvalCount">0</span>
+              </div>
+              <div id="approvalList" class="approval-list"></div>
+            </section>
+
+            <section class="safety-contract">
+              <div class="section-title">
+                <h3>安全契约</h3>
+                <span>人工闸门</span>
+              </div>
+              <ul class="compact-list">
+                <li>没有明确审批，不会修改项目文件。</li>
+                <li>沙盒补丁、回滚快照、写入闸门证据都可审计。</li>
+                <li>部署、重启、安装、钱包/交易、生产写入默认阻断。</li>
+              </ul>
+            </section>
+          </div>
+        </article>
+      </aside>
+    </div>
+    <!-- app-shell:end -->
+
+    <script type="importmap">
+      {
+        "imports": {
+          "three": "/vendor/three.module.min.js"
+        }
+      }
+    </script>
+    <script type="module" src="/app.js"></script>
+  </body>
+</html>

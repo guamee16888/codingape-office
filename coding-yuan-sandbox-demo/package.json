@@ -1,0 +1,11 @@
+{
+  "name": "coding-yuan-sandbox-demo",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Safe sandbox project for controlled Coding Yuan patch-run demos.",
+  "scripts": {
+    "test": "node scripts/check.mjs",
+    "check": "node scripts/check.mjs"
+  }
+}

@@ -1,0 +1,59 @@
+{
+  "name": "ai-worker-control-plane",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "next dev",
+    "test": "node --test tests/*.test.mjs",
+    "migrate": "node src/scripts/migrate.mjs",
+    "analyze": "node src/scripts/analyze-run.mjs",
+    "report": "node src/scripts/generate-nightly-report.mjs",
+    "nightly": "node src/scripts/run-nightly.mjs",
+    "retry": "node src/scripts/run-retries.mjs",
+    "demo": "node src/scripts/demo-smoke.mjs",
+    "demo:preview": "node src/scripts/demo-smoke.mjs --locale zh-CN --html-out demo-output/nightly-report.html --console-out demo-output/operator-console.html",
+    "demo:preview:en": "node src/scripts/demo-smoke.mjs --html-out demo-output/nightly-report.html --console-out demo-output/operator-console.html",
+    "local:bootstrap": "node src/scripts/bootstrap-local.mjs",
+    "local:record": "node src/scripts/record-local-run.mjs",
+    "local:preview": "node src/scripts/local-preview.mjs",
+    "local:feedback": "node src/scripts/local-feedback.mjs",
+    "local:evidence": "node src/scripts/local-evidence-pack.mjs",
+    "local:verify-evidence": "node src/scripts/verify-evidence-pack.mjs",
+    "local:evidence-manifest": "node src/scripts/evidence-manifest.mjs",
+    "local:data-governance": "node src/scripts/local-data-governance.mjs",
+    "local:readiness-dossier": "node src/scripts/local-readiness-dossier.mjs",
+    "local:policy-dossier": "node src/scripts/local-policy-governance-dossier.mjs",
+    "local:policy-workbench": "node src/scripts/local-policy-review-workbench.mjs",
+    "local:policy-workbench-event": "node src/scripts/local-policy-workbench-event.mjs",
+    "local:policy-workbench-effectiveness": "node src/scripts/local-policy-workbench-effectiveness.mjs",
+    "local:learning-rule-review": "node src/scripts/local-learning-rule-review.mjs",
+    "local:eval-coverage": "node src/scripts/local-eval-coverage.mjs",
+    "local:eval-backlog": "node src/scripts/local-eval-backlog.mjs",
+    "local:eval-backlog-replay": "node src/scripts/local-eval-backlog-replay.mjs",
+    "local:autonomy-gate": "node src/scripts/local-autonomy-gate.mjs",
+    "local:certification-roadmap": "node src/scripts/local-certification-roadmap.mjs",
+    "local:objective-status": "node src/scripts/local-objective-status.mjs",
+    "local:certification-recheck": "node src/scripts/local-certification-recheck.mjs",
+    "local:certification-review": "node src/scripts/local-certification-review.mjs",
+    "local:certification-decision": "node src/scripts/local-certification-decision.mjs",
+    "local:evidence-tasks": "node src/scripts/local-evidence-tasks.mjs",
+    "local:evidence-task-status": "node src/scripts/local-evidence-task-status.mjs",
+    "local:certification-actions": "node src/scripts/local-certification-actions.mjs",
+    "local:console": "node src/scripts/local-console-server.mjs"
+  },
+  "dependencies": {
+    "next": "latest",
+    "react": "latest",
+    "react-dom": "latest"
+  },
+  "devDependencies": {
+    "@types/node": "latest",
+    "@types/react": "latest",
+    "prisma": "latest",
+    "typescript": "latest"
+  },
+  "engines": {
+    "node": ">=26.0.0"
+  }
+}

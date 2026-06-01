@@ -1,0 +1,10 @@
+tunnel: YOUR_TUNNEL_ID
+credentials-file: /path/to/YOUR_TUNNEL_ID.json
+protocol: http2
+
+ingress:
+  - hostname: geoaifactory.com
+    service: http://127.0.0.1:4142
+  - hostname: www.geoaifactory.com
+    service: http://127.0.0.1:4142
+  - service: http_status:404

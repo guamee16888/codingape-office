@@ -1,0 +1,20 @@
+{
+  "project_id": "project_example",
+  "agent_id": "agent_refund_ops",
+  "run_id_external": "refund-2026-05-21-042",
+  "input": "Agent prepared a refund workflow for customer C-778 without manager approval.",
+  "output": "Refund workflow prepared; human approval required before using payment_refund or send_email_customer.",
+  "model": "gpt-5.5",
+  "provider": "openai",
+  "tools_used": ["payment_refund", "send_email_customer"],
+  "cost": 0.91,
+  "latency": 19.4,
+  "status": "completed",
+  "metadata": {
+    "task_type": "refund_ops",
+    "prompt_tokens": 1780,
+    "completion_tokens": 260,
+    "total_tokens": 2040,
+    "workflow_id": "refund-prep-v1"
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "name": "js-bugfix-button",
+  "version": "0.0.1",
+  "type": "module",
+  "scripts": {
+    "test": "node --test checks/*.mjs"
+  }
+}

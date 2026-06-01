@@ -1,0 +1,86 @@
+{
+  "schema": "codingyuan.worker-assets.v1",
+  "version": "1.0.0",
+  "maxRecommendedModelSizeMb": 8,
+  "texturePolicy": "embedded_or_bundled",
+  "requiredAnimations": [
+    "idle",
+    "assigned",
+    "working",
+    "running_command",
+    "reviewing",
+    "waiting_approval",
+    "blocked",
+    "completed",
+    "reporting"
+  ],
+  "workers": [
+    {
+      "id": "coding-yuan",
+      "name": "CodingYuan",
+      "role": "Mac-local coding worker",
+      "model": "/assets/workers/coding-ape.glb",
+      "textures": "embedded",
+      "fallbackAvatar": "猿",
+      "accent": "#30e0c6",
+      "version": "stage8-v1",
+      "hash": "sha256-53b2f8b21a347d52f27b9d3993f0d71abeb907431279ffa7bfa584f0b8f1dd8b",
+      "animations": {
+        "idle": "idle",
+        "assigned": "assigned",
+        "working": "working",
+        "running_command": "running_command",
+        "reviewing": "reviewing",
+        "waiting_approval": "waiting_approval",
+        "blocked": "blocked",
+        "completed": "completed",
+        "reporting": "reporting"
+      },
+      "sizeBytes": 30812
+    },
+    {
+      "id": "judge-yuan",
+      "name": "JudgeYuan",
+      "role": "Evidence and Human Gate reviewer",
+      "model": null,
+      "textures": "embedded",
+      "fallbackAvatar": "审",
+      "accent": "#8672c8",
+      "version": "placeholder-v1",
+      "hash": "placeholder",
+      "animations": {
+        "idle": "idle",
+        "assigned": "assigned",
+        "working": "working",
+        "running_command": "running_command",
+        "reviewing": "reviewing",
+        "waiting_approval": "waiting_approval",
+        "blocked": "blocked",
+        "completed": "completed",
+        "reporting": "reporting"
+      }
+    },
+    {
+      "id": "ops-yuan",
+      "name": "OpsYuan",
+      "role": "Apply Gate and rollback operator",
+      "model": null,
+      "textures": "embedded",
+      "fallbackAvatar": "运",
+      "accent": "#ffb454",
+      "version": "placeholder-v1",
+      "hash": "placeholder",
+      "animations": {
+        "idle": "idle",
+        "assigned": "assigned",
+        "working": "working",
+        "running_command": "running_command",
+        "reviewing": "reviewing",
+        "waiting_approval": "waiting_approval",
+        "blocked": "blocked",
+        "completed": "completed",
+        "reporting": "reporting"
+      }
+    }
+  ]
+}

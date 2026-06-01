@@ -1,0 +1,8 @@
+{
+  "name": "small-api-field-change",
+  "version": "0.0.1",
+  "type": "module",
+  "scripts": {
+    "test": "node --test checks/*.mjs"
+  }
+}

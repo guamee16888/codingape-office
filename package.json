@@ -1,0 +1,30 @@
+{
+  "name": "codingape-office",
+  "version": "0.1.0",
+  "description": "A safe AI coding worker for macOS: evidence, diff, verification, human gate, apply gate, and rollback before code writes.",
+  "private": false,
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js",
+    "build:mac-app": "bash scripts/build-mac-app.sh",
+    "build:mac-distribution": "bash scripts/build-mac-distribution.sh",
+    "build:mac-app-store": "bash scripts/build-mac-app-store.sh",
+    "prepare:mas-runtime": "bash scripts/prepare-mas-runtime.sh",
+    "assets:worker": "node scripts/generate-coding-ape-glb.mjs",
+    "stage8:record-demo": "node scripts/record-stage8-demo-video.mjs",
+    "stage8:verify-office": "node scripts/verify-stage8-office-state.mjs",
+    "stage9:capture-app-store-screenshots": "node scripts/capture-app-store-screenshots.mjs",
+    "evaluate:ai-patch-worker": "node scripts/evaluate-ai-patch-worker.mjs",
+    "evaluate:ai-patch-worker:failed": "node scripts/evaluate-ai-patch-worker.mjs --only-failed",
+    "beta:diagnostics": "bash scripts/collect-beta-diagnostics.sh",
+    "beta:first-order": "bash scripts/ten-minute-first-order-trial.sh",
+    "beta:record-tester": "bash scripts/record-beta-tester-run.sh",
+    "aiwc:dev": "npm --prefix integrations/ai-worker-control-plane run dev",
+    "aiwc:test": "npm --prefix integrations/ai-worker-control-plane test",
+    "aiwc:console": "npm --prefix integrations/ai-worker-control-plane run local:console",
+    "aiwc:preview": "npm --prefix integrations/ai-worker-control-plane run local:preview",
+    "test": "node --test"
+  }
+}

@@ -1,0 +1,74 @@
+import { AuthError, authenticateIngestionApiKey, readApiKeyFromHeaders } from "../../../../../../lib/api-keys.mjs";
+import {
+  buildPolicyReviewWorkbench,
+  listPolicyReviewWorkItemEvents,
+  recordPolicyReviewWorkItemEvent,
+} from "../../../../../../lib/policy-governance-dossier.mjs";
+
+export const runtime = "nodejs";
+
+export async function GET(
+  request: Request,
+  context: { params: Promise<{ policyRuleId: string }> }
+) {
+  try {
+    const { policyRuleId } = await context.params;
+    const workbench = buildPolicyReviewWorkbench(policyRuleId);
+
+    if (!workbench) {
+      return Response.json({ error: "Policy rule not found" }, { status: 404 });
+    }
+
+    authenticateIngestionApiKey(workbench.project_id, readApiKeyFromHeaders(request.headers));
+    const url = new URL(request.url);
+
+    return Response.json({
+      policy_rule_id: policyRuleId,
+      policy_review_work_item_events: listPolicyReviewWorkItemEvents(policyRuleId, {
+        limit: Number(url.searchParams.get("limit") || 50),
+      }),
+    }, { status: 200 });
+  } catch (error) {
+    if (error instanceof AuthError) {
+      return Response.json({ error: error.message }, { status: error.status });
+    }
+
+    return Response.json(
+      { error: error instanceof Error ? error.message : "Unexpected error" },
+      { status: 500 }
+    );
+  }
+}
+
+export async function POST(
+  request: Request,
+  context: { params: Promise<{ policyRuleId: string }> }
+) {
+  try {
+    const { policyRuleId } = await context.params;
+    const workbench = buildPolicyReviewWorkbench(policyRuleId);
+
+    if (!workbench) {
+      return Response.json({ error: "Policy rule not found" }, { status: 404 });
+    }
+
+    authenticateIngestionApiKey(workbench.project_id, readApiKeyFromHeaders(request.headers));
+    const payload = await request.json();
+    const result = recordPolicyReviewWorkItemEvent(policyRuleId, {
+      ...payload,
+      actor_type: payload.actor_type || "api_user",
+    });
+
+    return Response.json(result, { status: 201 });
+  } catch (error) {
+    if (error instanceof AuthError) {
+      return Response.json({ error: error.message }, { status: error.status });
+    }
+
+    const message = error instanceof Error ? error.message : "Unexpected error";
+    const status = message.includes("required") || message.startsWith("Invalid") || message.includes("not found in current workbench")
+      ? 400
+      : 500;
+    return Response.json({ error: message }, { status });
+  }
+}

@@ -1,0 +1,40 @@
+.DS_Store
+**/.DS_Store
+
+# Dependencies and build output
+node_modules/
+**/node_modules/
+.next/
+**/.next/
+dist/
+build/
+coverage/
+out/
+.turbo/
+.wrangler/
+
+# Runtime state and local evidence output
+data/
+**/.data/
+**/local-output/
+**/demo-output/
+codex-session-import/
+cloudflared-geoaifactory.yml
+
+# Logs and temp files
+*.log
+*.tmp
+*.temp
+.env
+.env.*
+
+# Local databases and secrets
+*.sqlite
+*.sqlite3
+*.db
+*.pem
+*.key
+*.p12
+credentials/
+secrets/
+private/

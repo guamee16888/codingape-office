@@ -1,0 +1,14 @@
+#!/bin/zsh
+set -euo pipefail
+
+SCRIPT_DIR="${0:A:h}"
+PROJECT_ROOT="${SCRIPT_DIR:h}"
+
+cd "$PROJECT_ROOT"
+
+export PORT="${PORT:-4142}"
+export CODEX_OFFICE_LOCAL_LLM_PROVIDER="${CODEX_OFFICE_LOCAL_LLM_PROVIDER:-ollama}"
+export CODEX_OFFICE_LOCAL_LLM_MODEL="${CODEX_OFFICE_LOCAL_LLM_MODEL:-huihui_ai/qwen3-abliterated:8b}"
+export CODEX_OFFICE_LOCAL_LLM_TIMEOUT_MS="${CODEX_OFFICE_LOCAL_LLM_TIMEOUT_MS:-25000}"
+
+exec "${CODEX_OFFICE_NODE:-node}" server.js
