@@ -21,6 +21,13 @@ What changed?
 - [ ] This PR does not include API keys, secrets, private keys, wallet files, certificates, `.env` contents, or private local paths.
 - [ ] User-facing copy does not claim Codingape Office is a fully autonomous developer.
 
+## Maintainer Checklist
+
+- [ ] This PR is scoped to the linked issue or clearly explains why no issue is needed.
+- [ ] This PR does not require direct `main` access to review.
+- [ ] Safety-sensitive files are called out in the summary.
+- [ ] Any skipped checks are explained.
+
 ## Verification
 
 Commands run:
