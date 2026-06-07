@@ -168,7 +168,8 @@ function buildPacket({ offline = false } = {}) {
   const releaseNotes = [
     readTextIfExists("docs/releases/v0.1.0.md"),
     readTextIfExists("docs/releases/v0.1.1.md"),
-    readTextIfExists("docs/releases/v0.1.2.md")
+    readTextIfExists("docs/releases/v0.1.2.md"),
+    readTextIfExists("docs/releases/v0.1.3.md")
   ].join("\n");
   const localPilotScorecard = readJsonIfExists(join(DATA_DIR, "pilot", "stage17-scorecard.json"));
 

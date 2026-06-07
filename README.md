@@ -109,6 +109,7 @@ npm install
 Run the local office:
 
 ```bash
+npm run pilot:smoke
 npm run dev
 ```
 
