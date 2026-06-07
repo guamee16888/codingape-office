@@ -1,8 +1,14 @@
 import assert from "node:assert/strict";
-import { readFile } from "node:fs/promises";
+import { execFile } from "node:child_process";
+import { mkdtemp, readFile } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import { test } from "node:test";
+import { promisify } from "node:util";
+import { fileURLToPath } from "node:url";
 
 const root = new URL("../", import.meta.url);
+const execFileAsync = promisify(execFile);
 
 async function readProjectFile(path) {
   return readFile(new URL(path, root), "utf8");
@@ -62,4 +68,80 @@ test("Pilot docs and README explain install, model modes, first task, support, a
   assert.match(invite, /Codingape Office should not write before you explicitly approve/);
   assert.match(scorecard, /Do not fill this section with simulated data/);
   assert.match(knownIssues, /invalid unified diff headers/);
+});
+
+test("Pilot tester recorder writes redacted scorecard and GitHub comment drafts", async () => {
+  const tmp = await mkdtemp(join(tmpdir(), "codingape-pilot-"));
+  const scriptPath = fileURLToPath(new URL("../scripts/record-pilot-tester-result.mjs", import.meta.url));
+
+  const { stdout } = await execFileAsync(process.execPath, [
+    scriptPath,
+    "--tester-id", "T01",
+    "--run-mode", "demo_only",
+    "--install-status", "pass",
+    "--project-selected", "pass",
+    "--model-configured", "skipped",
+    "--first-task", "pass",
+    "--diff-visible", "yes",
+    "--human-gate-understood", "yes",
+    "--apply-attempted", "no",
+    "--rollback-visible", "yes",
+    "--support-bundle-generated", "no",
+    "--main-blocker", "none",
+    "--feedback-score", "4",
+    "--next-fix", "Clarify /Users/dadada/private/project model setup"
+  ], {
+    env: { ...process.env, CODEX_OFFICE_DATA_DIR: tmp }
+  });
+
+  const result = JSON.parse(stdout);
+  assert.equal(result.record.testerId, "T01");
+  assert.equal(result.record.outcome, "usable_first_run");
+  assert.equal(result.record.privacy.localPathsRedacted, true);
+
+  const scorecard = JSON.parse(await readFile(join(tmp, "pilot", "stage17-scorecard.json"), "utf8"));
+  assert.equal(scorecard.testerResultsRecorded, 1);
+  assert.equal(scorecard.usableFirstRuns, 1);
+  assert.equal(scorecard.keyLeakage, 0);
+  assert.equal(scorecard.autoApplyAllowed, 0);
+
+  const comment = await readFile(join(tmp, "pilot", "github-comments", "T01.md"), "utf8");
+  assert.match(comment, /Tester slot T01/);
+  assert.match(comment, /Human Gate understood: yes/);
+  assert.match(comment, /<local-path>/);
+  assert.doesNotMatch(comment, /\/Users\/dadada/);
+});
+
+test("Pilot tester recorder refuses API keys without echoing secrets", async () => {
+  const tmp = await mkdtemp(join(tmpdir(), "codingape-pilot-secret-"));
+  const scriptPath = fileURLToPath(new URL("../scripts/record-pilot-tester-result.mjs", import.meta.url));
+  const secret = "sk-1234567890abcdefghijklmnop";
+
+  await assert.rejects(
+    execFileAsync(process.execPath, [
+      scriptPath,
+      "--tester-id", "T02",
+      "--run-mode", "demo_only",
+      "--install-status", "pass",
+      "--project-selected", "pass",
+      "--model-configured", "skipped",
+      "--first-task", "blocked",
+      "--diff-visible", "no",
+      "--human-gate-understood", "no",
+      "--apply-attempted", "no",
+      "--rollback-visible", "no",
+      "--support-bundle-generated", "no",
+      "--main-blocker", "model-provider",
+      "--feedback-score", "2",
+      "--notes", `tester pasted ${secret}`
+    ], {
+      env: { ...process.env, CODEX_OFFICE_DATA_DIR: tmp }
+    }),
+    (error) => {
+      assert.equal(error.code, 2);
+      assert.match(error.stderr, /Unsafe tester result content refused/);
+      assert.doesNotMatch(error.stderr, new RegExp(secret));
+      return true;
+    }
+  );
 });

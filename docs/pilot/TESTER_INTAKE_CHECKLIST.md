@@ -48,7 +48,35 @@ If macOS blocks the app, record the message and do not bypass security prompts u
 
 ## What To Report
 
-Use this format in the pilot tracker:
+If you are the maintainer, record the tester result locally first:
+
+```bash
+npm run pilot:record-tester -- \
+  --tester-id T01 \
+  --run-mode demo_only \
+  --install-status pass \
+  --project-selected pass \
+  --model-configured skipped \
+  --first-task pass \
+  --diff-visible yes \
+  --human-gate-understood yes \
+  --apply-attempted no \
+  --rollback-visible yes \
+  --support-bundle-generated no \
+  --main-blocker none \
+  --feedback-score 4 \
+  --next-fix "Clarify model setup"
+```
+
+The recorder writes a redacted GitHub comment draft under:
+
+```text
+data/pilot/github-comments/
+```
+
+Then paste the generated comment into the pilot tracker.
+
+Manual tracker format:
 
 ```text
 Tester: T01

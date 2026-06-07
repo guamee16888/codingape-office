@@ -80,6 +80,7 @@ https://github.com/guamee16888/codingape-office/issues/5
 - [x] Tester DM templates exist.
 - [x] Stage-16 intake plan exists.
 - [x] Tester slots `T01` through `T05` are reserved in the GitHub tracker.
+- [x] Local tester result recorder exists.
 - [ ] At least 3 external testers have been invited.
 - [ ] At least 3 real tester results are recorded.
 - [ ] Scorecard metrics are updated from real tester results only.

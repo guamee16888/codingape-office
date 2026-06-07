@@ -22,6 +22,21 @@ https://github.com/guamee16888/codingape-office/issues/5
 6. Record one public comment in issue `#5`.
 7. If the tester hits a blocker, create a focused follow-up issue and link it from the tracker.
 
+Before posting to GitHub, use the local recorder:
+
+```bash
+npm run pilot:record-tester -- --tester-id T01 --run-mode demo_only --install-status pass --project-selected pass --model-configured skipped --first-task pass --diff-visible yes --human-gate-understood yes --apply-attempted no --rollback-visible yes --support-bundle-generated no --main-blocker none --feedback-score 4 --next-fix "Clarify model setup"
+```
+
+The recorder refuses obvious API keys, private keys, code fences, and secret assignments, then writes:
+
+```text
+data/pilot/tester-results.jsonl
+data/pilot/stage17-scorecard.json
+data/pilot/latest-tester-result.json
+data/pilot/github-comments/T01.md
+```
+
 ## Do Not Count As Success
 
 Do not count a run as successful when:
@@ -63,6 +78,7 @@ Use one primary blocker category per tester:
 ## Stage-16 Exit Criteria
 
 - 3-5 tester slots exist in issue `#5`.
+- The local tester result recorder exists and blocks obvious secret leakage.
 - At least 3 real tester reports are recorded.
 - Pilot scorecard is updated from real reports only.
 - Top blockers are categorized.

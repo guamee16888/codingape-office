@@ -21,6 +21,7 @@
     "beta:diagnostics": "bash scripts/collect-beta-diagnostics.sh",
     "beta:first-order": "bash scripts/ten-minute-first-order-trial.sh",
     "beta:record-tester": "bash scripts/record-beta-tester-run.sh",
+    "pilot:record-tester": "node scripts/record-pilot-tester-result.mjs",
     "aiwc:dev": "npm --prefix integrations/ai-worker-control-plane run dev",
     "aiwc:test": "npm --prefix integrations/ai-worker-control-plane test",
     "aiwc:console": "npm --prefix integrations/ai-worker-control-plane run local:console",
