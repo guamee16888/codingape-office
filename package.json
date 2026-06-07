@@ -1,6 +1,6 @@
 {
   "name": "codingape-office",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "A local-first AI coding worker for Mac: evidence, diff, verification, human approval, and rollback before code writes.",
   "private": false,
   "license": "MIT",
