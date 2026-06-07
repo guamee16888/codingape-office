@@ -1,6 +1,8 @@
 # Pilot Scorecard
 
-Stage-13 measures whether real external testers can complete the first useful loop, not whether the internal framework has more features.
+Stage-13 started the first-run pilot workflow. Stage-15 activates public GitHub tracking for 3-5 real external testers.
+
+This scorecard measures whether real external testers can complete the first useful loop, not whether the internal framework has more features.
 
 ## Success Criteria
 
@@ -45,6 +47,12 @@ Fields:
 
 No external tester results are recorded in this repository. Do not fill this section with simulated data.
 
+GitHub tracker:
+
+```text
+https://github.com/guamee16888/codingape-office/issues/5
+```
+
 | Metric | Current |
 | --- | --- |
 | Tester count | 0 |
@@ -54,6 +62,17 @@ No external tester results are recorded in this repository. Do not fill this sec
 | Feedback score average | Not evaluated |
 | Key leakage | 0 known |
 | Auto apply | 0 allowed |
+
+## Stage-15 Activation Checklist
+
+- [x] Pilot labels exist on GitHub.
+- [x] Public pilot tracker issue exists.
+- [x] Existing external tester roadmap issue is labeled.
+- [x] Existing benchmark issue is labeled.
+- [ ] 3-5 external testers have been invited.
+- [ ] Each tester result is recorded without secrets or source code.
+- [ ] Main blockers are categorized.
+- [x] OpenAI OSS application draft is ready to submit.
 
 ## Reporting Rule
 

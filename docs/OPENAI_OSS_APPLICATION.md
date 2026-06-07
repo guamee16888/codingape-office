@@ -58,3 +58,56 @@ It helps developers use AI to change code safely by requiring evidence, an AI pl
 The project supports Demo Only, BYO API keys, and local model providers such as Ollama and LM Studio. It focuses on safety primitives for AI coding agents: project root guards, sensitive file filtering, context minimization, unified diff validation, sandbox apply, human approval, rollback, and redacted support bundles.
 
 I am the project maintainer and actively maintain the code, docs, evaluation fixtures, macOS packaging pipeline, and contributor workflow. Codex access would help improve AI patch reliability, evaluation coverage, onboarding, documentation, and OSS contributor review.
+
+## Submission Checklist
+
+Before submitting:
+
+- [ ] Repository is public.
+- [ ] README first screen explains the project in plain English.
+- [ ] MIT license is present.
+- [ ] Release `v0.1.0` exists.
+- [ ] Demo GIF is visible in README or release notes.
+- [ ] `CONTRIBUTING.md` is present.
+- [ ] `SECURITY.md` is present.
+- [ ] GitHub issue and PR templates are present.
+- [ ] At least one external pilot tracker issue exists.
+- [ ] Do not include API keys, Apple credentials, private local paths, app-specific passwords, or private source code in the application.
+
+## Suggested Form Fields
+
+Project name:
+
+```text
+Codingape Office
+```
+
+Repository:
+
+```text
+https://github.com/guamee16888/codingape-office
+```
+
+One-line description:
+
+```text
+A local-first AI coding worker for Mac: evidence, diff, verification, human approval, and rollback before code writes.
+```
+
+Maintainer role:
+
+```text
+I am the maintainer and primary developer of Codingape Office. I maintain the safety workflow, AI patch worker, evaluation fixtures, macOS packaging pipeline, documentation, and contributor workflow.
+```
+
+Open-source impact:
+
+```text
+Codingape Office explores safety primitives for AI-assisted code changes: selected project roots, context minimization, sensitive file filtering, unified diff validation, sandbox apply, verification before apply, human approval gates, rollback snapshots, and redacted support bundles.
+```
+
+What access would help with:
+
+```text
+Codex access would help improve AI patch reliability, expand evaluation fixtures, harden diff validation, improve first-run onboarding, document model provider setup, review external contributions, and support the macOS external pilot.
+```

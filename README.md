@@ -145,6 +145,7 @@ When a model is used, Codingape Office may send task-relevant code snippets to t
 External pilot docs live in:
 
 - `docs/pilot/EXTERNAL_PILOT_RUNBOOK.md`
+- `docs/pilot/STAGE15_EXTERNAL_PILOT_ACTIVATION.md`
 - `docs/pilot/TESTER_INVITE_TEMPLATE.md`
 - `docs/pilot/PILOT_SCORECARD.md`
 - `docs/pilot/KNOWN_ISSUES.md`
