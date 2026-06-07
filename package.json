@@ -1,7 +1,7 @@
 {
   "name": "codingape-office",
   "version": "0.1.0",
-  "description": "A safe AI coding worker for macOS: evidence, diff, verification, human gate, apply gate, and rollback before code writes.",
+  "description": "A local-first AI coding worker for Mac: evidence, diff, verification, human approval, and rollback before code writes.",
   "private": false,
   "license": "MIT",
   "type": "module",

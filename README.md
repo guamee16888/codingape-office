@@ -1,38 +1,62 @@
 # Codingape Office
 
-**A safe AI coding worker for your Mac.**
+**A local-first AI coding worker for Mac.**
 
-Public project page language: English.
+Codingape Office helps developers use AI to change code safely.
+It reads only the project folder you choose, builds a small task-specific context, generates an AI plan and patch, shows the diff, runs verification, and waits for human approval before writing to your project.
 
-Codingape Office helps a developer turn a task into evidence, a plan, a patch, verification, a human approval gate, and a rollback-ready report before any code is written to the project.
+> Your local AI coding worker for macOS: evidence first, diff before write, human approval before apply.
 
 ![Codingape Office demo](docs/media/codingape-office-demo.gif)
 
 ## Why This Exists
 
-Most AI coding tools optimize for speed. Codingape Office optimizes for controlled change:
+AI coding tools are powerful, but many developers still hesitate to let an agent touch a real project.
 
-- No automatic code writes.
-- No default full-disk scan.
-- The user must choose a project folder.
-- Model context is limited to task-relevant snippets.
-- Sensitive files such as `.env`, private keys, wallets, certificates, and credentials are skipped.
-- Every patch goes through diff preview, verification, Human Gate, Apply Gate, and rollback.
+Codingape Office is built around controlled code changes:
+
+- **No full-disk scan** - the user must choose a project folder.
+- **No automatic code writes** - patches stay blocked until approval.
+- **Evidence before patch** - see what the worker inspected.
+- **Diff before write** - review exactly what would change.
+- **Verification before apply** - run project checks before writing.
+- **Human Gate + Apply Gate** - approval is required before apply.
+- **Rollback available** - snapshots are created before writes.
+- **BYO key or local model** - use your own OpenAI, Anthropic, Gemini, Ollama, LM Studio, or OpenAI-compatible endpoint.
 
 ## Core Loop
 
 ```text
-Task
-  -> Evidence Pack
+Choose project
+  -> Build evidence
   -> AI Plan
-  -> Patch Proposal
-  -> Diff Preview
+  -> Generate patch
+  -> Preview diff
   -> Verification
   -> Human Gate
   -> Apply Gate
   -> Rollback Snapshot
-  -> Company Report
+  -> Report
 ```
+
+## What It Is
+
+Codingape Office is:
+
+- a local macOS AI coding worker
+- a safety-gated patch workflow
+- a local-first AI code modification workbench
+- an evaluation harness for AI patch reliability
+
+## What It Is Not
+
+Codingape Office is not:
+
+- a fully autonomous developer
+- a tool that silently changes your project
+- a cloud service that uploads your whole repo by default
+- a replacement for human code review
+- a polished App Store release yet
 
 ## Features
 
@@ -55,6 +79,14 @@ Requirements:
 - macOS
 - Node.js 20 or newer
 - Git
+
+Clone and install:
+
+```bash
+git clone https://github.com/guamee16888/codingape-office.git
+cd codingape-office
+npm install
+```
 
 Run the local office:
 
@@ -162,7 +194,7 @@ The real AI coding reliability benchmark lives in:
 - `scripts/evaluate-ai-patch-worker.mjs`
 - `test-fixtures/ai-patch-worker/`
 
-Latest Stage-12.4 local result:
+Latest local evaluation result:
 
 ```text
 15 tasks
@@ -185,7 +217,7 @@ tests/                            Node test suite
 test-fixtures/ai-patch-worker/    Small projects for real AI patch evaluation
 docs/                             Product, App Store, evaluation, and 3D docs
 integrations/ai-worker-control-plane/
-                                  Bundled AIWC ingestion/control-plane module
+                                  Optional ingestion/control-plane module
 ```
 
 ## Cloudflare Preview

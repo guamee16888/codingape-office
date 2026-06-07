@@ -53,7 +53,8 @@ test("Pilot docs and README explain install, model modes, first task, support, a
   const knownIssues = await readProjectFile("docs/pilot/KNOWN_ISSUES.md");
 
   assert.match(readme, /First Pilot Task/);
-  assert.match(readme, /A safe AI coding worker for your Mac/);
+  assert.match(readme, /A local-first AI coding worker for Mac/);
+  assert.match(readme, /evidence first, diff before write, human approval before apply/);
   assert.match(runbook, /npm run dev/);
   assert.match(runbook, /BYO API Key/);
   assert.match(runbook, /Ollama, LM Studio/);

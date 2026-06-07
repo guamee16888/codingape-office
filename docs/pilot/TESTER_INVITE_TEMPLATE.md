@@ -1,12 +1,23 @@
 # Tester Invite Template
 
-Subject: Try Codingape Office: a safe local AI coding worker for Mac
+Subject: Try Codingape Office: a local-first AI coding worker for Mac
 
 Hi,
 
-I am inviting a small group of testers to try Codingape Office.
+I am running a small external pilot for Codingape Office, an open-source local AI coding worker for Mac.
 
-Codingape Office is a local AI coding worker for your Mac. It does not auto-change your code. The first run is designed to show evidence, context preview, diff, verification, Human Gate, Apply Gate, rollback, and a report before any project write.
+It helps you try AI-assisted code changes safely:
+
+- choose a local project folder
+- configure your own model key or local model
+- ask for a small change
+- review the evidence and diff
+- approve before any write
+- rollback if needed
+
+I am looking for feedback on one question:
+
+Would you trust this workflow enough to use it on a real project?
 
 ## What I Need You To Try
 
@@ -20,9 +31,17 @@ Codingape Office is a local AI coding worker for your Mac. It does not auto-chan
 5. Tell me where you got stuck.
 6. Export the feedback JSON and support bundle if anything fails.
 
+Good first tasks:
+
+- update README instructions
+- fix a small bug
+- add input validation
+- repair a failing test
+- improve UI copy
+
 ## Safety Notes
 
-- Do not choose a production repo for the first run.
+- Do not test it first on a critical project. Use a small repo or a disposable branch.
 - Do not paste API keys into screenshots, issues, or feedback.
 - Codingape Office should not scan your full disk.
 - Codingape Office should not write before you explicitly approve.

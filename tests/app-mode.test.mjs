@@ -45,7 +45,8 @@ test("public home is a beta landing page instead of an empty console", async () 
   const app = await readProjectFile("public/app.js");
   const css = await readProjectFile("public/control-room.css");
 
-  assert.match(html, /Your local AI coding worker for Mac\. Evidence first, diff second, writes only after approval\./);
+  assert.match(html, /Your local AI coding worker for Mac\./);
+  assert.match(html, /Let AI inspect your project, propose a plan, generate a diff, run verification/);
   assert.match(html, /Join Mac Beta/);
   assert.match(html, /Watch Demo/);
   assert.match(app, /if \(APP_MODE === AppMode\.publicHome\)[\s\S]*?renderPublicHome\(\);[\s\S]*?return;/);
