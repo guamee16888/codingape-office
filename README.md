@@ -147,11 +147,23 @@ External pilot docs live in:
 - `docs/pilot/EXTERNAL_PILOT_RUNBOOK.md`
 - `docs/pilot/STAGE15_EXTERNAL_PILOT_ACTIVATION.md`
 - `docs/pilot/STAGE16_REAL_TESTER_INTAKE.md`
+- `docs/pilot/STAGE19_TESTER_INVITE_TRACKER.md`
 - `docs/pilot/TESTER_INTAKE_CHECKLIST.md`
 - `docs/pilot/TESTER_DM_TEMPLATES.md`
 - `docs/pilot/TESTER_INVITE_TEMPLATE.md`
 - `docs/pilot/PILOT_SCORECARD.md`
 - `docs/pilot/KNOWN_ISSUES.md`
+
+OpenAI OSS application materials live in:
+
+- `docs/OPENAI_OSS_APPLICATION.md`
+- `docs/oss/STAGE19_OSS_SUBMISSION_TRACKER.md`
+
+Public tracking:
+
+- Pilot first-run tracker: https://github.com/guamee16888/codingape-office/issues/5
+- OpenAI OSS submission tracker: https://github.com/guamee16888/codingape-office/issues/6
+- First tester invite tracker: https://github.com/guamee16888/codingape-office/issues/7
 
 After the first task, testers can export a redacted feedback JSON under `data/pilot-feedback/`. The lightweight latest metrics file is `data/pilot/latest.json`. These files are local runtime data and are intentionally not committed.
 

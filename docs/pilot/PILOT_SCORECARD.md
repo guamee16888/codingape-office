@@ -1,6 +1,6 @@
 # Pilot Scorecard
 
-Stage-13 started the first-run pilot workflow. Stage-15 activates public GitHub tracking for 3-5 real external testers.
+Stage-13 started the first-run pilot workflow. Stage-15 activates public GitHub tracking for 3-5 real external testers. Stage-19 prepares explicit invite tracking so reserved slots are not confused with real tester results.
 
 This scorecard measures whether real external testers can complete the first useful loop, not whether the internal framework has more features.
 
@@ -85,6 +85,18 @@ https://github.com/guamee16888/codingape-office/issues/5
 - [ ] At least 3 real tester results are recorded.
 - [ ] Scorecard metrics are updated from real tester results only.
 - [ ] Top blocker category is selected from evidence.
+
+## Stage-19 Submission And Invite Checklist
+
+- [x] OSS application packet can be generated locally.
+- [x] OSS submission tracker document exists.
+- [x] Tester invite tracker document exists.
+- [x] Public OSS submission tracker issue exists: https://github.com/guamee16888/codingape-office/issues/6
+- [x] Public tester invite tracker issue exists: https://github.com/guamee16888/codingape-office/issues/7
+- [ ] At least 3 real tester invites have been sent.
+- [ ] OpenAI OSS application has been submitted by the maintainer.
+- [ ] No application or invite tracker contains secrets, private local paths, or private source code.
+- [ ] Real tester results are recorded only after an actual run.
 
 ## Reporting Rule
 

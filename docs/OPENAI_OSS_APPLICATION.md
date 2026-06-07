@@ -63,16 +63,18 @@ I am the project maintainer and actively maintain the code, docs, evaluation fix
 
 Before submitting:
 
-- [ ] Repository is public.
-- [ ] README first screen explains the project in plain English.
-- [ ] MIT license is present.
-- [ ] Release `v0.1.0` exists.
-- [ ] Demo GIF is visible in README or release notes.
-- [ ] `CONTRIBUTING.md` is present.
-- [ ] `SECURITY.md` is present.
-- [ ] GitHub issue and PR templates are present.
-- [ ] At least one external pilot tracker issue exists.
-- [ ] Do not include API keys, Apple credentials, private local paths, app-specific passwords, or private source code in the application.
+- [x] Repository is public.
+- [x] README first screen explains the project in plain English.
+- [x] MIT license is present.
+- [x] Release `v0.1.0` exists.
+- [x] Demo GIF is visible in README or release notes.
+- [x] `CONTRIBUTING.md` is present.
+- [x] `SECURITY.md` is present.
+- [x] GitHub issue and PR templates are present.
+- [x] At least one external pilot tracker issue exists.
+- [x] Do not include API keys, Apple credentials, private local paths, app-specific passwords, or private source code in the application.
+- [ ] Submit the OpenAI OSS application from the maintainer account.
+- [ ] Record the submitted status in the public OSS tracker.
 
 Generate the latest local application packet before submitting:
 
@@ -88,6 +90,20 @@ data/oss-application/latest.json
 ```
 
 The packet summarizes repository metadata, release evidence, pilot tracker status, the no-fabricated-data scorecard rule, and copy-ready form fields.
+
+## Stage-19 Submission Tracker
+
+Stage-19 tracks the application process without claiming that submission has already happened:
+
+```text
+docs/oss/STAGE19_OSS_SUBMISSION_TRACKER.md
+```
+
+Public GitHub tracker:
+
+```text
+https://github.com/guamee16888/codingape-office/issues/6
+```
 
 ## Suggested Form Fields
 
