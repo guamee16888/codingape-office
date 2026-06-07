@@ -27,6 +27,7 @@ It should let you:
 git clone https://github.com/guamee16888/codingape-office.git
 cd codingape-office
 npm install
+npm run pilot:smoke
 npm run dev
 ```
 
@@ -91,4 +92,3 @@ Next fix:
 ```
 
 Good feedback is specific: the exact step where you got stuck is more useful than a general opinion.
-

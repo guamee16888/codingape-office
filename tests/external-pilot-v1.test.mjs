@@ -59,8 +59,13 @@ test("Pilot docs and README explain install, model modes, first task, support, a
   const knownIssues = await readProjectFile("docs/pilot/KNOWN_ISSUES.md");
 
   assert.match(readme, /First Pilot Task/);
+  assert.match(readme, /npm run pilot:smoke/);
   assert.match(readme, /A local-first AI coding worker for Mac/);
   assert.match(readme, /evidence first, diff before write, human approval before apply/);
+  const startHere = await readProjectFile("docs/pilot/START_HERE.md");
+  assert.match(startHere, /10-Minute Pilot/);
+  assert.match(startHere, /npm run pilot:smoke/);
+  assert.match(startHere, /Do not post API keys/);
   assert.match(runbook, /npm run dev/);
   assert.match(runbook, /BYO API Key/);
   assert.match(runbook, /Ollama, LM Studio/);
@@ -68,6 +73,19 @@ test("Pilot docs and README explain install, model modes, first task, support, a
   assert.match(invite, /Codingape Office should not write before you explicitly approve/);
   assert.match(scorecard, /Do not fill this section with simulated data/);
   assert.match(knownIssues, /invalid unified diff headers/);
+});
+
+test("Pilot smoke check verifies setup without collecting private project data", async () => {
+  const scriptPath = fileURLToPath(new URL("../scripts/pilot-smoke-check.mjs", import.meta.url));
+  const { stdout } = await execFileAsync(process.execPath, [scriptPath, "--json"]);
+  const report = JSON.parse(stdout);
+
+  assert.equal(report.ok, true);
+  assert.equal(report.checks.some((check) => check.id === "script:pilot:smoke" && check.ok), true);
+  assert.equal(report.checks.some((check) => check.id === "file:docs/pilot/START_HERE.md" && check.ok), true);
+  assert.equal(typeof report.packageVersion, "string");
+  assert.doesNotMatch(stdout, /\/Users\/dadada/);
+  assert.doesNotMatch(stdout, /sk-[A-Za-z0-9_-]+/);
 });
 
 test("Pilot tester recorder writes redacted scorecard and GitHub comment drafts", async () => {

@@ -1,6 +1,6 @@
 {
   "name": "codingape-office",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "A local-first AI coding worker for Mac: evidence, diff, verification, human approval, and rollback before code writes.",
   "private": false,
   "license": "MIT",
@@ -19,6 +19,7 @@
     "evaluate:ai-patch-worker": "node scripts/evaluate-ai-patch-worker.mjs",
     "evaluate:ai-patch-worker:failed": "node scripts/evaluate-ai-patch-worker.mjs --only-failed",
     "oss:application-packet": "node scripts/generate-oss-application-packet.mjs",
+    "pilot:smoke": "node scripts/pilot-smoke-check.mjs",
     "beta:diagnostics": "bash scripts/collect-beta-diagnostics.sh",
     "beta:first-order": "bash scripts/ten-minute-first-order-trial.sh",
     "beta:record-tester": "bash scripts/record-beta-tester-run.sh",
