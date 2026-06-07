@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Security issue
+    url: https://github.com/guamee16888/codingape-office/security/advisories/new
+    about: Please report private security issues through GitHub Security Advisories.
+  - name: External pilot runbook
+    url: https://github.com/guamee16888/codingape-office/blob/main/docs/pilot/EXTERNAL_PILOT_RUNBOOK.md
+    about: Read this before sharing first-run feedback.
