@@ -11,6 +11,22 @@ It reads only the project folder you choose, builds a small task-specific contex
 
 ![Codingape Office demo](docs/media/codingape-office-demo.gif)
 
+## 10-Minute Pilot
+
+If you are trying Codingape Office for the first time, start here:
+
+```text
+docs/pilot/START_HERE.md
+```
+
+The pilot path uses one small README task in a toy repo, test repo, or disposable branch. A useful first-run result is either a visible diff with Human Gate understood, or a clear blocker with redacted feedback.
+
+Public pilot tracker:
+
+```text
+https://github.com/guamee16888/codingape-office/issues/5
+```
+
 ## Why This Exists
 
 AI coding tools are powerful, but many developers still hesitate to let an agent touch a real project.
@@ -146,6 +162,7 @@ When a model is used, Codingape Office may send task-relevant code snippets to t
 
 External pilot docs live in:
 
+- `docs/pilot/START_HERE.md`
 - `docs/pilot/EXTERNAL_PILOT_RUNBOOK.md`
 - `docs/pilot/STAGE15_EXTERNAL_PILOT_ACTIVATION.md`
 - `docs/pilot/STAGE16_REAL_TESTER_INTAKE.md`
