@@ -31,6 +31,8 @@ npm install --no-audit --no-fund
 npm test
 ```
 
+It uses Node.js 24 because the AI Worker Control Plane integration imports `node:sqlite`, which is not available in the Node 20 runner used by the first CI attempt.
+
 The check name should appear as:
 
 ```text
@@ -58,4 +60,3 @@ Do not mark Stage-23 as enforced until current GitHub branch protection shows:
 - required status check configured
 - CI check passing on the relevant branch or PR
 - admin bypass disabled, or a documented reason why GitHub does not allow it
-
