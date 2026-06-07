@@ -59,7 +59,7 @@ Use API credits to improve Codingape Office's AI patch worker and maintainer wor
 Anything else OpenAI should know? Keep under 500 characters:
 
 ```text
-Current public signals are early: 0 stars, 1 fork, v0.1.0 release, active issue trackers, 309 passing tests, safety docs, PR/issue templates, and external pilot tracking. We are not claiming broad adoption yet; the request is to accelerate a maintainer-led safety workflow for local AI coding agents.
+Current public signals are early: 0 stars, 1 fork, public release notes, required CI, branch protection, safety docs, PR/issue templates, and external pilot tracking. We are not claiming broad adoption yet; the request is to accelerate a maintainer-led safety workflow for local AI coding agents.
 ```
 
 ## After Submission
@@ -80,4 +80,3 @@ Submitted date: YYYY-MM-DD
 
 No private account data, Organization ID, credentials, or private source code are recorded in this tracker.
 ```
-

@@ -2,6 +2,8 @@
 
 **A local-first AI coding worker for Mac.**
 
+[![CI](https://github.com/guamee16888/codingape-office/actions/workflows/ci.yml/badge.svg)](https://github.com/guamee16888/codingape-office/actions/workflows/ci.yml)
+
 Codingape Office helps developers use AI to change code safely.
 It reads only the project folder you choose, builds a small task-specific context, generates an AI plan and patch, shows the diff, runs verification, and waits for human approval before writing to your project.
 
@@ -161,6 +163,7 @@ OpenAI OSS application materials live in:
 - `docs/oss/STAGE19_OSS_SUBMISSION_TRACKER.md`
 - `docs/oss/STAGE20_OPENAI_OSS_FORM_WORKSHEET.md`
 - `docs/oss/STAGE24_SOLO_MAINTAINER_GOVERNANCE.md`
+- `docs/oss/STAGE25_PUBLIC_SIGNAL_BOOST.md`
 
 Public tracking:
 

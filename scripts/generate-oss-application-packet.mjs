@@ -15,6 +15,11 @@ const PACKET_JSON = join(OUTPUT_DIR, "latest.json");
 const REPO = "guamee16888/codingape-office";
 const REPO_URL = `https://github.com/${REPO}`;
 const TRACKER_URL = `${REPO_URL}/issues/5`;
+const FALLBACK_RELEASE = {
+  tagName: "v0.1.0",
+  name: "v0.1.0 - Safe Local AI Coding Worker for Mac",
+  url: `${REPO_URL}/releases/tag/v0.1.0`
+};
 
 const SECRET_PATTERNS = [
   ["openai_or_provider_key", /\bsk-(?:ant-)?[A-Za-z0-9_-]{20,}\b/g],
@@ -62,6 +67,12 @@ function readText(relativePath) {
 function readJsonIfExists(path) {
   if (!existsSync(path)) return null;
   return JSON.parse(readFileSync(path, "utf8"));
+}
+
+function readTextIfExists(relativePath) {
+  const path = join(ROOT_DIR, relativePath);
+  if (!existsSync(path)) return "";
+  return readFileSync(path, "utf8");
 }
 
 function ghJson(args) {
@@ -154,7 +165,10 @@ function buildPacket({ offline = false } = {}) {
   const readme = readText("README.md");
   const applicationDraft = readText("docs/OPENAI_OSS_APPLICATION.md");
   const pilotScorecardDoc = readText("docs/pilot/PILOT_SCORECARD.md");
-  const releaseNotes = readText("docs/releases/v0.1.0.md");
+  const releaseNotes = [
+    readTextIfExists("docs/releases/v0.1.0.md"),
+    readTextIfExists("docs/releases/v0.1.1.md")
+  ].join("\n");
   const localPilotScorecard = readJsonIfExists(join(DATA_DIR, "pilot", "stage17-scorecard.json"));
 
   const repo = safeGhJson([
@@ -173,6 +187,14 @@ function buildPacket({ offline = false } = {}) {
     "--json",
     "number,title,state,labels,url,comments"
   ], { url: TRACKER_URL, state: "unknown", comments: [] }, offline);
+  const latestRelease = safeGhJson([
+    "release",
+    "view",
+    "--repo",
+    REPO,
+    "--json",
+    "tagName,name,url,isDraft,isPrerelease,publishedAt"
+  ], FALLBACK_RELEASE, offline);
 
   const commit = gitOutput(["rev-parse", "--short", "HEAD"], "unknown");
   const latestTag = gitOutput(["describe", "--tags", "--abbrev=0"], "none");
@@ -193,7 +215,9 @@ function buildPacket({ offline = false } = {}) {
       topics,
       latestCommit: commit,
       latestStableTag: latestTag,
-      release: `${REPO_URL}/releases/tag/v0.1.0`
+      release: latestRelease.url || FALLBACK_RELEASE.url,
+      releaseTag: latestRelease.tagName || FALLBACK_RELEASE.tagName,
+      releaseName: latestRelease.name || FALLBACK_RELEASE.name
     },
     application: {
       projectSummary: extractSection(applicationDraft, "Project Summary"),
@@ -205,6 +229,8 @@ function buildPacket({ offline = false } = {}) {
     evidence: {
       readmeHasPlainEnglishHero: /A local-first AI coding worker for Mac/.test(readme),
       releaseHasDemoGif: /Codingape Office demo/.test(releaseNotes),
+      governanceEnforced: /Admin enforcement\s*\|\s*Enabled/.test(readTextIfExists("docs/oss/STAGE24_SOLO_MAINTAINER_GOVERNANCE.md")),
+      requiredCiDocumented: /Required status checks configured\s*\|\s*Verified: `npm test`/.test(readTextIfExists("docs/oss/STAGE22_PR_ONLY_GOVERNANCE.md")),
       contributingPresent: existsSync(join(ROOT_DIR, "CONTRIBUTING.md")),
       securityPresent: existsSync(join(ROOT_DIR, "SECURITY.md")),
       issueTemplatesPresent: existsSync(join(ROOT_DIR, ".github", "ISSUE_TEMPLATE")),
@@ -253,7 +279,7 @@ Generated: ${packet.generatedAt}
 - Forks: ${project.forks ?? "not checked"}
 - Latest commit: ${project.latestCommit}
 - Latest stable tag: ${project.latestStableTag}
-- Release: ${project.release}
+- Latest release: ${project.releaseTag} - ${project.release}
 - Topics: ${project.topics.length ? project.topics.join(", ") : "not checked"}
 
 ## Project Summary
@@ -279,11 +305,13 @@ ${app.shortVersion}
 ## Evidence Checklist
 
 - README plain-English hero: ${evidence.readmeHasPlainEnglishHero ? "yes" : "no"}
-- v0.1.0 release includes demo GIF: ${evidence.releaseHasDemoGif ? "yes" : "no"}
+- Public release notes include demo GIF: ${evidence.releaseHasDemoGif ? "yes" : "no"}
 - CONTRIBUTING.md present: ${evidence.contributingPresent ? "yes" : "no"}
 - SECURITY.md present: ${evidence.securityPresent ? "yes" : "no"}
 - GitHub issue templates present: ${evidence.issueTemplatesPresent ? "yes" : "no"}
 - GitHub PR template present: ${evidence.pullRequestTemplatePresent ? "yes" : "no"}
+- Solo-maintainer governance documented: ${evidence.governanceEnforced ? "yes" : "no"}
+- Required CI documented: ${evidence.requiredCiDocumented ? "yes" : "no"}
 - Pilot tracker: ${pilot.trackerIssue}
 - Pilot tracker state: ${pilot.trackerState}
 - Tester slots reserved: ${pilot.reservedSlots}

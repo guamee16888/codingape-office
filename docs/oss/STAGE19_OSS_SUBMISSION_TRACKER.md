@@ -20,6 +20,7 @@ Make the OpenAI OSS application process trackable without leaking secrets or fab
 | Pilot tracker | Ready |
 | OSS application packet generator | Ready |
 | Stage-20 form worksheet | Ready |
+| Stage-25 public signal notes | Ready |
 | OpenAI OSS form submission | Pending user action |
 | OpenAI response | Not received |
 
@@ -61,6 +62,7 @@ https://openai.com/form/codex-for-oss/
 - OSS submission tracker: https://github.com/guamee16888/codingape-office/issues/6
 - Application draft: `docs/OPENAI_OSS_APPLICATION.md`
 - Stage-20 form worksheet: `docs/oss/STAGE20_OPENAI_OSS_FORM_WORKSHEET.md`
+- Stage-25 public signal notes: `docs/oss/STAGE25_PUBLIC_SIGNAL_BOOST.md`
 
 ## Do Not Submit
 

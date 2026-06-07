@@ -33,7 +33,7 @@ The goal is not to create a fully autonomous developer, but to build a practical
 
 I am the maintainer of the project and actively work on the core safety workflow, AI patch worker, macOS packaging, evaluation harness, documentation, and external pilot process.
 
-The repository includes tests, fixtures, evaluation scripts, docs, a contribution guide, a demo GIF, MIT license, v0.1.0 release tag, and a structured benchmark for AI patch reliability. The project has also started receiving external contributor interest and PR activity.
+The repository includes tests, fixtures, evaluation scripts, docs, a contribution guide, a demo GIF, MIT license, public release tags, required CI, branch protection, and a structured benchmark for AI patch reliability. The project has also started receiving external contributor interest and PR activity.
 
 ## What Support Would Enable
 
@@ -67,6 +67,7 @@ Before submitting:
 - [x] README first screen explains the project in plain English.
 - [x] MIT license is present.
 - [x] Release `v0.1.0` exists.
+- [x] Governance/CI release notes are prepared for `v0.1.1`.
 - [x] Demo GIF is visible in README or release notes.
 - [x] `CONTRIBUTING.md` is present.
 - [x] `SECURITY.md` is present.
@@ -115,6 +116,13 @@ Stage-20 copy-ready form worksheet:
 
 ```text
 docs/oss/STAGE20_OPENAI_OSS_FORM_WORKSHEET.md
+```
+
+Stage-25 public signal notes:
+
+```text
+docs/oss/STAGE25_PUBLIC_SIGNAL_BOOST.md
+docs/releases/v0.1.1.md
 ```
 
 ## Suggested Form Fields
