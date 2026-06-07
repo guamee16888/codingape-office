@@ -98,3 +98,11 @@ Do not include private secrets, tokens, local paths, or private source in that i
 | Required status checks configured | Not yet |
 | PR-only maintainer policy documented | Ready |
 | Public governance tracker | https://github.com/guamee16888/codingape-office/issues/8 |
+
+## Stage-23 Follow-up
+
+Stage-23 adds the first GitHub Actions CI gate and prepares `main` for required status checks:
+
+```text
+docs/oss/STAGE23_CI_GATE_ENFORCEMENT.md
+```
