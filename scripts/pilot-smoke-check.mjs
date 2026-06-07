@@ -109,7 +109,7 @@ async function buildReport() {
     addCheck(checks, `file:${file}`, existsSync(join(ROOT_DIR, file)), `${file} exists`);
   }
 
-  const requiredScripts = ["dev", "test", "pilot:smoke", "pilot:record-tester", "beta:first-order"];
+  const requiredScripts = ["dev", "test", "pilot:smoke", "pilot:feedback-template", "pilot:record-tester", "beta:first-order"];
   for (const script of requiredScripts) {
     addCheck(checks, `script:${script}`, Boolean(pkg.scripts?.[script]), `npm script ${script} exists`);
   }

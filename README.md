@@ -27,6 +27,12 @@ Public pilot tracker:
 https://github.com/guamee16888/codingape-office/issues/5
 ```
 
+After a first run, print a public-safe feedback template:
+
+```bash
+npm run pilot:feedback-template
+```
+
 ## Why This Exists
 
 AI coding tools are powerful, but many developers still hesitate to let an agent touch a real project.

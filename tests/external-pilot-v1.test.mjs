@@ -60,12 +60,17 @@ test("Pilot docs and README explain install, model modes, first task, support, a
 
   assert.match(readme, /First Pilot Task/);
   assert.match(readme, /npm run pilot:smoke/);
+  assert.match(readme, /npm run pilot:feedback-template/);
   assert.match(readme, /A local-first AI coding worker for Mac/);
   assert.match(readme, /evidence first, diff before write, human approval before apply/);
   const startHere = await readProjectFile("docs/pilot/START_HERE.md");
   assert.match(startHere, /10-Minute Pilot/);
   assert.match(startHere, /npm run pilot:smoke/);
+  assert.match(startHere, /npm run pilot:feedback-template/);
   assert.match(startHere, /Do not post API keys/);
+  const intakeChecklist = await readProjectFile("docs/pilot/TESTER_INTAKE_CHECKLIST.md");
+  assert.match(intakeChecklist, /npm run pilot:feedback-template/);
+  assert.match(intakeChecklist, /does not record a tester result/);
   assert.match(runbook, /npm run dev/);
   assert.match(runbook, /BYO API Key/);
   assert.match(runbook, /Ollama, LM Studio/);
@@ -82,8 +87,27 @@ test("Pilot smoke check verifies setup without collecting private project data",
 
   assert.equal(report.ok, true);
   assert.equal(report.checks.some((check) => check.id === "script:pilot:smoke" && check.ok), true);
+  assert.equal(report.checks.some((check) => check.id === "script:pilot:feedback-template" && check.ok), true);
   assert.equal(report.checks.some((check) => check.id === "file:docs/pilot/START_HERE.md" && check.ok), true);
   assert.equal(typeof report.packageVersion, "string");
+  assert.doesNotMatch(stdout, /\/Users\/dadada/);
+  assert.doesNotMatch(stdout, /sk-[A-Za-z0-9_-]+/);
+});
+
+test("Pilot feedback template is public-safe and does not record tester data", async () => {
+  const scriptPath = fileURLToPath(new URL("../scripts/pilot-feedback-template.mjs", import.meta.url));
+  const { stdout } = await execFileAsync(process.execPath, [scriptPath, "--json"]);
+  const report = JSON.parse(stdout);
+
+  assert.equal(report.ok, true);
+  assert.equal(report.safety.writesFiles, false);
+  assert.equal(report.safety.readsProjectFiles, false);
+  assert.equal(report.safety.callsModelProvider, false);
+  assert.equal(report.safety.recordsTesterResult, false);
+  assert.match(report.template, /Pilot First Run Feedback/);
+  assert.match(report.template, /Human Gate understood/);
+  assert.match(report.template, /API keys/);
+  assert.match(report.template, /https:\/\/github.com\/guamee16888\/codingape-office\/issues\/5/);
   assert.doesNotMatch(stdout, /\/Users\/dadada/);
   assert.doesNotMatch(stdout, /sk-[A-Za-z0-9_-]+/);
 });

@@ -92,3 +92,11 @@ Next fix:
 ```
 
 Good feedback is specific: the exact step where you got stuck is more useful than a general opinion.
+
+To print a public-safe feedback template, run:
+
+```bash
+npm run pilot:feedback-template
+```
+
+This only prints a template. It does not record a tester result, inspect your project, call a model, or write files.
