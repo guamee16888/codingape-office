@@ -174,6 +174,7 @@ After the first task, testers can export a redacted feedback JSON under `data/pi
 - Read `CONTRIBUTING.md` before opening a pull request.
 - Use the GitHub issue templates for bugs, docs/copy, feature requests, and external pilot feedback.
 - Use `SECURITY.md` and GitHub Security Advisories for private vulnerability reports.
+- Maintainers and contributors should use pull requests for normal changes to `main`.
 - Do not include API keys, `.env` contents, private keys, certificates, wallet files, private local paths, or full private source code in issues, PRs, screenshots, support bundles, or docs.
 
 ## Safety Principles
