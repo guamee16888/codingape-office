@@ -19,13 +19,13 @@ https://github.com/guamee16888/codingape-office/issues/8
 GitHub currently reports branch protection on `main` with:
 
 - pull request review required: yes
-- required approving reviews: 1
+- required approving reviews: 0
 - force pushes disabled: yes
 - deletions disabled: yes
-- admin enforcement: no
-- required status checks: not configured
+- admin enforcement: yes
+- required status checks: `npm test`
 
-Because admin enforcement is disabled, a maintainer can still bypass the rule and push directly to `main`. GitHub has shown this warning during recent pushes:
+Earlier Stage-22 setup allowed maintainer bypass because admin enforcement was disabled. GitHub showed this warning during direct pushes:
 
 ```text
 Bypassed rule violations for refs/heads/main:
@@ -94,8 +94,8 @@ Do not include private secrets, tokens, local paths, or private source in that i
 | --- | --- |
 | Branch protection exists | Observed |
 | Pull request review required | Observed |
-| Admin bypass disabled | Not yet |
-| Required status checks configured | Not yet |
+| Admin bypass disabled | Verified |
+| Required status checks configured | Verified: `npm test` |
 | PR-only maintainer policy documented | Ready |
 | Public governance tracker | https://github.com/guamee16888/codingape-office/issues/8 |
 
@@ -105,4 +105,10 @@ Stage-23 adds the first GitHub Actions CI gate and prepares `main` for required 
 
 ```text
 docs/oss/STAGE23_CI_GATE_ENFORCEMENT.md
+```
+
+Stage-24 records the solo-maintainer governance mode:
+
+```text
+docs/oss/STAGE24_SOLO_MAINTAINER_GOVERNANCE.md
 ```
