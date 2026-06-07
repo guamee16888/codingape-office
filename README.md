@@ -146,6 +146,9 @@ External pilot docs live in:
 
 - `docs/pilot/EXTERNAL_PILOT_RUNBOOK.md`
 - `docs/pilot/STAGE15_EXTERNAL_PILOT_ACTIVATION.md`
+- `docs/pilot/STAGE16_REAL_TESTER_INTAKE.md`
+- `docs/pilot/TESTER_INTAKE_CHECKLIST.md`
+- `docs/pilot/TESTER_DM_TEMPLATES.md`
 - `docs/pilot/TESTER_INVITE_TEMPLATE.md`
 - `docs/pilot/PILOT_SCORECARD.md`
 - `docs/pilot/KNOWN_ISSUES.md`

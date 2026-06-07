@@ -74,6 +74,17 @@ https://github.com/guamee16888/codingape-office/issues/5
 - [ ] Main blockers are categorized.
 - [x] OpenAI OSS application draft is ready to submit.
 
+## Stage-16 Intake Checklist
+
+- [x] Tester intake checklist exists.
+- [x] Tester DM templates exist.
+- [x] Stage-16 intake plan exists.
+- [x] Tester slots `T01` through `T05` are reserved in the GitHub tracker.
+- [ ] At least 3 external testers have been invited.
+- [ ] At least 3 real tester results are recorded.
+- [ ] Scorecard metrics are updated from real tester results only.
+- [ ] Top blocker category is selected from evidence.
+
 ## Reporting Rule
 
 If a run fails because of model transport, invalid diff, missing Node/npm, port conflict, project selection, or user confusion, record the blocker. Do not turn failure into success just to improve the number.
