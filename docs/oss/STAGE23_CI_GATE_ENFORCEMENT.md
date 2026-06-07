@@ -13,9 +13,9 @@ Make pull requests verifiable by GitHub before they can be merged to `main`.
 | Draft PR for governance docs | https://github.com/guamee16888/codingape-office/pull/9 |
 | CI workflow proposed | Ready in PR branch |
 | CI observed on PR | Passed on PR #9 |
-| CI workflow merged to `main` | Not yet |
-| Required status check configured | Not yet |
-| Admin bypass disabled | Not yet |
+| CI workflow merged to `main` | Verified |
+| Required status check configured | Verified: `npm test` |
+| Admin bypass disabled | Verified |
 | Merge attempt without admin bypass | Blocked by review policy |
 | Auto-merge | Not enabled for this repository |
 
@@ -75,3 +75,9 @@ https://github.com/guamee16888/codingape-office/actions/runs/27098787720
 A normal merge without administrator bypass was attempted and blocked by branch policy because review is still required. Auto-merge was also attempted, but GitHub reported that auto-merge is not enabled for this repository.
 
 This is the correct remaining blocker: review/merge governance, not a code or test failure.
+
+Stage-24 resolved that blocker by switching to solo-maintainer governance:
+
+```text
+docs/oss/STAGE24_SOLO_MAINTAINER_GOVERNANCE.md
+```

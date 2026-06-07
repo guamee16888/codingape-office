@@ -160,6 +160,7 @@ OpenAI OSS application materials live in:
 - `docs/OPENAI_OSS_APPLICATION.md`
 - `docs/oss/STAGE19_OSS_SUBMISSION_TRACKER.md`
 - `docs/oss/STAGE20_OPENAI_OSS_FORM_WORKSHEET.md`
+- `docs/oss/STAGE24_SOLO_MAINTAINER_GOVERNANCE.md`
 
 Public tracking:
 
