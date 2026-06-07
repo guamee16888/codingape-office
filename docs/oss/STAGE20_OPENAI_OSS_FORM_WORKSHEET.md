@@ -14,6 +14,8 @@ https://openai.com/form/codex-for-oss/
 | --- | --- |
 | Official form URL identified | Ready |
 | Public-safe copy prepared | Ready |
+| Latest release evidence | `v0.1.1` |
+| Stage-26 execution runbook | Ready |
 | OpenAI Organization ID | User must enter privately |
 | First name / last name / email | User must enter privately |
 | Final form submission | Pending user action |
@@ -69,6 +71,7 @@ After the maintainer clicks submit:
 1. Comment on GitHub issue #6 with status `submitted`.
 2. Record only the submission date and public status.
 3. Do not record account email, Organization ID, confirmation tokens, private form content, or screenshots containing private account details.
+4. Follow `docs/oss/STAGE26_OPENAI_OSS_SUBMISSION_EXECUTION.md` for the final tracker comment format.
 
 Suggested public issue comment:
 

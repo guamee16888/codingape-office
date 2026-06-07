@@ -16,6 +16,12 @@ Send the first 3 external tester invites and keep GitHub issue #7 honest about i
 | T04 | Reserve | Use after T01-T03 are sent |
 | T05 | Reserve | Use after T01-T03 are sent |
 
+For the Stage-26 execution checklist, use:
+
+```text
+docs/pilot/STAGE26_FIRST_THREE_TESTER_INVITES_EXECUTION.md
+```
+
 ## Invite Message
 
 Use this short version for the first 3 testers:
@@ -76,4 +82,3 @@ npm run pilot:record-tester -- \
 ```
 
 Review the generated comment draft before posting it to issue #5.
-
