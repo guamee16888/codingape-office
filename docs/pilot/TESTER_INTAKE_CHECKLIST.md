@@ -48,6 +48,14 @@ If macOS blocks the app, record the message and do not bypass security prompts u
 
 ## What To Report
 
+If you are an external tester and want a public-safe template to paste into the tracker, run:
+
+```bash
+npm run pilot:feedback-template
+```
+
+This command only prints a template. It does not record a tester result, inspect your project, call a model, or write files.
+
 If you are the maintainer, record the tester result locally first:
 
 ```bash
