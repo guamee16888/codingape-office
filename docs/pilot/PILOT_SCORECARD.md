@@ -93,6 +93,8 @@ https://github.com/guamee16888/codingape-office/issues/5
 - [x] Tester invite tracker document exists.
 - [x] Public OSS submission tracker issue exists: https://github.com/guamee16888/codingape-office/issues/6
 - [x] Public tester invite tracker issue exists: https://github.com/guamee16888/codingape-office/issues/7
+- [x] Stage-20 OpenAI OSS form worksheet exists.
+- [x] Stage-20 first three invite plan exists.
 - [ ] At least 3 real tester invites have been sent.
 - [ ] OpenAI OSS application has been submitted by the maintainer.
 - [ ] No application or invite tracker contains secrets, private local paths, or private source code.

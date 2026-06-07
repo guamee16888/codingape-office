@@ -105,6 +105,18 @@ Public GitHub tracker:
 https://github.com/guamee16888/codingape-office/issues/6
 ```
 
+Official form:
+
+```text
+https://openai.com/form/codex-for-oss/
+```
+
+Stage-20 copy-ready form worksheet:
+
+```text
+docs/oss/STAGE20_OPENAI_OSS_FORM_WORKSHEET.md
+```
+
 ## Suggested Form Fields
 
 Project name:

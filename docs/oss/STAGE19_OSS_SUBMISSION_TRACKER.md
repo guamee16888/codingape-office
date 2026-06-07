@@ -19,6 +19,7 @@ Make the OpenAI OSS application process trackable without leaking secrets or fab
 | Security policy | Ready |
 | Pilot tracker | Ready |
 | OSS application packet generator | Ready |
+| Stage-20 form worksheet | Ready |
 | OpenAI OSS form submission | Pending user action |
 | OpenAI response | Not received |
 
@@ -46,6 +47,12 @@ The packet contains copy-ready fields for:
 - open-source impact
 - what Codex or OpenAI OSS support would help with
 
+Official form:
+
+```text
+https://openai.com/form/codex-for-oss/
+```
+
 ## Public Evidence To Reference
 
 - Repository: https://github.com/guamee16888/codingape-office
@@ -53,6 +60,7 @@ The packet contains copy-ready fields for:
 - Pilot tracker: https://github.com/guamee16888/codingape-office/issues/5
 - OSS submission tracker: https://github.com/guamee16888/codingape-office/issues/6
 - Application draft: `docs/OPENAI_OSS_APPLICATION.md`
+- Stage-20 form worksheet: `docs/oss/STAGE20_OPENAI_OSS_FORM_WORKSHEET.md`
 
 ## Do Not Submit
 

@@ -148,6 +148,7 @@ External pilot docs live in:
 - `docs/pilot/STAGE15_EXTERNAL_PILOT_ACTIVATION.md`
 - `docs/pilot/STAGE16_REAL_TESTER_INTAKE.md`
 - `docs/pilot/STAGE19_TESTER_INVITE_TRACKER.md`
+- `docs/pilot/STAGE20_FIRST_THREE_INVITES.md`
 - `docs/pilot/TESTER_INTAKE_CHECKLIST.md`
 - `docs/pilot/TESTER_DM_TEMPLATES.md`
 - `docs/pilot/TESTER_INVITE_TEMPLATE.md`
@@ -158,6 +159,7 @@ OpenAI OSS application materials live in:
 
 - `docs/OPENAI_OSS_APPLICATION.md`
 - `docs/oss/STAGE19_OSS_SUBMISSION_TRACKER.md`
+- `docs/oss/STAGE20_OPENAI_OSS_FORM_WORKSHEET.md`
 
 Public tracking:
 

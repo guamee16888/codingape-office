@@ -15,6 +15,7 @@ Invite at least 3 real external testers and track whether they can reach a visib
 | Tester DM templates | Ready |
 | Tester intake checklist | Ready |
 | Local result recorder | Ready |
+| Stage-20 first invite plan | Ready |
 | Public invite tracker | https://github.com/guamee16888/codingape-office/issues/7 |
 | Real invites sent | Pending |
 | Real tester results recorded | 0 |
