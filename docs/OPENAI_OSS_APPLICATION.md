@@ -74,6 +74,21 @@ Before submitting:
 - [ ] At least one external pilot tracker issue exists.
 - [ ] Do not include API keys, Apple credentials, private local paths, app-specific passwords, or private source code in the application.
 
+Generate the latest local application packet before submitting:
+
+```bash
+npm run oss:application-packet
+```
+
+The generated files are local runtime artifacts and are not committed:
+
+```text
+data/oss-application/latest.md
+data/oss-application/latest.json
+```
+
+The packet summarizes repository metadata, release evidence, pilot tracker status, the no-fabricated-data scorecard rule, and copy-ready form fields.
+
 ## Suggested Form Fields
 
 Project name:
