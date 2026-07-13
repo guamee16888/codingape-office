@@ -1,7 +1,10 @@
 import * as THREE from "./vendor/three.module.min.js";
 import { GLTFLoader } from "./vendor/loaders/GLTFLoader.js";
 import { clone as cloneSkeleton } from "./vendor/utils/SkeletonUtils.js";
-import { buildCompanyShareCard, companyMetricValue } from "./company-report-model.js";
+import {
+  buildCompanyShareCard,
+  companyMetricValue
+} from "./company-report-model.js";
 import {
   diffFileChangeKind,
   diffReviewRisk,
@@ -63,6 +66,7 @@ function appModeFromPath(pathname = window.location.pathname) {
 
 const APP_MODE = appModeFromPath();
 document.body.dataset.appMode = APP_MODE;
+document.body.dataset.officeView = "workbench";
 
 const state = {
   snapshot: null,
@@ -199,6 +203,14 @@ const elements = {
   roomMissions: document.querySelector("#roomMissions"),
   roomSaved: document.querySelector("#roomSaved"),
   roomBlocked: document.querySelector("#roomBlocked"),
+  currentWorkScope: document.querySelector("#currentWorkScope"),
+  currentWorkProject: document.querySelector("#currentWorkProject"),
+  currentWorkModel: document.querySelector("#currentWorkModel"),
+  currentWorkTask: document.querySelector("#currentWorkTask"),
+  currentWorkDiff: document.querySelector("#currentWorkDiff"),
+  currentWorkVerification: document.querySelector("#currentWorkVerification"),
+  currentWorkNext: document.querySelector("#currentWorkNext"),
+  currentWorkDiffButton: document.querySelector("#currentWorkDiffButton"),
   commandProject: document.querySelector("#commandProject"),
   commandRun: document.querySelector("#commandRun"),
   commandPhase: document.querySelector("#commandPhase"),
@@ -623,7 +635,7 @@ function zhTab(tab) {
 }
 
 function zhText(value = "") {
-  let text = String(value || "");
+  const text = String(value || "");
   if (!text) return text;
   const exact = {
     "编程猿": "Codingape",
@@ -660,119 +672,7 @@ function zhText(value = "") {
     "成功": "Success"
   };
   if (exact[text]) return exact[text];
-  const replacements = [
-    ["正在", ""],
-    ["已", ""],
-    ["未", "not "],
-    ["暂无", "No "],
-    ["待命", "Idle"],
-    ["排队中", "Queued"],
-    ["已排队", "Queued"],
-    ["已分配", "Assigned"],
-    ["进行中", "Running"],
-    ["工作中", "Working"],
-    ["运行中", "Running"],
-    ["等待中", "Waiting"],
-    ["等待", "Waiting for "],
-    ["就绪", "Ready"],
-    ["已完成", "Completed"],
-    ["完成", "Complete"],
-    ["失败", "Failed"],
-    ["阻断", "Blocked"],
-    ["已阻断", "Blocked"],
-    ["默认阻断", "Blocked by default"],
-    ["批准", "Approved"],
-    ["已批准", "Approved"],
-    ["审核", "Review"],
-    ["复核", "Review"],
-    ["审查", "Review"],
-    ["证据", "Evidence"],
-    ["证据包", "Evidence Pack"],
-    ["补丁", "Patch"],
-    ["方案", "Plan"],
-    ["差异", "Diff"],
-    ["验证", "Verification"],
-    ["人工", "Human"],
-    ["闸门", "Gate"],
-    ["写入", "Write"],
-    ["回滚", "Rollback"],
-    ["快照", "Snapshot"],
-    ["项目", "Project"],
-    ["文件", "Files"],
-    ["任务", "Task"],
-    ["运行", "Run"],
-    ["阶段", "Phase"],
-    ["状态", "Status"],
-    ["风险", "Risk"],
-    ["清单", "Manifest"],
-    ["草稿", "Draft"],
-    ["候选", "Candidate"],
-    ["可用", "Available"],
-    ["缺少", "Missing"],
-    ["不允许", "Not allowed"],
-    ["不会", "will not"],
-    ["不能", "cannot"],
-    ["需要", "Requires"],
-    ["确认语", "confirmation phrase"],
-    ["本地", "Local"],
-    ["沙盒", "Sandbox"],
-    ["只读", "Read-only"],
-    ["外部副作用", "external side effects"],
-    ["重启", "restart"],
-    ["部署", "deploy"],
-    ["支持包", "support bundle"],
-    ["诊断摘要", "diagnostic summary"],
-    ["连接", "connection"],
-    ["配置", "configuration"],
-    ["演示", "Demo"],
-    ["办公室", "Office"],
-    ["公司战报", "Company Report"],
-    ["路线图目标", "Roadmap goals"],
-    ["无", "None"],
-    ["个", ""],
-    ["项", ""],
-    ["字节", "bytes"],
-    ["秒", "sec"],
-    ["分钟", "min"],
-    ["刚刚开始", "Just started"],
-    ["请输入或粘贴 Mac Project absolute path", "Enter or paste the Mac project absolute path"],
-    ["请选择", "Choose"],
-    ["选择", "Choose"],
-    ["打开", "Open"],
-    ["生成", "Generate"],
-    ["采集", "Collect"],
-    ["起草", "Draft"],
-    ["检查", "Check"],
-    ["返回", "Back"],
-    ["保持", "Keep"],
-    ["要求返工", "Request rework"],
-    ["返工", "Rework"],
-    ["复制", "Copy"],
-    ["显示", "Show"],
-    ["取消", "Cancel"],
-    ["更改", "Change"],
-    ["绑定", "Bind"],
-    ["保存", "Save"],
-    ["目标", "Target"],
-    ["当前", "Current"],
-    ["最新", "Latest"],
-    ["流程节点", "Flow node"],
-    ["关联", "Attached"],
-    ["级别", "Severity"],
-    ["聚焦员工", "Focused worker"],
-    ["员工", "worker"],
-    ["核心", "Core"],
-    ["待上线", "Coming soon"],
-    ["本次", "This run"],
-    ["仍", "still"],
-    ["且", "and"],
-    ["与", "and"],
-    ["后", "after"],
-    ["前", "before"],
-    ["内", "inside"],
-    ["外", "outside"]
-  ];
-  text = text
+  return text
     .replaceAll("Coding猿", "Codingape")
     .replaceAll("Judge猿", "Judgeape")
     .replaceAll("Ops猿", "Opsape")
@@ -782,76 +682,6 @@ function zhText(value = "") {
     .replaceAll("编程猿", "Codingape")
     .replaceAll("审核猿", "Judgeape")
     .replaceAll("运维猿", "Opsape");
-  for (const [source, target] of replacements) {
-    text = text.replaceAll(source, target);
-  }
-  text = text
-    .replaceAll("：", ": ")
-    .replaceAll("，", ", ")
-    .replaceAll("、", ", ")
-    .replaceAll("。", ".")
-    .replaceAll("；", "; ")
-    .replaceAll("（", " (")
-    .replaceAll("）", ") ")
-    .replace(/\s{2,}/g, " ")
-    .replace(/\s+([,.:;])/g, "$1")
-    .replace(/([,.:;])([^\s])/g, "$1 $2")
-    .trim();
-  if (/\p{Script=Han}/u.test(text)) {
-    text = text.replace(/\p{Script=Han}+/gu, "").replace(/\s{2,}/g, " ").trim();
-  }
-  return text;
-}
-
-function needsEnglishSurfaceNormalize(value = "") {
-  return /[\p{Script=Han}：，、。；（）]/u.test(String(value || ""));
-}
-
-function enforceEnglishSurface(root = document.body) {
-  if (!root) return;
-  const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
-  const textNodes = [];
-  while (walker.nextNode()) textNodes.push(walker.currentNode);
-  textNodes.forEach((node) => {
-    if (needsEnglishSurfaceNormalize(node.nodeValue)) node.nodeValue = zhText(node.nodeValue);
-  });
-  root.querySelectorAll("[aria-label], [title], [placeholder], [value]").forEach((node) => {
-    ["aria-label", "title", "placeholder", "value"].forEach((attr) => {
-      const value = node.getAttribute?.(attr);
-      if (value && needsEnglishSurfaceNormalize(value)) node.setAttribute(attr, zhText(value));
-    });
-  });
-}
-
-let englishSurfaceObserver = null;
-let englishSurfaceGuardRunning = false;
-let englishSurfaceGuardQueued = false;
-
-function scheduleEnglishSurfaceGuard() {
-  if (englishSurfaceGuardRunning || englishSurfaceGuardQueued) return;
-  englishSurfaceGuardQueued = true;
-  queueMicrotask(() => {
-    englishSurfaceGuardQueued = false;
-    englishSurfaceGuardRunning = true;
-    enforceEnglishSurface(document.body);
-    englishSurfaceGuardRunning = false;
-  });
-}
-
-function startEnglishSurfaceGuard() {
-  if (englishSurfaceObserver || typeof MutationObserver === "undefined") {
-    enforceEnglishSurface(document.body);
-    return;
-  }
-  englishSurfaceObserver = new MutationObserver(scheduleEnglishSurfaceGuard);
-  englishSurfaceObserver.observe(document.body, {
-    attributes: true,
-    attributeFilter: ["aria-label", "title", "placeholder", "value"],
-    characterData: true,
-    childList: true,
-    subtree: true
-  });
-  enforceEnglishSurface(document.body);
 }
 
 function zhWorkerName(value = "", id = "") {
@@ -3670,9 +3500,9 @@ async function copyLocalJudgeCommand() {
 }
 
 function serviceHealthTone(status) {
-  if (["online", "managed"].includes(status)) return "ready";
-  if (status === "configured") return "configured";
-  if (["manual", "missing"].includes(status)) return "warning";
+  if (["online", "connected", "managed"].includes(status)) return "ready";
+  if (["checking"].includes(status)) return "configured";
+  if (["manual", "missing", "offline", "degraded"].includes(status)) return "warning";
   return "neutral";
 }
 
@@ -3695,14 +3525,14 @@ function renderServiceHealthPanel(snapshot) {
   if (!elements.serviceHealthList) return;
   const health = snapshot.serviceHealth || {};
   const items = [health.local, health.publicEntry, health.tunnel, health.daemon].filter(Boolean);
-  const warnings = items.filter((item) => ["manual", "missing"].includes(item.status));
-  const managed = items.filter((item) => ["online", "managed", "configured"].includes(item.status));
+  const warnings = items.filter((item) => ["manual", "missing", "offline", "degraded"].includes(item.status));
+  const managed = items.filter((item) => ["online", "connected", "managed"].includes(item.status));
 
   elements.serviceHealthStatus.textContent = warnings.length ? "Needs attention" : "Managed";
   elements.serviceHealthStatus.className = warnings.length ? "is-warning" : "is-ready";
   elements.serviceHealthSummary.textContent = warnings.length
-    ? "Public entry or daemon hosting still needs confirmation, but the main service remains visible."
-    : `Local service, public entry, Cloudflare tunnel, and daemon hosting confirmed ${managed.length}/${items.length}.`;
+    ? "The local service is available, but public routing or background hosting needs attention."
+    : `Live checks confirmed ${managed.length}/${items.length} service components.`;
   elements.serviceHealthList.innerHTML = items.length
     ? items.map(serviceHealthCardTemplate).join("")
     : `<div class="service-health-item tone-warning"><strong>No health snapshot yet</strong><p>Refresh the page or check the service process.</p></div>`;
@@ -3955,9 +3785,9 @@ function renderRoomOpsRibbon(snapshot) {
   const companyReport = snapshot.companyReport || {};
   const project = currentProject() || preferredProject(snapshot);
   const latestEvent = missionRibbonEvent(snapshot, project);
-  const completed = companyMetricValue(companyReport, ["completed", "tasks done", "missions", "任务完成", "完成任务"], "0");
-  const savedValue = companyMetricValue(companyReport, ["hours saved", "saved", "节省时间", "节省"], "0");
-  const saved = String(savedValue).includes("小时") ? savedValue : `${savedValue}小时`;
+  const completed = companyMetricValue(companyReport, ["real tasks completed", "completed", "tasks done", "missions"], "0");
+  const savedValue = companyMetricValue(companyReport, ["estimated time saved", "hours saved", "saved"], "0");
+  const saved = String(savedValue).match(/h$/i) ? savedValue : `${savedValue}h`;
   const blocked =
     companyMetricValue(companyReport, ["risk blocked", "risks blocked", "risks gated", "apply blocks", "blocked", "风险阻断", "阻断"], "0");
 
@@ -3975,11 +3805,29 @@ function renderOperatorConsole(snapshot) {
   const launch = snapshot.launch || {};
   const latest = launch.latestEvidence || {};
   const project = currentProject() || preferredProject(snapshot);
-  const activeTask = latestTaskForProject(snapshot, project?.id);
+  const realSnapshot = {
+    ...snapshot,
+    tasks: (snapshot.tasks || []).filter((task) => (task.dataScope || "real") === "real")
+  };
+  const activeTask = latestTaskForProject(realSnapshot, project?.id);
   const director = missionDirectorForTask(activeTask, {
     applyRunnerEnabled: Boolean(autonomy.metrics?.applyRunnerEnabled),
     project
   });
+  const modelProvider = snapshot.modelProvider || {};
+  const verificationStatus = activeTask?.result?.verificationStatus || activeTask?.result?.verification?.status || "not_run";
+  const patchStatus = activeTask?.result?.patchRunStatus || "not_run";
+  if (elements.currentWorkScope) elements.currentWorkScope.textContent = "Real data only";
+  if (elements.currentWorkProject) elements.currentWorkProject.textContent = project?.name || snapshot.localProjects?.selectedName || "Choose a project";
+  if (elements.currentWorkModel) elements.currentWorkModel.textContent = modelProvider.model || modelProvider.provider || "Not configured";
+  if (elements.currentWorkTask) elements.currentWorkTask.textContent = activeTask?.title || "No real task yet";
+  if (elements.currentWorkDiff) elements.currentWorkDiff.textContent = patchRunStatusLabel(patchStatus);
+  if (elements.currentWorkVerification) elements.currentWorkVerification.textContent = verificationStatusLabel(verificationStatus);
+  if (elements.currentWorkNext) elements.currentWorkNext.textContent = director.nextAction || "Choose a project and assign a task";
+  if (elements.currentWorkDiffButton) {
+    elements.currentWorkDiffButton.disabled = !activeTask?.id;
+    elements.currentWorkDiffButton.dataset.taskId = activeTask?.id || "";
+  }
   const blockers = autonomy.hardBlockers || [];
   const objectives = autonomy.objectives || [];
   const score = Number(autonomy.score || 0);
@@ -4074,6 +3922,12 @@ function renderOperatorConsole(snapshot) {
       ? `本地模型：${zhText(localJudge.provider)} · ${zhText(localJudge.model)} · 最近：${localJudgeStatusLabel(localJudge.latestStatus)}`
       : "未启用本地模型审查";
     elements.commandIngestion.className = `command-badge ${judgeReady || connected ? "is-live" : ""}${judgeFailed ? " risk-medium" : ""}`;
+  }
+  if (elements.commandPublicHealth) {
+    const publicHealth = commandPublicHealthBadge(state.snapshot?.serviceHealth || {});
+    elements.commandPublicHealth.textContent = publicHealth.label;
+    elements.commandPublicHealth.className = publicHealth.className;
+    elements.commandPublicHealth.title = publicHealth.title;
   }
   if (elements.commandReadiness) elements.commandReadiness.textContent = `${score}/100`;
   if (elements.commandMode) {
@@ -4814,6 +4668,42 @@ function renderSummary(snapshot) {
   elements.sceneWorking.textContent = active;
   elements.sceneDraft.textContent = draft;
   elements.sceneReady.textContent = ready;
+}
+
+function commandPublicHealthBadge(serviceHealth = {}) {
+  const publicStatus = serviceHealth.publicEntry?.status || "";
+  const tunnelStatus = serviceHealth.tunnel?.status || "";
+  const publicUrl = serviceHealth.publicEntry?.url || "";
+
+  if (publicStatus === "online" && ["connected", "online"].includes(tunnelStatus)) {
+    return {
+      label: serviceHealth.publicEntry?.statusLabel === "Protected" ? "Public protected" : "Public live",
+      className: "command-badge is-live",
+      title: publicUrl ? `Live probe confirmed ${publicUrl}.` : "Live probe confirmed the public entry."
+    };
+  }
+
+  if (publicStatus === "checking") {
+    return {
+      label: "Public checking",
+      className: "command-badge",
+      title: "A live public endpoint probe is in progress."
+    };
+  }
+
+  if (["missing", "offline"].includes(publicStatus)) {
+    return {
+      label: publicStatus === "offline" ? "Public offline" : "Public setup needed",
+      className: "command-badge risk-medium",
+      title: serviceHealth.publicEntry?.detail || "The public route is not available."
+    };
+  }
+
+  return {
+    label: "Public pending",
+    className: "command-badge",
+    title: "Waiting for the service health snapshot."
+  };
 }
 
 function deskTemplate(project) {
@@ -7513,7 +7403,23 @@ function connectEvents() {
   });
 }
 
+function setOfficeView(view, { persist = true } = {}) {
+  const nextView = ["workbench", "operations", "office"].includes(view) ? view : "workbench";
+  document.body.dataset.officeView = nextView;
+  document.querySelectorAll("[data-office-view-target]").forEach((button) => {
+    button.classList.toggle("is-active", button.dataset.officeViewTarget === nextView);
+    button.setAttribute("aria-pressed", button.dataset.officeViewTarget === nextView ? "true" : "false");
+  });
+  if (persist) localStorage.setItem("codingape-office-view", nextView);
+  window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+  requestDeckDraw();
+}
+
 function attachLocalOfficeHandlers() {
+  document.querySelectorAll("[data-office-view-target]").forEach((button) => {
+    button.addEventListener("click", () => setOfficeView(button.dataset.officeViewTarget));
+  });
+  setOfficeView(localStorage.getItem("codingape-office-view") || "workbench", { persist: false });
   elements.refreshButton.addEventListener("click", fetchStatus);
   elements.newMissionButton.addEventListener("click", runCodingLoop);
   elements.runFirstOrderButton?.addEventListener("click", runFirstOrder);
@@ -7570,6 +7476,10 @@ function attachLocalOfficeHandlers() {
   elements.markBlockedButton.addEventListener("click", () => queueSelectedTask("blocked"));
   elements.runCodingLoopButton.addEventListener("click", runCodingLoop);
   elements.runCodingLoopHeroButton.addEventListener("click", runCodingLoop);
+  elements.currentWorkDiffButton?.addEventListener("click", () => {
+    const taskId = elements.currentWorkDiffButton.dataset.taskId;
+    if (taskId) viewTaskEvidence(taskId, { focus: "diff" });
+  });
   elements.viewDossierButton.addEventListener("click", viewDossier);
   elements.testAiwcHealthButton?.addEventListener("click", testAiwcHealth);
   elements.generateSupportBundleButton?.addEventListener("click", generateSupportBundle);
@@ -7725,7 +7635,6 @@ function attachLocalOfficeHandlers() {
 }
 
 async function bootAppMode() {
-  startEnglishSurfaceGuard();
   if (APP_MODE === AppMode.publicHome) {
     renderPublicHome();
     return;

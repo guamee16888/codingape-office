@@ -194,13 +194,15 @@ test("evidence diff and gate surfaces stay readable in the floating inspector", 
   assert.match(css, /\.audit-pack-footer button,[\s\S]*?\.gate-action-dock button\s*{[^}]*min-height:\s*44px !important/s);
 });
 
-test("operator console is guarded to render English-first copy", async () => {
+test("operator console preserves untranslated copy instead of producing broken mixed text", async () => {
   const app = await readProjectFile("public/app.js");
   const html = await readProjectFile("public/index.html");
   const server = await readProjectFile("server.js");
 
-  assert.match(app, /function enforceEnglishSurface\(root = document\.body\)/);
-  assert.match(app, /new MutationObserver\(scheduleEnglishSurfaceGuard\)/);
+  assert.doesNotMatch(app, /function enforceEnglishSurface\(root = document\.body\)/);
+  assert.doesNotMatch(app, /new MutationObserver\(scheduleEnglishSurfaceGuard\)/);
+  assert.doesNotMatch(app, /Script=Han/);
+  assert.match(app, /if \(exact\[text\]\) return exact\[text\]/);
   assert.match(app, /"Codingape"/);
   assert.match(server, /title:\s*`Task queued: \$\{task\.title\}`/);
   assert.match(server, /title:\s*`Codingape collected evidence: \$\{task\.title\}`/);
@@ -390,21 +392,49 @@ test("operator console exposes service health for public launch reliability", as
   const app = await readProjectFile("public/app.js");
   const css = await readProjectFile("public/control-room.css");
   const server = await readProjectFile("server.js");
+  const serviceHealth = await readProjectFile("src/service-health.mjs");
 
-  assert.match(server, /function buildServiceHealthSummary\(\)/);
+  assert.match(server, /import \{ buildServiceHealthSummary \} from "\.\/src\/service-health\.mjs"/);
   assert.match(server, /const PORT = Number\(process\.env\.PORT \|\| 4142\)/);
   assert.match(server, /PUBLIC_ENTRY_URL/);
   assert.match(server, /serviceHealth,\s*\n\s*operationalReadiness,\s*\n\s*companyReport/);
-  assert.match(server, /Cloudflare tunnel/);
-  assert.match(server, /Background daemon/);
+  assert.match(serviceHealth, /Cloudflare tunnel/);
+  assert.match(serviceHealth, /Background daemon/);
   assert.match(html, /<article class="service-health-panel"/);
   assert.match(html, /Service Health/);
   assert.match(html, /id="serviceHealthList"/);
+  assert.match(html, /id="commandPublicHealth"/);
   assert.match(app, /function renderServiceHealthPanel\(snapshot\)/);
-  assert.match(app, /Local service, public entry, Cloudflare tunnel, and daemon hosting/);
+  assert.match(app, /function commandPublicHealthBadge\(serviceHealth = \{\}\)/);
+  assert.match(app, /elements\.commandPublicHealth\.textContent = publicHealth\.label/);
+  assert.match(app, /Public protected/);
+  assert.match(app, /Public offline/);
+  assert.match(app, /Public setup needed/);
+  assert.match(app, /Live checks confirmed/);
   assert.match(app, /serviceHealthCardTemplate/);
   assert.match(css, /\.service-health-panel\s*{[^}]*display:\s*grid !important/s);
   assert.match(css, /\.service-health-item\.tone-warning\s*{[^}]*rgba\(255, 180, 84, 0\.24\)/s);
+});
+
+test("local office defaults to a task-first workbench with secondary operations and 3d views", async () => {
+  const html = await readProjectFile("public/index.html");
+  const app = await readProjectFile("public/app.js");
+  const css = await readProjectFile("public/control-room.css");
+
+  assert.match(html, /data-office-view-target="workbench"/);
+  assert.match(html, /data-office-view-target="operations"/);
+  assert.match(html, /data-office-view-target="office"/);
+  assert.match(html, /class="current-work-panel"/);
+  assert.match(html, /id="currentWorkProject"/);
+  assert.match(html, /id="currentWorkModel"/);
+  assert.match(html, /id="currentWorkTask"/);
+  assert.match(html, /id="currentWorkDiff"/);
+  assert.match(html, /id="currentWorkVerification"/);
+  assert.match(html, /id="currentWorkNext"/);
+  assert.match(app, /document\.body\.dataset\.officeView = "workbench"/);
+  assert.match(app, /function setOfficeView\(view, \{ persist = true \} = \{\}\)/);
+  assert.match(css, /data-office-view="workbench"[\s\S]*?\.deck-viewport/);
+  assert.match(css, /data-office-view="office"[\s\S]*?\.operator-console/);
 });
 
 test("gate inspector includes an operator decision brief before approval actions", async () => {

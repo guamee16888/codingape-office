@@ -182,6 +182,11 @@
             </div>
           </form>
         </div>
+        <nav class="office-view-switcher" aria-label="Office views">
+          <button class="is-active" type="button" data-office-view-target="workbench">Workbench</button>
+          <button type="button" data-office-view-target="operations">Operations</button>
+          <button type="button" data-office-view-target="office">Office</button>
+        </nav>
         <div class="command-status-strip" aria-label="Run status">
           <span class="command-badge is-live">Sandbox mode</span>
           <span id="commandRisk" class="command-badge">Human Gate</span>
@@ -313,7 +318,7 @@
               <strong id="roomMissions">0</strong>
             </div>
             <div>
-              <span>Saved</span>
+              <span>Estimated</span>
               <strong id="roomSaved">0h</strong>
             </div>
             <div>
@@ -343,6 +348,22 @@
             <span id="launchStage">Waiting for first run</span>
           </div>
           <div class="operator-grid">
+            <article class="current-work-panel" aria-label="Current work">
+              <div class="section-title">
+                <h3>Current Work</h3>
+                <span id="currentWorkScope">Real data</span>
+              </div>
+              <div class="current-work-grid">
+                <div><span>Project</span><strong id="currentWorkProject">--</strong></div>
+                <div><span>Model</span><strong id="currentWorkModel">--</strong></div>
+                <div><span>Task</span><strong id="currentWorkTask">No real task yet</strong></div>
+                <div><span>Diff</span><strong id="currentWorkDiff">Not generated</strong></div>
+                <div><span>Verification</span><strong id="currentWorkVerification">Not run</strong></div>
+                <div><span>Next</span><strong id="currentWorkNext">Choose a project</strong></div>
+              </div>
+              <button id="currentWorkDiffButton" type="button" disabled>Review Diff</button>
+            </article>
+
             <article class="readiness-panel">
               <div class="score-ring">
                 <strong id="readinessScore">--</strong>
@@ -815,6 +836,6 @@
         }
       }
     </script>
-    <script type="module" src="/app.js?v=english-surface-20260601"></script>
+    <script type="module" src="/app.js?v=workbench-20260713"></script>
   </body>
 </html>

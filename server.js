@@ -43,6 +43,9 @@ import {
   openMacNativeFolderPicker
 } from "./src/native-folder-picker.mjs";
 import { buildOperationalReadiness } from "./src/operational-readiness.mjs";
+import { localOperatorAccess } from "./src/request-access-policy.mjs";
+import { buildServiceHealthSummary } from "./src/service-health.mjs";
+import { splitWorkRecords, taskDataScope } from "./src/work-metrics.mjs";
 import { buildBetaOpsDashboard } from "./src/beta-ops-dashboard.mjs";
 import { buildAiPatchContext } from "./src/ai-context-builder-v1.mjs";
 import {
@@ -118,6 +121,12 @@ const DEMO_PLAYBACK_DELAY_MS = Math.max(
   Math.min(1200, Number(process.env.CODEX_OFFICE_DEMO_PLAYBACK_DELAY_MS || 220))
 );
 const FIRST_ORDER_TITLE = "Add a Codingape pilot note to README";
+let publicHealthProbe = {
+  status: "checking",
+  checkedAt: "",
+  httpStatus: 0,
+  error: ""
+};
 
 const SKIP_DIRS = new Set([
   ".git",
@@ -253,6 +262,33 @@ function readModelSettings() {
 
 function modelProviderSnapshot() {
   return redactedModelProviderSettings(readModelSettings());
+}
+
+async function refreshPublicHealthProbe() {
+  const checkedAt = new Date().toISOString();
+  try {
+    const response = await fetch(PUBLIC_ENTRY_URL, {
+      method: "HEAD",
+      redirect: "manual",
+      signal: AbortSignal.timeout(5000)
+    });
+    const protectedRoute = response.status === 401 || response.status === 403;
+    publicHealthProbe = {
+      status: protectedRoute ? "protected" : response.ok || (response.status >= 300 && response.status < 400) ? "online" : "offline",
+      checkedAt,
+      httpStatus: response.status,
+      error: response.ok || protectedRoute ? "" : `HTTP ${response.status}`
+    };
+  } catch (error) {
+    publicHealthProbe = {
+      status: "offline",
+      checkedAt,
+      httpStatus: 0,
+      error: String(error?.message || "Public probe failed").slice(0, 180)
+    };
+  }
+  broadcastStatusEvent();
+  return publicHealthProbe;
 }
 
 function writeStatusEvent(response) {
@@ -1094,6 +1130,7 @@ function discoverProjects() {
 function buildLocalProjectsSnapshot(projects = []) {
   const registry = readLocalProjectRegistry(LOCAL_PROJECTS_FILE);
   const selected = registry.projects.find((project) => project.id === registry.selectedProjectId) || null;
+  const selectedPathExists = Boolean(selected?.path && existsSync(selected.path));
   const selectedProject = selected
     ? projects.find((project) => project.id === selected.id) || null
     : null;
@@ -1104,13 +1141,25 @@ function buildLocalProjectsSnapshot(projects = []) {
     createdAt: record.createdAt,
     updatedAt: record.updatedAt,
     lastSelectedAt: record.lastSelectedAt,
+    available: Boolean(record.path && existsSync(record.path)),
     authorizationSource: record.authorizationSource || "local_path",
     hasSecurityScopedBookmark: Boolean(record.securityScopedBookmark)
   });
   return {
-    selectedProjectId: registry.selectedProjectId,
+    selectedProjectId: selectedPathExists && selectedProject ? registry.selectedProjectId : "",
+    storedSelectedProjectId: registry.selectedProjectId,
     selectedPath: selected?.path || "",
     selectedName: selected?.name || "",
+    selectedPathExists,
+    migrationRequired: Boolean(selected && !selectedPathExists),
+    migration: selected && !selectedPathExists
+      ? {
+          status: "required",
+          reason: "saved_project_missing",
+          previousPath: selected.path,
+          action: "Choose the project folder on this Mac to rebind the workspace."
+        }
+      : { status: "ready" },
     selectedAuthorizationSource: selected?.authorizationSource || "",
     selectedHasSecurityScopedBookmark: Boolean(selected?.securityScopedBookmark),
     selectedProject,
@@ -1128,9 +1177,11 @@ function authorizedProjectSelection(projects = [], projectId = "") {
       ok: false,
       status: 409,
       blocker: {
-        id: "project_root_required",
-        title: "Project root must be selected",
-        detail: "Choose a local project folder before running evidence, diff, apply, or rollback."
+        id: localProjects.migrationRequired ? "project_root_migration_required" : "project_root_required",
+        title: localProjects.migrationRequired ? "Saved project root is missing on this Mac" : "Project root must be selected",
+        detail: localProjects.migrationRequired
+          ? localProjects.migration?.previousPath || localProjects.selectedPath
+          : "Choose a local project folder before running evidence, diff, apply, or rollback."
       },
       localProjects
     };
@@ -1423,7 +1474,7 @@ function buildAutonomyReadiness({ tasks = [], approvals = [], evidencePacks = []
   };
 }
 
-function buildCompanyReport({ tasks = [], approvals = [], evidencePacks = [], proposalPacks = [], verificationPacks = [], patchRunPacks = [], patchApplyPacks = [], workers = [], projects = [] }) {
+function buildCompanyReport({ tasks = [], approvals = [], evidencePacks = [], proposalPacks = [], verificationPacks = [], patchRunPacks = [], patchApplyPacks = [], rollbackPacks = [], workers = [], projects = [] }) {
   const completedTasks = tasks.filter((task) => task.status === "completed").length;
   const queuedTasks = tasks.filter((task) => task.status === "queued").length;
   const blockedTasks = tasks.filter((task) => task.status === "blocked").length;
@@ -1432,9 +1483,10 @@ function buildCompanyReport({ tasks = [], approvals = [], evidencePacks = [], pr
   const successfulPatchRuns = patchRunPacks.filter((pack) => ["dry_run", "sandbox_written"].includes(pack?.status)).length;
   const applyGateChecks = patchApplyPacks.filter((pack) => ["requires_confirmation", "blocked", "applied"].includes(pack?.status)).length;
   const appliedPatchRuns = patchApplyPacks.filter((pack) => pack?.status === "applied").length;
+  const rolledBackRuns = rollbackPacks.filter((pack) => pack?.status === "rolled_back").length;
   const activeWorkers = workers.filter((worker) => ["working", "running", "blocked"].includes(worker.status)).length;
   const passedVerifications = verificationPacks.filter((pack) => pack?.result?.ok).length;
-  const hoursSaved = Number((evidencePacks.length * 0.45 + proposalPacks.length * 0.35 + passedVerifications * 0.25 + approvedCloseLoopGates * 0.15 + successfulPatchRuns * 0.2 + applyGateChecks * 0.15 + completedTasks * 0.25).toFixed(1));
+  const estimatedHoursSaved = Number((completedTasks * 0.25 + appliedPatchRuns * 0.5 + rolledBackRuns * 0.2).toFixed(1));
   const riskBlocked = pendingApprovals + blockedTasks;
   const latestLoop = latestArtifactSummary(evidencePacks, proposalPacks, verificationPacks, patchRunPacks, patchApplyPacks);
   const latestLoopLine = latestLoop.taskId && latestLoop.patchRunStatus === "sandbox_written"
@@ -1442,12 +1494,13 @@ function buildCompanyReport({ tasks = [], approvals = [], evidencePacks = [], pr
     : "";
 
   return {
+    dataScope: "real",
     headline: completedTasks
-      ? `Your AI worker company completed ${completedTasks} task(s) with traceable evidence.`
-      : "Your AI worker company is ready to start the first real work loop.",
+      ? `Completed ${completedTasks} real task(s) with traceable evidence.`
+      : "No completed real tasks yet. Demo and evaluation records are tracked separately.",
     generatedAt: new Date().toISOString(),
     metrics: [
-      { label: "Tasks done", value: completedTasks },
+      { label: "Real tasks completed", value: completedTasks },
       { label: "Evidence packs", value: evidencePacks.length },
       { label: "Patch plans", value: proposalPacks.length },
       { label: "Verifications passed", value: passedVerifications },
@@ -1455,9 +1508,11 @@ function buildCompanyReport({ tasks = [], approvals = [], evidencePacks = [], pr
       { label: "Patch preflights", value: successfulPatchRuns },
       { label: "Apply gates", value: applyGateChecks },
       { label: "Applied", value: appliedPatchRuns },
+      { label: "Rolled back", value: rolledBackRuns },
       { label: "Risks gated", value: riskBlocked },
-      { label: "Hours saved", value: hoursSaved }
+      { label: "Estimated time saved", value: estimatedHoursSaved, unit: "h", estimated: true }
     ],
+    estimateNotice: "Estimated time saved is directional and is not measured elapsed time.",
     queue: {
       queuedTasks,
       blockedTasks,
@@ -1468,8 +1523,8 @@ function buildCompanyReport({ tasks = [], approvals = [], evidencePacks = [], pr
     latestLoop,
     latestLoopLine,
     shareLine: completedTasks
-      ? `${latestLoopLine || `Today my AI worker company completed ${completedTasks} task(s), produced ${evidencePacks.length} evidence pack(s), passed ${passedVerifications} verification run(s), approved ${approvedCloseLoopGates} supervised result(s), ran ${successfulPatchRuns} controlled patch preflight(s), checked ${applyGateChecks} Apply Gate(s), and blocked ${riskBlocked} risk(s).`}`
-      : "Today my AI worker company is ready to start the first evidence-backed Codingape run."
+      ? `${latestLoopLine || `Completed ${completedTasks} real task(s), applied ${appliedPatchRuns} patch(es), rolled back ${rolledBackRuns} run(s), and gated ${riskBlocked} risk(s).`}`
+      : "No real task has completed yet; demo and evaluation records are excluded."
   };
 }
 
@@ -1672,9 +1727,15 @@ function buildSnapshot() {
   const patchRunPacks = readPatchRunPacks();
   const patchApplyPacks = readPatchApplyPacks();
   const taskReports = readTaskCompanyReports();
-  const autonomy = buildAutonomyReadiness({ tasks, approvals, evidencePacks, proposalPacks, verificationPacks, patchRunPacks, patchApplyPacks });
-  const companyReport = buildCompanyReport({ tasks, approvals, evidencePacks, proposalPacks, verificationPacks, patchRunPacks, patchApplyPacks, workers, projects });
-  const launch = buildLaunchSnapshot({ workers, events, autonomy, companyReport, evidencePacks, proposalPacks, verificationPacks, patchRunPacks, patchApplyPacks, approvals });
+  const rollbackPacks = tasks.map((task) => readRollbackPack(task.id)).filter(Boolean);
+  const scopedWork = splitWorkRecords({ tasks, evidencePacks, proposalPacks, verificationPacks, patchRunPacks, patchApplyPacks, taskReports, rollbackPacks });
+  const realWork = scopedWork.real;
+  const realTaskIds = new Set(realWork.tasks.map((task) => task.id));
+  const realApprovals = approvals.filter((approval) => realTaskIds.has(approval.taskId));
+  const autonomy = buildAutonomyReadiness({ tasks: realWork.tasks, approvals: realApprovals, evidencePacks: realWork.evidencePacks, proposalPacks: realWork.proposalPacks, verificationPacks: realWork.verificationPacks, patchRunPacks: realWork.patchRunPacks, patchApplyPacks: realWork.patchApplyPacks });
+  const companyReport = buildCompanyReport({ tasks: realWork.tasks, approvals: realApprovals, evidencePacks: realWork.evidencePacks, proposalPacks: realWork.proposalPacks, verificationPacks: realWork.verificationPacks, patchRunPacks: realWork.patchRunPacks, patchApplyPacks: realWork.patchApplyPacks, rollbackPacks: realWork.rollbackPacks, workers, projects });
+  companyReport.scopeSummary = scopedWork.summary;
+  const launch = buildLaunchSnapshot({ workers, events, autonomy, companyReport, evidencePacks: realWork.evidencePacks, proposalPacks: realWork.proposalPacks, verificationPacks: realWork.verificationPacks, patchRunPacks: realWork.patchRunPacks, patchApplyPacks: realWork.patchApplyPacks, approvals: realApprovals });
   const localJudgeConfig = localLlmConfig(process.env);
   const modelProvider = modelProviderSnapshot();
   const latestLocalJudgeProposal = proposalPacks.find((proposal) => proposal?.localJudgeReviewStatus) || null;
@@ -1689,18 +1750,25 @@ function buildSnapshot() {
     latestVerdict: latestLocalJudgeProposal?.localJudgeReview?.review?.verdict || "",
     latestSummary: latestLocalJudgeProposal?.localJudgeReview?.review?.summary || latestLocalJudgeProposal?.localJudgeReview?.error || ""
   };
-  const serviceHealth = buildServiceHealthSummary();
+  const serviceHealth = buildServiceHealthSummary({
+    localUrl: `http://${HOST}:${PORT}`,
+    publicUrl: PUBLIC_ENTRY_URL,
+    publicProbe: publicHealthProbe,
+    appLaunchAgentInstalled: existsSync(CODEX_OFFICE_LAUNCH_AGENT),
+    tunnelConfigured: existsSync(CLOUDFLARED_CONFIG_FILE),
+    tunnelLaunchAgentInstalled: existsSync(CLOUDFLARE_LAUNCH_AGENT)
+  });
   const aiwcHealth = buildAiwcHealthSnapshot();
   const operationalReadiness = buildOperationalReadiness({
     serviceHealth,
     localProjects,
-    tasks,
-    evidencePacks,
-    proposalPacks,
-    verificationPacks,
-    patchRunPacks,
-    patchApplyPacks,
-    taskReports,
+    tasks: realWork.tasks,
+    evidencePacks: realWork.evidencePacks,
+    proposalPacks: realWork.proposalPacks,
+    verificationPacks: realWork.verificationPacks,
+    patchRunPacks: realWork.patchRunPacks,
+    patchApplyPacks: realWork.patchApplyPacks,
+    taskReports: realWork.taskReports,
     aiwcConfigured: aiwcConfigured(),
     aiwcHealth,
     hasSupportBundle: true,
@@ -1737,7 +1805,7 @@ function buildSnapshot() {
     counts,
     workers,
     events,
-    tasks: tasks.slice(-40).reverse(),
+    tasks: tasks.slice(-40).reverse().map((task) => ({ ...task, dataScope: taskDataScope(task) })),
     approvals,
     autonomy,
     localJudge,
@@ -1745,6 +1813,7 @@ function buildSnapshot() {
     serviceHealth,
     operationalReadiness,
     companyReport,
+    workScopes: scopedWork.summary,
     aiwc: aiwcHealth,
     firstRunChecklist,
     onboarding,
@@ -1784,51 +1853,6 @@ function readBetaSupportBundles() {
     ...readJsonFilesInDirectory(BETA_SUPPORT_BUNDLE_DIR, 80),
     ...readJsonFilesInDirectory(SUPPORT_BUNDLE_DIR, 20)
   ];
-}
-
-function buildServiceHealthSummary() {
-  const appLaunchAgentInstalled = existsSync(CODEX_OFFICE_LAUNCH_AGENT);
-  const tunnelConfigured = existsSync(CLOUDFLARED_CONFIG_FILE);
-  const tunnelLaunchAgentInstalled = existsSync(CLOUDFLARE_LAUNCH_AGENT);
-  const localUrl = `http://${HOST}:${PORT}`;
-
-  return {
-    generatedAt: new Date().toISOString(),
-    local: {
-      label: "Local service",
-      status: "online",
-      statusLabel: "Online",
-      url: localUrl,
-      detail: `This page is served from ${localUrl}; the service process is responding to snapshot requests.`
-    },
-    publicEntry: {
-      label: "Public entry",
-      status: tunnelConfigured ? "configured" : "missing",
-      statusLabel: tunnelConfigured ? "Configured" : "Pending",
-      url: PUBLIC_ENTRY_URL,
-      detail: tunnelConfigured
-        ? "The public domain points to the local office through a Cloudflare tunnel."
-        : "Cloudflare tunnel config file was not found."
-    },
-    tunnel: {
-      label: "Cloudflare tunnel",
-      status: tunnelConfigured && tunnelLaunchAgentInstalled ? "managed" : tunnelConfigured ? "configured" : "missing",
-      statusLabel: tunnelConfigured && tunnelLaunchAgentInstalled ? "Managed" : tunnelConfigured ? "Configured" : "Pending",
-      detail: tunnelConfigured
-        ? tunnelLaunchAgentInstalled
-          ? "Cloudflare tunnel is configured to run automatically after login."
-          : "Tunnel config exists, but the login launch agent was not detected."
-        : "Configure the Cloudflare tunnel first."
-    },
-    daemon: {
-      label: "Background daemon",
-      status: appLaunchAgentInstalled ? "managed" : "manual",
-      statusLabel: appLaunchAgentInstalled ? "Managed" : "Manual",
-      detail: appLaunchAgentInstalled
-        ? "Codingape Office is managed by the macOS background launch agent."
-        : "The current service may have been started manually and may need to be started again after restart."
-    }
-  };
 }
 
 function commandVersion(command, args = ["--version"]) {
@@ -2765,6 +2789,7 @@ function createTaskFromBody(body, projects) {
     risk,
     priority: body.priority || "normal",
     source: body.source || "operator",
+    dataScope: taskDataScope({ dataScope: body.dataScope, source: body.source || "operator", title }),
     patchCandidates: Array.isArray(body.patchCandidates)
       ? [...new Set([
           ...body.patchCandidates.map((candidate) => String(candidate || "").trim()).filter(Boolean),
@@ -5583,6 +5608,19 @@ function serveStatic(request, response) {
 const server = createServer(async (request, response) => {
   try {
     const url = new URL(request.url || "/", "http://localhost");
+    const access = localOperatorAccess({
+      host: request.headers.host || "",
+      origin: request.headers.origin || "",
+      pathname: url.pathname
+    });
+    if (!access.allowed) {
+      sendJson(response, {
+        ok: false,
+        status: "blocked",
+        error: "Codingape Office operator routes are available only from this Mac."
+      }, 403);
+      return;
+    }
 
     if (url.pathname === "/api/status" && request.method === "GET") {
       sendJson(response, buildSnapshot());
@@ -5789,4 +5827,7 @@ const server = createServer(async (request, response) => {
 server.listen(PORT, HOST, () => {
   console.log(`Codex Office running at http://${HOST}:${PORT}`);
   console.log(`Watching ${WORKSPACE_ROOT}`);
+  void refreshPublicHealthProbe();
+  const publicProbeTimer = setInterval(() => void refreshPublicHealthProbe(), 30000);
+  publicProbeTimer.unref();
 });

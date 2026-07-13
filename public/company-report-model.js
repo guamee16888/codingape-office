@@ -38,13 +38,13 @@ export function verificationStatusLabel(status = "not_run") {
 }
 
 export function companyReportMetrics(report = {}) {
-  const tasksDone = metricValue(report, ["tasks done", "completed", "missions"], 0);
+  const tasksDone = metricValue(report, ["real tasks completed", "tasks done", "completed", "missions"], 0);
   const evidencePacks = metricValue(report, ["evidence packs", "evidence"], 0);
   const verified = metricValue(report, ["verified", "verification"], 0);
   const patchRuns = metricValue(report, ["patch runs", "controlled patch"], 0);
   const applyGates = metricValue(report, ["apply gates", "apply"], 0);
   const risksGated = metricValue(report, ["risks gated", "risk blocked", "blocked"], 0);
-  const hoursSavedRaw = metricValue(report, ["hours saved", "saved"], 0);
+  const hoursSavedRaw = metricValue(report, ["estimated time saved", "hours saved", "saved"], 0);
   const hoursSaved = String(hoursSavedRaw).includes("h") ? String(hoursSavedRaw) : `${hoursSavedRaw}h`;
 
   return {
@@ -117,10 +117,10 @@ export function companyReportBullets(report = {}) {
     : [];
   return [
     ...latestLoopBullets,
-    `Codingape completed ${metrics.tasksDone} tasks.`,
+    `Codingape completed ${metrics.tasksDone} real tasks.`,
     `Judgeape reviewed ${metrics.evidencePacks} Evidence Packs.`,
     `Opsape gated ${metrics.risksGated} risk points.`,
-    `This worker office estimated about ${metrics.hoursSaved} of saved manual time.`,
+    `Estimated manual time avoided: about ${metrics.hoursSaved}; this is directional, not measured elapsed time.`,
     "No high-risk write bypassed the Human Gate."
   ];
 }
@@ -129,7 +129,7 @@ export function companyReportShareLine(report = {}) {
   const metrics = companyReportMetrics(report);
   return (
     report.shareLine ||
-    `My AI worker office completed ${metrics.tasksDone} tasks today, saved ${metrics.hoursSaved}, and blocked ${metrics.risksGated} risks.`
+    `My AI worker office completed ${metrics.tasksDone} real tasks, estimated ${metrics.hoursSaved} of manual time avoided, and gated ${metrics.risksGated} risks.`
   );
 }
 

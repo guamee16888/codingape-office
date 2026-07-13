@@ -14,12 +14,13 @@ function completeCriticalInput(overrides = {}) {
     serviceHealth: {
       local: { status: "online", detail: "Local server is responding." },
       daemon: { status: "managed", detail: "launchd is installed." },
-      publicEntry: { status: "configured", detail: "Public entry is configured." }
+      publicEntry: { status: "online", detail: "Public entry responded to a live probe." }
     },
     localProjects: {
       selectedProjectId: "proj_1",
       selectedName: "Coding猿",
-      selectedPath: "/Users/example/Code/codingape-office"
+      selectedPath: "/Users/example/Code/codingape-office",
+      selectedPathExists: true
     },
     tasks: [{ id: "task_1", status: "completed" }],
     evidencePacks: [{ taskId: "task_1", capturedAt: "2026-05-28T01:00:00.000Z" }],
@@ -67,6 +68,23 @@ test("operational readiness is beta-ready when critical loop exists but advisori
   assert.ok(readiness.advisories.some((check) => check.id === "daemon"));
   assert.ok(readiness.advisories.some((check) => check.id === "git_checkpoint"));
   assert.ok(readiness.advisories.some((check) => check.id === "aiwc_ingestion"));
+});
+
+test("operational readiness blocks a stale migrated project path", () => {
+  const readiness = buildOperationalReadiness(completeCriticalInput({
+    localProjects: {
+      selectedProjectId: "",
+      storedSelectedProjectId: "proj_stale",
+      selectedPath: "/Users/old-mac/Documents/codingape",
+      selectedPathExists: false,
+      migrationRequired: true,
+      migration: { detail: "Saved project path is unavailable on this Mac." }
+    }
+  }));
+
+  assert.equal(readiness.status, "blocked");
+  assert.ok(readiness.blockers.some((check) => check.id === "local_project"));
+  assert.match(readiness.blockers.find((check) => check.id === "local_project")?.label || "", /migration/i);
 });
 
 test("operational readiness reaches operational when AIWC health-check passes", () => {

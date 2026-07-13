@@ -2665,6 +2665,194 @@ body,
   }
 }
 
+/* v30: task-first views. Keep the work loop primary and move telemetry/3D to secondary views. */
+body[data-app-mode="local_office"] .command-brand {
+  grid-column: 1 !important;
+  grid-row: 1 / span 2 !important;
+}
+
+body[data-app-mode="local_office"] .top-command-bar {
+  grid-template-columns: 205px minmax(0, 1fr) minmax(270px, 360px) !important;
+}
+
+body[data-app-mode="local_office"] .command-brand h1 {
+  max-width: 155px !important;
+  overflow: visible !important;
+  text-overflow: clip !important;
+  white-space: normal !important;
+}
+
+body[data-app-mode="local_office"] .active-mission-strip {
+  grid-column: 2 !important;
+  grid-row: 1 / span 2 !important;
+}
+
+.office-view-switcher {
+  display: inline-grid;
+  grid-column: 3 !important;
+  grid-row: 1 !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  justify-self: stretch;
+  gap: 2px;
+  min-width: 0;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 8px;
+  padding: 2px;
+  background: rgba(0, 0, 0, 0.24);
+}
+
+.office-view-switcher button {
+  min-width: 0;
+  min-height: 30px !important;
+  border: 0 !important;
+  border-radius: 6px !important;
+  padding: 0 8px !important;
+  background: transparent !important;
+  color: #aebdca !important;
+  font-size: 0.75rem !important;
+  font-weight: 850 !important;
+}
+
+.office-view-switcher button.is-active {
+  background: rgba(48, 224, 198, 0.16) !important;
+  color: #effffc !important;
+  box-shadow: inset 0 0 0 1px rgba(48, 224, 198, 0.24) !important;
+}
+
+body[data-app-mode="local_office"] .command-status-strip {
+  grid-column: 3 !important;
+  grid-row: 2 !important;
+}
+
+.current-work-panel {
+  display: grid;
+  grid-column: 1 / -1;
+  gap: 12px;
+  border: 1px solid rgba(48, 224, 198, 0.25);
+  border-radius: 8px;
+  padding: 16px;
+  background: rgba(9, 15, 22, 0.98);
+}
+
+.current-work-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.current-work-grid > div {
+  display: grid;
+  min-width: 0;
+  min-height: 72px;
+  align-content: space-between;
+  gap: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  padding: 10px;
+  background: rgba(255, 255, 255, 0.035);
+}
+
+.current-work-grid span {
+  color: #91a4b4;
+  font-size: 0.7rem;
+  font-weight: 850;
+  text-transform: uppercase;
+}
+
+.current-work-grid strong {
+  min-width: 0;
+  color: #f6fbff;
+  font-size: 0.9rem;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+
+#currentWorkDiffButton {
+  justify-self: start;
+  min-height: 34px;
+  border: 1px solid rgba(48, 224, 198, 0.3);
+  border-radius: 6px;
+  background: rgba(48, 224, 198, 0.12);
+  color: #eafffb;
+  font-weight: 850;
+}
+
+body[data-app-mode="local_office"][data-office-view="workbench"] .side-rail,
+body[data-app-mode="local_office"][data-office-view="workbench"] .deck-viewport,
+body[data-app-mode="local_office"][data-office-view="workbench"] .mission-flow-panel,
+body[data-app-mode="local_office"][data-office-view="workbench"] .workfeed-panel,
+body[data-app-mode="local_office"][data-office-view="workbench"] .office-floor,
+body[data-app-mode="local_office"][data-office-view="operations"] .side-rail,
+body[data-app-mode="local_office"][data-office-view="operations"] .deck-viewport,
+body[data-app-mode="local_office"][data-office-view="operations"] .mission-flow-panel,
+body[data-app-mode="local_office"][data-office-view="operations"] .workfeed-panel,
+body[data-app-mode="local_office"][data-office-view="operations"] .office-floor,
+body[data-app-mode="local_office"][data-office-view="office"] .operator-console {
+  display: none !important;
+}
+
+body[data-app-mode="local_office"][data-office-view="workbench"] .office-stage,
+body[data-app-mode="local_office"][data-office-view="operations"] .office-stage {
+  grid-column: 1 / -1 !important;
+  width: 100% !important;
+  max-width: 1280px;
+  margin-inline: auto;
+}
+
+body[data-app-mode="local_office"][data-office-view="workbench"] .operator-console,
+body[data-app-mode="local_office"][data-office-view="operations"] .operator-console {
+  margin: 14px;
+}
+
+body[data-app-mode="local_office"][data-office-view="workbench"] .operator-grid > article,
+body[data-app-mode="local_office"][data-office-view="operations"] .operator-grid > article {
+  display: none !important;
+}
+
+body[data-app-mode="local_office"][data-office-view="workbench"] .operator-grid > .current-work-panel,
+body[data-app-mode="local_office"][data-office-view="workbench"] .operator-grid > .local-model-panel,
+body[data-app-mode="local_office"][data-office-view="workbench"] .operator-grid > .first-real-order-panel,
+body[data-app-mode="local_office"][data-office-view="workbench"] .operator-grid > .service-health-panel,
+body[data-app-mode="local_office"][data-office-view="workbench"] .operator-grid > .blocker-panel,
+body[data-app-mode="local_office"][data-office-view="operations"] .operator-grid > .readiness-panel,
+body[data-app-mode="local_office"][data-office-view="operations"] .operator-grid > .service-health-panel,
+body[data-app-mode="local_office"][data-office-view="operations"] .operator-grid > .operational-readiness-panel,
+body[data-app-mode="local_office"][data-office-view="operations"] .operator-grid > .first-run-panel,
+body[data-app-mode="local_office"][data-office-view="operations"] .operator-grid > .beta-support-panel,
+body[data-app-mode="local_office"][data-office-view="operations"] .operator-grid > .beta-ops-panel,
+body[data-app-mode="local_office"][data-office-view="operations"] .operator-grid > .blocker-panel,
+body[data-app-mode="local_office"][data-office-view="operations"] .operator-grid > .company-report-panel {
+  display: grid !important;
+}
+
+body[data-app-mode="local_office"][data-office-view="workbench"] .operator-grid > .current-work-panel,
+body[data-app-mode="local_office"][data-office-view="operations"] .operator-grid > .operational-readiness-panel,
+body[data-app-mode="local_office"][data-office-view="operations"] .operator-grid > .company-report-panel {
+  grid-column: 1 / -1 !important;
+}
+
+@media (max-width: 1180px) {
+  body[data-app-mode="local_office"] .command-brand,
+  body[data-app-mode="local_office"] .active-mission-strip,
+  body[data-app-mode="local_office"] .office-view-switcher,
+  body[data-app-mode="local_office"] .command-status-strip {
+    grid-column: 1 / -1 !important;
+    grid-row: auto !important;
+  }
+
+  .office-view-switcher {
+    width: min(100%, 420px);
+    justify-self: start;
+  }
+}
+
+@media (max-width: 720px) {
+  .current-work-grid,
+  body[data-app-mode="local_office"] .operator-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
 /* v11: final blocker/readability polish. The current write gate should feel unmistakable without becoming noisy. */
 @keyframes gateBlockerBreath {
   0%,
@@ -4909,7 +5097,7 @@ body[data-app-mode="public_beta"] {
 }
 
 body[data-app-mode="local_office"] .top-command-bar {
-  grid-template-columns: 170px minmax(0, 1fr) minmax(270px, 360px) !important;
+  grid-template-columns: 205px minmax(0, 1fr) minmax(270px, 360px) !important;
   min-height: 116px !important;
   padding: 11px 14px 12px !important;
 }
@@ -4919,8 +5107,11 @@ body[data-app-mode="local_office"] .command-brand .eyebrow {
 }
 
 body[data-app-mode="local_office"] .command-brand h1 {
-  max-width: 110px !important;
-  font-size: 0.96rem !important;
+  max-width: 155px !important;
+  overflow: visible !important;
+  font-size: 0.92rem !important;
+  text-overflow: clip !important;
+  white-space: nowrap !important;
 }
 
 body[data-app-mode="local_office"] .active-mission-strip {
@@ -5461,4 +5652,530 @@ body[data-app-mode="local_office"] .project-root-label span {
 
 .pilot-feedback-form textarea {
   resize: vertical;
+}
+
+/* v28: aesthetic-only /office polish. CSS-only, no DOM or behavior changes. */
+:root {
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-8: 48px;
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 8px;
+  --font-xs: 11px;
+  --font-sm: 12px;
+  --font-base: 13px;
+  --font-md: 15px;
+  --font-lg: 18px;
+  --font-xl: 22px;
+  --leading-tight: 1.3;
+  --leading-normal: 1.5;
+  --shadow-1: 0 1px 2px rgba(0, 0, 0, 0.28), 0 1px 3px rgba(0, 0, 0, 0.2);
+  --shadow-2: 0 10px 28px rgba(0, 0, 0, 0.28), 0 3px 10px rgba(0, 0, 0, 0.18);
+  --border-subtle: 1px solid rgba(255, 255, 255, 0.12);
+  --surface-0: #060a0f;
+  --surface-1: #0b1119;
+  --surface-2: #111925;
+  --surface-3: rgba(255, 255, 255, 0.055);
+  --accent-cyan: #30e0c6;
+  --accent-amber: #ffb454;
+  --accent-green: #7cff9b;
+  --accent-red: #ff5c7a;
+  --mono-font: "SFMono-Regular", "JetBrains Mono", Consolas, monospace;
+}
+
+body[data-app-mode="local_office"] {
+  background:
+    linear-gradient(180deg, #070b11 0%, #05070a 42%, #05070a 100%) !important;
+  font-size: var(--font-base) !important;
+  line-height: var(--leading-normal) !important;
+}
+
+body[data-app-mode="local_office"] .top-command-bar,
+body[data-app-mode="local_office"] .side-rail,
+body[data-app-mode="local_office"] .deck-viewport,
+body[data-app-mode="local_office"] .mission-flow-panel,
+body[data-app-mode="local_office"] .operator-console,
+body[data-app-mode="local_office"] .workfeed-panel,
+body[data-app-mode="local_office"] .detail-panel {
+  border-color: rgba(255, 255, 255, 0.115) !important;
+}
+
+body[data-app-mode="local_office"] .top-command-bar {
+  gap: var(--space-3) !important;
+  padding-inline: var(--space-4) !important;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.065), rgba(255, 255, 255, 0.018)),
+    rgba(7, 11, 17, 0.98) !important;
+  box-shadow: var(--shadow-1) !important;
+}
+
+body[data-app-mode="local_office"] .command-brand,
+body[data-app-mode="local_office"] .brand-lockup {
+  gap: var(--space-2) !important;
+}
+
+body[data-app-mode="local_office"] .brand-mark {
+  border-radius: var(--radius-md) !important;
+  box-shadow: none !important;
+}
+
+body[data-app-mode="local_office"] .command-brand h1,
+body[data-app-mode="local_office"] .brand-lockup h1,
+body[data-app-mode="local_office"] .active-mission-strip h2,
+body[data-app-mode="local_office"] .room-headline h2,
+body[data-app-mode="local_office"] .section-title h3,
+body[data-app-mode="local_office"] .operator-head h3,
+body[data-app-mode="local_office"] .feed-head h3 {
+  letter-spacing: 0 !important;
+}
+
+body[data-app-mode="local_office"] .active-mission-strip {
+  gap: 6px !important;
+  min-width: 0 !important;
+}
+
+body[data-app-mode="local_office"] .active-mission-strip h2 {
+  max-width: 100% !important;
+  font-size: var(--font-md) !important;
+  line-height: var(--leading-tight) !important;
+  overflow-wrap: anywhere !important;
+}
+
+body[data-app-mode="local_office"] .command-meta {
+  gap: 6px !important;
+}
+
+body[data-app-mode="local_office"] .command-meta span,
+body[data-app-mode="local_office"] .command-run-receipt,
+body[data-app-mode="local_office"] .detail-list dd,
+body[data-app-mode="local_office"] .gate-run-id,
+body[data-app-mode="local_office"] .apply-approval-card code,
+body[data-app-mode="local_office"] .task-company-report-card pre,
+body[data-app-mode="local_office"] .patch-run-card pre.diff-preview,
+body[data-app-mode="local_office"] .diff-line code {
+  font-family: var(--mono-font) !important;
+}
+
+body[data-app-mode="local_office"] .command-status-strip {
+  align-items: center !important;
+  gap: 6px !important;
+}
+
+body[data-app-mode="local_office"] .command-badge,
+body[data-app-mode="local_office"] #commandReadiness,
+body[data-app-mode="local_office"] #lastUpdated,
+body[data-app-mode="local_office"] .status-pill,
+body[data-app-mode="local_office"] .mission-flow-node small,
+body[data-app-mode="local_office"] .section-title span {
+  min-height: 24px !important;
+  border-radius: var(--radius-sm) !important;
+  letter-spacing: 0 !important;
+}
+
+body[data-app-mode="local_office"] button,
+body[data-app-mode="local_office"] select,
+body[data-app-mode="local_office"] input,
+body[data-app-mode="local_office"] textarea {
+  font-size: var(--font-sm) !important;
+}
+
+body[data-app-mode="local_office"] button {
+  border-radius: var(--radius-sm) !important;
+  box-shadow: none !important;
+}
+
+body[data-app-mode="local_office"] button:hover:not(:disabled) {
+  transform: translateY(-1px) !important;
+}
+
+body[data-app-mode="local_office"] button:focus-visible,
+body[data-app-mode="local_office"] select:focus-visible,
+body[data-app-mode="local_office"] input:focus-visible,
+body[data-app-mode="local_office"] textarea:focus-visible,
+body[data-app-mode="local_office"] .mission-flow-node:focus-visible,
+body[data-app-mode="local_office"] .mission-inspector-tabs button:focus-visible {
+  outline: 2px solid rgba(48, 224, 198, 0.72) !important;
+  outline-offset: 2px !important;
+}
+
+body[data-app-mode="local_office"] #assignMissionButton,
+body[data-app-mode="local_office"] #newMissionButton,
+body[data-app-mode="local_office"] #runFirstOrderButton,
+body[data-app-mode="local_office"] #runFirstRealOrderButton,
+body[data-app-mode="local_office"] #onboardingFirstOrderButton {
+  border-color: rgba(48, 224, 198, 0.38) !important;
+  background:
+    linear-gradient(180deg, rgba(48, 224, 198, 0.2), rgba(48, 224, 198, 0.1)),
+    rgba(6, 13, 18, 0.96) !important;
+  color: #edfffc !important;
+}
+
+body[data-app-mode="local_office"] #refreshButton,
+body[data-app-mode="local_office"] #queueReviewButton,
+body[data-app-mode="local_office"] #markBlockedButton,
+body[data-app-mode="local_office"] #runCodingLoopButton,
+body[data-app-mode="local_office"] #chooseProjectFolderButton,
+body[data-app-mode="local_office"] #saveProjectRootButton,
+body[data-app-mode="local_office"] .mission-inspector-tabs button,
+body[data-app-mode="local_office"] .control-actions button {
+  border-color: rgba(255, 255, 255, 0.14) !important;
+  background: rgba(255, 255, 255, 0.06) !important;
+  color: #edf5ff !important;
+}
+
+body[data-app-mode="local_office"] button:disabled,
+body[data-app-mode="local_office"] .gate-action-dock button:disabled,
+body[data-app-mode="local_office"] .apply-gate-v1-card button:disabled {
+  border-color: rgba(255, 255, 255, 0.09) !important;
+  background: rgba(255, 255, 255, 0.035) !important;
+  color: rgba(216, 226, 238, 0.54) !important;
+  transform: none !important;
+}
+
+body[data-app-mode="local_office"] .mission-composer,
+body[data-app-mode="local_office"] .project-root-form {
+  gap: 7px !important;
+}
+
+body[data-app-mode="local_office"] .mission-composer select,
+body[data-app-mode="local_office"] .mission-composer input,
+body[data-app-mode="local_office"] .project-root-controls input,
+body[data-app-mode="local_office"] .model-provider-form input,
+body[data-app-mode="local_office"] .model-provider-form select,
+body[data-app-mode="local_office"] .first-real-order-select select,
+body[data-app-mode="local_office"] .pilot-feedback-form input,
+body[data-app-mode="local_office"] .pilot-feedback-form select,
+body[data-app-mode="local_office"] .pilot-feedback-form textarea,
+body[data-app-mode="local_office"] .apply-confirm-controls input[type="text"] {
+  border-color: rgba(255, 255, 255, 0.14) !important;
+  border-radius: var(--radius-sm) !important;
+  background: rgba(4, 8, 13, 0.82) !important;
+  color: #f7fbff !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.035) !important;
+}
+
+body[data-app-mode="local_office"] .deck-viewport {
+  border-radius: var(--radius-lg) !important;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.032), transparent 42%),
+    #060a0f !important;
+  box-shadow: var(--shadow-2) !important;
+}
+
+body[data-app-mode="local_office"] #threeDeck {
+  filter: saturate(0.96) contrast(1.08) brightness(0.74) !important;
+}
+
+body[data-app-mode="local_office"] .room-headline,
+body[data-app-mode="local_office"] .mission-director-ribbon,
+body[data-app-mode="local_office"] .mission-proof-strip,
+body[data-app-mode="local_office"] .core-station,
+body[data-app-mode="local_office"] .room-ops-ribbon,
+body[data-app-mode="local_office"] .worker-room-fallback,
+body[data-app-mode="local_office"] .fallback-worker-card {
+  border: var(--border-subtle) !important;
+  border-radius: var(--radius-lg) !important;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.022)),
+    rgba(6, 10, 15, 0.92) !important;
+  box-shadow: var(--shadow-1) !important;
+}
+
+body[data-app-mode="local_office"] .room-headline h2 {
+  font-size: clamp(1.42rem, 1.9vw, var(--font-xl)) !important;
+  line-height: 1.08 !important;
+}
+
+body[data-app-mode="local_office"] .mission-director-ribbon > div,
+body[data-app-mode="local_office"] .mission-proof-strip > div,
+body[data-app-mode="local_office"] .room-ops-ribbon > div,
+body[data-app-mode="local_office"] .station-meta span,
+body[data-app-mode="local_office"] .scene-metrics div {
+  border-radius: var(--radius-sm) !important;
+  background: rgba(255, 255, 255, 0.048) !important;
+}
+
+body[data-app-mode="local_office"] .mission-flow-panel,
+body[data-app-mode="local_office"] .operator-console,
+body[data-app-mode="local_office"] .workfeed-panel {
+  border-radius: var(--radius-lg) !important;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.04), transparent 220px),
+    var(--surface-1) !important;
+  box-shadow: var(--shadow-1) !important;
+}
+
+body[data-app-mode="local_office"] .mission-flow-rail {
+  align-items: stretch !important;
+  gap: var(--space-2) !important;
+}
+
+body[data-app-mode="local_office"] .mission-flow-node {
+  border-radius: var(--radius-md) !important;
+  border-color: rgba(255, 255, 255, 0.12) !important;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.046), rgba(255, 255, 255, 0.018)),
+    rgba(12, 18, 27, 0.96) !important;
+  box-shadow: none !important;
+}
+
+body[data-app-mode="local_office"] .mission-flow-node span {
+  box-shadow: none !important;
+}
+
+body[data-app-mode="local_office"] .mission-flow-node.status-running,
+body[data-app-mode="local_office"] .mission-flow-node.is-focus {
+  border-color: rgba(48, 224, 198, 0.34) !important;
+}
+
+body[data-app-mode="local_office"] .mission-flow-node.status-passed {
+  border-color: rgba(124, 255, 155, 0.26) !important;
+}
+
+body[data-app-mode="local_office"] .mission-flow-node.status-blocked,
+body[data-app-mode="local_office"] .mission-flow-node.status-waiting_human {
+  border-color: rgba(255, 180, 84, 0.34) !important;
+}
+
+body[data-app-mode="local_office"] .mission-flow-node strong {
+  color: #f8fbff !important;
+  font-size: var(--font-sm) !important;
+}
+
+body[data-app-mode="local_office"] .mission-flow-node small {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: fit-content !important;
+  max-width: 100% !important;
+  padding: 3px 6px !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  background: rgba(255, 255, 255, 0.04) !important;
+  font-size: var(--font-xs) !important;
+}
+
+body[data-app-mode="local_office"] .detail-panel {
+  border-radius: var(--radius-lg) 0 0 var(--radius-lg) !important;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.04), transparent 220px),
+    #090e15 !important;
+  box-shadow: -18px 0 42px rgba(0, 0, 0, 0.34) !important;
+}
+
+body[data-app-mode="local_office"] .inspector-shell-head,
+body[data-app-mode="local_office"] .mission-inspector-tabs {
+  background: rgba(9, 14, 21, 0.96) !important;
+}
+
+body[data-app-mode="local_office"] .mission-inspector-tabs {
+  gap: 5px !important;
+  padding: 8px 12px !important;
+  border-bottom: var(--border-subtle) !important;
+}
+
+body[data-app-mode="local_office"] .mission-inspector-tabs button {
+  min-height: 30px !important;
+}
+
+body[data-app-mode="local_office"] .mission-inspector-tabs button.is-active {
+  border-color: rgba(48, 224, 198, 0.34) !important;
+  background: rgba(48, 224, 198, 0.12) !important;
+  color: #effffc !important;
+}
+
+body[data-app-mode="local_office"] .company-report-panel,
+body[data-app-mode="local_office"] .service-health-panel,
+body[data-app-mode="local_office"] .operational-readiness-panel,
+body[data-app-mode="local_office"] .first-run-panel,
+body[data-app-mode="local_office"] .beta-support-panel,
+body[data-app-mode="local_office"] .launch-flow-panel,
+body[data-app-mode="local_office"] .readiness-panel,
+body[data-app-mode="local_office"] .blocker-panel,
+body[data-app-mode="local_office"] .feed-event,
+body[data-app-mode="local_office"] .feed-empty,
+body[data-app-mode="local_office"] .task-brief,
+body[data-app-mode="local_office"] .task-queue-panel,
+body[data-app-mode="local_office"] .task-insight-panel,
+body[data-app-mode="local_office"] .gate-inspector-panel,
+body[data-app-mode="local_office"] .approval-panel,
+body[data-app-mode="local_office"] .safety-contract,
+body[data-app-mode="local_office"] .event-replay-panel,
+body[data-app-mode="local_office"] .detail-list div,
+body[data-app-mode="local_office"] .mission-status-grid > div,
+body[data-app-mode="local_office"] .first-real-order-panel,
+body[data-app-mode="local_office"] .context-preview-panel,
+body[data-app-mode="local_office"] .pilot-feedback-panel {
+  border-color: rgba(255, 255, 255, 0.12) !important;
+  border-radius: var(--radius-md) !important;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.045), rgba(255, 255, 255, 0.018)),
+    rgba(13, 20, 30, 0.96) !important;
+  box-shadow: none !important;
+}
+
+body[data-app-mode="local_office"] .diff-viewer,
+body[data-app-mode="local_office"] .task-insight-body pre,
+body[data-app-mode="local_office"] .gate-insight-body pre,
+body[data-app-mode="local_office"] .patch-run-card pre.diff-preview,
+body[data-app-mode="local_office"] .task-company-report-card pre {
+  border-radius: var(--radius-md) !important;
+  border-color: rgba(255, 255, 255, 0.12) !important;
+  background: #04070c !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.025) !important;
+}
+
+body[data-app-mode="local_office"] .diff-line {
+  min-height: 22px !important;
+}
+
+body[data-app-mode="local_office"] .diff-line code,
+body[data-app-mode="local_office"] pre,
+body[data-app-mode="local_office"] code {
+  word-break: break-word !important;
+  overflow-wrap: anywhere !important;
+}
+
+body[data-app-mode="local_office"] .gate-blocker-hero,
+body[data-app-mode="local_office"] .apply-approval-head,
+body[data-app-mode="local_office"] .apply-approval-card,
+body[data-app-mode="local_office"] .gate-decision-grid > div,
+body[data-app-mode="local_office"] .gate-preflight-action,
+body[data-app-mode="local_office"] .apply-gate-v1-card,
+body[data-app-mode="local_office"] .rollback-option,
+body[data-app-mode="local_office"] .task-company-report-card {
+  border-radius: var(--radius-md) !important;
+  box-shadow: none !important;
+}
+
+body[data-app-mode="local_office"] .gate-blocker-hero,
+body[data-app-mode="local_office"] .apply-approval-head,
+body[data-app-mode="local_office"] .apply-gate-v1-card {
+  border-color: rgba(255, 180, 84, 0.34) !important;
+  background:
+    linear-gradient(180deg, rgba(255, 180, 84, 0.105), rgba(255, 255, 255, 0.018)),
+    rgba(13, 17, 24, 0.98) !important;
+}
+
+body[data-app-mode="local_office"] .pilot-feedback-panel {
+  border-color: rgba(48, 224, 198, 0.22) !important;
+}
+
+body[data-app-mode="local_office"] .pilot-feedback-form {
+  gap: var(--space-2) !important;
+}
+
+body[data-app-mode="local_office"] .pilot-feedback-form label,
+body[data-app-mode="local_office"] .model-provider-form label,
+body[data-app-mode="local_office"] .first-real-order-select {
+  gap: 5px !important;
+}
+
+body[data-app-mode="local_office"] .pilot-feedback-form span,
+body[data-app-mode="local_office"] .model-provider-form label span,
+body[data-app-mode="local_office"] .first-real-order-select span {
+  color: #c6d3e2 !important;
+  font-size: var(--font-xs) !important;
+  letter-spacing: 0 !important;
+  text-transform: none !important;
+}
+
+@keyframes liveRunButtonPulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 rgba(255, 180, 84, 0) !important;
+  }
+
+  50% {
+    box-shadow: 0 0 0 2px rgba(255, 180, 84, 0.1) !important;
+  }
+}
+
+@keyframes gateBlockerBreath {
+  0%,
+  100% {
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.08),
+      0 0 0 1px rgba(255, 180, 84, 0.18),
+      0 12px 28px rgba(0, 0, 0, 0.24);
+  }
+
+  50% {
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.1),
+      0 0 0 1px rgba(255, 180, 84, 0.28),
+      0 14px 32px rgba(0, 0, 0, 0.3);
+  }
+}
+
+body[data-app-mode="local_office"] .mission-flow-node.status-blocked.is-focus,
+body[data-app-mode="local_office"] .mission-flow-node.status-waiting_human.is-focus,
+body[data-app-mode="local_office"] .deck-viewport[data-live-phase="apply_blocked"] .mission-proof-strip,
+body[data-app-mode="local_office"] .deck-viewport[data-live-phase="apply_blocked"] .room-ops-ribbon {
+  animation-duration: 3.6s !important;
+}
+
+@media (max-width: 720px) {
+  body[data-app-mode="local_office"] .top-command-bar {
+    grid-template-columns: minmax(0, 1fr) !important;
+    padding-inline: var(--space-3) !important;
+  }
+
+  body[data-app-mode="local_office"] .command-brand,
+  body[data-app-mode="local_office"] .active-mission-strip,
+  body[data-app-mode="local_office"] .command-status-strip {
+    grid-column: 1 / -1 !important;
+    width: 100% !important;
+  }
+
+  body[data-app-mode="local_office"] .active-mission-strip,
+  body[data-app-mode="local_office"] .mission-composer,
+  body[data-app-mode="local_office"] .project-root-form,
+  body[data-app-mode="local_office"] .project-root-controls {
+    min-width: 0 !important;
+    width: 100% !important;
+  }
+
+  body[data-app-mode="local_office"] .command-status-strip,
+  body[data-app-mode="local_office"] .project-root-controls,
+  body[data-app-mode="local_office"] .first-real-order-actions,
+  body[data-app-mode="local_office"] .model-provider-actions,
+  body[data-app-mode="local_office"] .control-actions,
+  body[data-app-mode="local_office"] .gate-action-dock,
+  body[data-app-mode="local_office"] .diff-review-actions {
+    grid-template-columns: 1fr !important;
+  }
+
+  body[data-app-mode="local_office"] .mission-composer {
+    grid-template-columns: 1fr !important;
+  }
+
+  body[data-app-mode="local_office"] .mission-composer #missionProjectSelect,
+  body[data-app-mode="local_office"] .mission-composer #missionModeSelect,
+  body[data-app-mode="local_office"] .mission-composer #missionInput,
+  body[data-app-mode="local_office"] .mission-composer #assignMissionButton {
+    grid-column: 1 !important;
+    grid-row: auto !important;
+    width: 100% !important;
+  }
+
+  body[data-app-mode="local_office"] .project-root-controls input,
+  body[data-app-mode="local_office"] .project-root-controls button {
+    width: 100% !important;
+  }
+
+  body[data-app-mode="local_office"] .detail-panel {
+    border-radius: var(--radius-lg) !important;
+  }
+
+  body[data-app-mode="local_office"] button,
+  body[data-app-mode="local_office"] select,
+  body[data-app-mode="local_office"] input,
+  body[data-app-mode="local_office"] textarea {
+    max-width: 100% !important;
+  }
 }

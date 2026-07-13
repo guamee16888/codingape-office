@@ -12,13 +12,13 @@ import {
 const report = {
   headline: "Your AI worker office completed 8 tasks with traceable evidence.",
   metrics: [
-    { label: "tasks done", value: 8 },
+    { label: "real tasks completed", value: 8 },
     { label: "evidence packs", value: 8 },
     { label: "verified", value: 6 },
     { label: "patch runs", value: 3 },
     { label: "apply gates", value: 1 },
     { label: "risks gated", value: 10 },
-    { label: "hours saved", value: 11.4 }
+    { label: "estimated time saved", value: 11.4 }
   ],
   shareLine: "My AI worker office completed 8 tasks today."
 };
@@ -39,8 +39,8 @@ const reportWithLatestLoop = {
 };
 
 test("companyMetricValue reads metric labels case-insensitively", () => {
-  assert.equal(companyMetricValue(report, ["tasks done"]), 8);
-  assert.equal(companyMetricValue(report, ["hours saved"]), 11.4);
+  assert.equal(companyMetricValue(report, ["real tasks completed"]), 8);
+  assert.equal(companyMetricValue(report, ["estimated time saved"]), 11.4);
   assert.equal(companyMetricValue(report, ["missing"], "fallback"), "fallback");
 });
 
@@ -64,9 +64,9 @@ test("companyReportBullets keeps safety as a first-class report line", () => {
 test("companyReportShareLine creates a screenshot-ready English sentence", () => {
   const line = companyReportShareLine({ metrics: report.metrics });
 
-  assert.match(line, /completed 8 tasks today/);
-  assert.match(line, /saved 11\.4h/);
-  assert.match(line, /blocked 10 risks/);
+  assert.match(line, /completed 8 real tasks/);
+  assert.match(line, /estimated 11\.4h/);
+  assert.match(line, /gated 10 risks/);
 });
 
 test("buildCompanyShareCard preserves shareLine and headline", () => {
