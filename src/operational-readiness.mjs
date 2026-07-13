@@ -65,12 +65,14 @@ export function buildOperationalReadiness({
     ["managed", "configured"].includes(serviceHealth.daemon?.status)
       ? okCheck("daemon", "Daemon configured", serviceHealth.daemon.detail || "macOS launchd can keep the local server alive.", 8, false)
       : advisoryCheck("daemon", "Daemon not configured", "Use launchd to keep the public entry available after the terminal closes.", 5),
-    ["configured", "managed"].includes(serviceHealth.publicEntry?.status)
-      ? okCheck("public_entry", "Public entry configured", serviceHealth.publicEntry.detail || "Public home can route to the local service.", 6, false)
-      : advisoryCheck("public_entry", "Public entry not configured", "Beta users need geoaifactory.com or an equivalent public entry.", 4),
-    localProjects.selectedProjectId
+    serviceHealth.publicEntry?.status === "online"
+      ? okCheck("public_entry", "Public entry reachable", serviceHealth.publicEntry.detail || "Public home responded to a live probe.", 6, false)
+      : advisoryCheck("public_entry", "Public entry not reachable", serviceHealth.publicEntry?.detail || "Beta users need a public entry that responds to a live probe.", 4),
+    localProjects.selectedProjectId && localProjects.selectedPathExists !== false
       ? okCheck("local_project", "Local project selected", localProjects.selectedPath || localProjects.selectedName || "Local project root is selected.", 10)
-      : blockedCheck("local_project", "No local project selected", "Real tasks must be bound to an explicit project root.", 10),
+      : localProjects.migrationRequired || localProjects.selectedPathExists === false
+        ? blockedCheck("local_project", "Project migration incomplete", localProjects.migration?.detail || "The saved project path does not exist on this Mac. Select the migrated project before running real tasks.", 10)
+        : blockedCheck("local_project", "No local project selected", "Real tasks must be bound to an explicit project root.", 10),
     latestEvidence
       ? okCheck("evidence_pack", "Evidence Pack generated", latestEvidence.taskId || "Evidence exists.", 10, true, [latestEvidence.taskId].filter(Boolean))
       : blockedCheck("evidence_pack", "Evidence Pack missing", "Run at least one read-only evidence capture.", 10),

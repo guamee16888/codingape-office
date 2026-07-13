@@ -28,7 +28,7 @@ test("project discovery only uses explicitly saved local project records", async
   assert.match(server, /selectedHasSecurityScopedBookmark: Boolean\(selected\?\.securityScopedBookmark\)/);
   assert.match(server, /project_root_required/);
   assert.match(server, /project_root_not_authorized/);
-  assert.match(app, /当前授权项目/);
+  assert.match(app, /Authorized:/);
   assert.match(app, /Codingape Office will not scan the full disk by default/);
 });
 

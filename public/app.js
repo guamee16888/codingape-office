@@ -1,7 +1,10 @@
 import * as THREE from "./vendor/three.module.min.js";
 import { GLTFLoader } from "./vendor/loaders/GLTFLoader.js";
 import { clone as cloneSkeleton } from "./vendor/utils/SkeletonUtils.js";
-import { buildCompanyShareCard, companyMetricValue } from "./company-report-model.js";
+import {
+  buildCompanyShareCard,
+  companyMetricValue
+} from "./company-report-model.js";
 import {
   diffFileChangeKind,
   diffReviewRisk,
@@ -63,6 +66,7 @@ function appModeFromPath(pathname = window.location.pathname) {
 
 const APP_MODE = appModeFromPath();
 document.body.dataset.appMode = APP_MODE;
+document.body.dataset.officeView = "office";
 
 const state = {
   snapshot: null,
@@ -199,6 +203,14 @@ const elements = {
   roomMissions: document.querySelector("#roomMissions"),
   roomSaved: document.querySelector("#roomSaved"),
   roomBlocked: document.querySelector("#roomBlocked"),
+  currentWorkScope: document.querySelector("#currentWorkScope"),
+  currentWorkProject: document.querySelector("#currentWorkProject"),
+  currentWorkModel: document.querySelector("#currentWorkModel"),
+  currentWorkTask: document.querySelector("#currentWorkTask"),
+  currentWorkDiff: document.querySelector("#currentWorkDiff"),
+  currentWorkVerification: document.querySelector("#currentWorkVerification"),
+  currentWorkNext: document.querySelector("#currentWorkNext"),
+  currentWorkDiffButton: document.querySelector("#currentWorkDiffButton"),
   commandProject: document.querySelector("#commandProject"),
   commandRun: document.querySelector("#commandRun"),
   commandPhase: document.querySelector("#commandPhase"),
@@ -339,6 +351,7 @@ const threeDeck = {
   renderer: null,
   scene: null,
   mixers: [],
+  coreWorkerRigs: [],
   signalPulses: [],
   phaseTransferPulses: [],
   selectedRing: null,
@@ -440,8 +453,24 @@ function createCodingYuanModelRig(project, color, lift, index, context = {}) {
   const rig = new THREE.Group();
   const model = cloneSkeleton(threeDeck.avatar.template);
   model.userData.projectId = project.id;
+  const accent = new THREE.Color(color);
   model.traverse((object) => {
     object.userData.projectId = project.id;
+    if (object.isMesh || object.isSkinnedMesh) {
+      object.userData.sharedAvatarGeometry = true;
+      const sourceMaterials = Array.isArray(object.material) ? object.material : [object.material];
+      const materials = sourceMaterials.map((source) => {
+        const material = source.clone();
+        material.color?.lerp(accent, active ? 0.2 : 0.1);
+        if (material.emissive) {
+          material.emissive.lerp(accent, active ? 0.34 : 0.18);
+          material.emissiveIntensity = Math.max(material.emissiveIntensity || 0, active ? 0.24 : 0.12);
+        }
+        material.needsUpdate = true;
+        return material;
+      });
+      object.material = Array.isArray(object.material) ? materials : materials[0];
+    }
   });
 
   const box = new THREE.Box3().setFromObject(model);
@@ -623,7 +652,7 @@ function zhTab(tab) {
 }
 
 function zhText(value = "") {
-  let text = String(value || "");
+  const text = String(value || "");
   if (!text) return text;
   const exact = {
     "编程猿": "Codingape",
@@ -660,119 +689,7 @@ function zhText(value = "") {
     "成功": "Success"
   };
   if (exact[text]) return exact[text];
-  const replacements = [
-    ["正在", ""],
-    ["已", ""],
-    ["未", "not "],
-    ["暂无", "No "],
-    ["待命", "Idle"],
-    ["排队中", "Queued"],
-    ["已排队", "Queued"],
-    ["已分配", "Assigned"],
-    ["进行中", "Running"],
-    ["工作中", "Working"],
-    ["运行中", "Running"],
-    ["等待中", "Waiting"],
-    ["等待", "Waiting for "],
-    ["就绪", "Ready"],
-    ["已完成", "Completed"],
-    ["完成", "Complete"],
-    ["失败", "Failed"],
-    ["阻断", "Blocked"],
-    ["已阻断", "Blocked"],
-    ["默认阻断", "Blocked by default"],
-    ["批准", "Approved"],
-    ["已批准", "Approved"],
-    ["审核", "Review"],
-    ["复核", "Review"],
-    ["审查", "Review"],
-    ["证据", "Evidence"],
-    ["证据包", "Evidence Pack"],
-    ["补丁", "Patch"],
-    ["方案", "Plan"],
-    ["差异", "Diff"],
-    ["验证", "Verification"],
-    ["人工", "Human"],
-    ["闸门", "Gate"],
-    ["写入", "Write"],
-    ["回滚", "Rollback"],
-    ["快照", "Snapshot"],
-    ["项目", "Project"],
-    ["文件", "Files"],
-    ["任务", "Task"],
-    ["运行", "Run"],
-    ["阶段", "Phase"],
-    ["状态", "Status"],
-    ["风险", "Risk"],
-    ["清单", "Manifest"],
-    ["草稿", "Draft"],
-    ["候选", "Candidate"],
-    ["可用", "Available"],
-    ["缺少", "Missing"],
-    ["不允许", "Not allowed"],
-    ["不会", "will not"],
-    ["不能", "cannot"],
-    ["需要", "Requires"],
-    ["确认语", "confirmation phrase"],
-    ["本地", "Local"],
-    ["沙盒", "Sandbox"],
-    ["只读", "Read-only"],
-    ["外部副作用", "external side effects"],
-    ["重启", "restart"],
-    ["部署", "deploy"],
-    ["支持包", "support bundle"],
-    ["诊断摘要", "diagnostic summary"],
-    ["连接", "connection"],
-    ["配置", "configuration"],
-    ["演示", "Demo"],
-    ["办公室", "Office"],
-    ["公司战报", "Company Report"],
-    ["路线图目标", "Roadmap goals"],
-    ["无", "None"],
-    ["个", ""],
-    ["项", ""],
-    ["字节", "bytes"],
-    ["秒", "sec"],
-    ["分钟", "min"],
-    ["刚刚开始", "Just started"],
-    ["请输入或粘贴 Mac Project absolute path", "Enter or paste the Mac project absolute path"],
-    ["请选择", "Choose"],
-    ["选择", "Choose"],
-    ["打开", "Open"],
-    ["生成", "Generate"],
-    ["采集", "Collect"],
-    ["起草", "Draft"],
-    ["检查", "Check"],
-    ["返回", "Back"],
-    ["保持", "Keep"],
-    ["要求返工", "Request rework"],
-    ["返工", "Rework"],
-    ["复制", "Copy"],
-    ["显示", "Show"],
-    ["取消", "Cancel"],
-    ["更改", "Change"],
-    ["绑定", "Bind"],
-    ["保存", "Save"],
-    ["目标", "Target"],
-    ["当前", "Current"],
-    ["最新", "Latest"],
-    ["流程节点", "Flow node"],
-    ["关联", "Attached"],
-    ["级别", "Severity"],
-    ["聚焦员工", "Focused worker"],
-    ["员工", "worker"],
-    ["核心", "Core"],
-    ["待上线", "Coming soon"],
-    ["本次", "This run"],
-    ["仍", "still"],
-    ["且", "and"],
-    ["与", "and"],
-    ["后", "after"],
-    ["前", "before"],
-    ["内", "inside"],
-    ["外", "outside"]
-  ];
-  text = text
+  return text
     .replaceAll("Coding猿", "Codingape")
     .replaceAll("Judge猿", "Judgeape")
     .replaceAll("Ops猿", "Opsape")
@@ -782,76 +699,6 @@ function zhText(value = "") {
     .replaceAll("编程猿", "Codingape")
     .replaceAll("审核猿", "Judgeape")
     .replaceAll("运维猿", "Opsape");
-  for (const [source, target] of replacements) {
-    text = text.replaceAll(source, target);
-  }
-  text = text
-    .replaceAll("：", ": ")
-    .replaceAll("，", ", ")
-    .replaceAll("、", ", ")
-    .replaceAll("。", ".")
-    .replaceAll("；", "; ")
-    .replaceAll("（", " (")
-    .replaceAll("）", ") ")
-    .replace(/\s{2,}/g, " ")
-    .replace(/\s+([,.:;])/g, "$1")
-    .replace(/([,.:;])([^\s])/g, "$1 $2")
-    .trim();
-  if (/\p{Script=Han}/u.test(text)) {
-    text = text.replace(/\p{Script=Han}+/gu, "").replace(/\s{2,}/g, " ").trim();
-  }
-  return text;
-}
-
-function needsEnglishSurfaceNormalize(value = "") {
-  return /[\p{Script=Han}：，、。；（）]/u.test(String(value || ""));
-}
-
-function enforceEnglishSurface(root = document.body) {
-  if (!root) return;
-  const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
-  const textNodes = [];
-  while (walker.nextNode()) textNodes.push(walker.currentNode);
-  textNodes.forEach((node) => {
-    if (needsEnglishSurfaceNormalize(node.nodeValue)) node.nodeValue = zhText(node.nodeValue);
-  });
-  root.querySelectorAll("[aria-label], [title], [placeholder], [value]").forEach((node) => {
-    ["aria-label", "title", "placeholder", "value"].forEach((attr) => {
-      const value = node.getAttribute?.(attr);
-      if (value && needsEnglishSurfaceNormalize(value)) node.setAttribute(attr, zhText(value));
-    });
-  });
-}
-
-let englishSurfaceObserver = null;
-let englishSurfaceGuardRunning = false;
-let englishSurfaceGuardQueued = false;
-
-function scheduleEnglishSurfaceGuard() {
-  if (englishSurfaceGuardRunning || englishSurfaceGuardQueued) return;
-  englishSurfaceGuardQueued = true;
-  queueMicrotask(() => {
-    englishSurfaceGuardQueued = false;
-    englishSurfaceGuardRunning = true;
-    enforceEnglishSurface(document.body);
-    englishSurfaceGuardRunning = false;
-  });
-}
-
-function startEnglishSurfaceGuard() {
-  if (englishSurfaceObserver || typeof MutationObserver === "undefined") {
-    enforceEnglishSurface(document.body);
-    return;
-  }
-  englishSurfaceObserver = new MutationObserver(scheduleEnglishSurfaceGuard);
-  englishSurfaceObserver.observe(document.body, {
-    attributes: true,
-    attributeFilter: ["aria-label", "title", "placeholder", "value"],
-    characterData: true,
-    childList: true,
-    subtree: true
-  });
-  enforceEnglishSurface(document.body);
 }
 
 function zhWorkerName(value = "", id = "") {
@@ -1481,7 +1328,7 @@ function renderLiveRunState() {
   const isDone = live.status === "completed";
   const selectedMode = isRunning ? live.mode : selectedMissionMode();
   const buttonStates = [
-    [elements.newMissionButton, "运行当前任务", "编程猿工作中"],
+    [elements.newMissionButton, "Run Current Task", "Codingape Working"],
     [elements.assignMissionButton, missionModeActionLabel(selectedMode), missionModeRunningLabel(selectedMode)],
     [elements.runCodingLoopButton, "Run Loop", "Loop running"],
     [elements.runCodingLoopHeroButton, "Run Three-Worker Demo", "Three workers running"]
@@ -1677,7 +1524,7 @@ function renderWorkers(snapshot) {
   const gated = visibleWorkers.filter((worker) => worker.risk === "high").length;
 
   elements.workerUniverseSignal.textContent =
-    `${visibleWorkers.length} 个核心员工 · ${activeQueues} 个队列${gated ? ` · ${gated} 个被闸门保护` : ""}`;
+    `${visibleWorkers.length} core workers · ${activeQueues} queued${gated ? ` · ${gated} gate protected` : ""}`;
   elements.workerGrid.innerHTML = visibleWorkers.map(workerTemplate).join("");
 
   elements.workerGrid.querySelectorAll(".worker-card").forEach((card) => {
@@ -2684,36 +2531,36 @@ function missionFlowNodeTemplate(task, node, director, replayFocus) {
 }
 
 function missionFlowNodeCaption(task, node, status, isFocus = false, isReplayFocus = false) {
-  if (isReplayFocus) return "回放";
+  if (isReplayFocus) return "Replay";
   const mode = missionModeFromTask(task);
   const nodeId = typeof node === "string" ? node : node?.id;
   const modeHints = {
     review_only: {
-      task: "接单",
-      evidence: status === "passed" ? "只读完成" : "只做证据",
-      verification: "本次不跑",
-      judge: "本次不审",
-      apply: "本次不写"
+      task: "Accepted",
+      evidence: status === "passed" ? "Read-only done" : "Evidence only",
+      verification: "Not in this run",
+      judge: "Not in this run",
+      apply: "No write"
     },
     proposal: {
-      task: "接单",
-      evidence: status === "passed" ? "方案就绪" : "采集+方案",
-      verification: "本次不跑",
-      judge: status === "running" || status === "waiting_human" ? "旁路审查" : "方案审查",
-      apply: "本次不写"
+      task: "Accepted",
+      evidence: status === "passed" ? "Plan ready" : "Evidence + plan",
+      verification: "Not in this run",
+      judge: status === "running" || status === "waiting_human" ? "Side review" : "Plan review",
+      apply: "No write"
     },
     verify: {
-      task: "接单",
-      evidence: "证据+方案",
-      verification: status === "passed" ? "验证通过" : isFocus ? "验证中" : "验证",
-      judge: status === "waiting_human" ? "待复核" : "审核",
-      apply: "本次不写"
+      task: "Accepted",
+      evidence: "Evidence + plan",
+      verification: status === "passed" ? "Passed" : isFocus ? "Verifying" : "Verify",
+      judge: status === "waiting_human" ? "Review needed" : "Review",
+      apply: "No write"
     },
     sandbox_patch: {
-      apply: status === "blocked" ? "安全阻断" : status === "waiting_human" ? "待确认" : "受闸门保护"
+      apply: status === "blocked" ? "Safely blocked" : status === "waiting_human" ? "Awaiting approval" : "Gate protected"
     }
   };
-  return modeHints[mode]?.[nodeId] || (isFocus ? "当前" : zhStatus(status));
+  return modeHints[mode]?.[nodeId] || (isFocus ? "Current" : zhStatus(status));
 }
 
 function renderMissionFlow(snapshot, selectedProject) {
@@ -2729,10 +2576,10 @@ function renderMissionFlow(snapshot, selectedProject) {
 
   if (elements.missionFlowStatus) {
     elements.missionFlowStatus.textContent = replayFocus?.focusNode
-      ? `回放：${replayNode?.label || zhStatus(replayFocus.focusNode)} · ${replayFocus.taskId || "事件"}`
+      ? `Replay: ${replayNode?.label || zhStatus(replayFocus.focusNode)} · ${replayFocus.taskId || "event"}`
       : task
       ? `${zhText(director.phaseLabel)} · ${director.progress}% · ${formatRunId(task.id)}`
-      : "等待任务证据";
+      : "Waiting for task evidence";
   }
   if (elements.missionFlowRail) {
     elements.missionFlowRail.classList.add("is-premium");
@@ -2765,7 +2612,7 @@ function coreWorkerStationTemplate(worker, task, event, replayFocus) {
   const isFocus = director.focusWorkerId === worker?.id;
   const isReplayFocus = replayFocus?.focusWorkerId === worker?.id;
   const phaseLabel = runPhaseLabel(model.phase);
-  const roleLabel = WORKER_DOMAIN_ZH[worker?.domain] || zhText(worker?.domain || "员工");
+  const roleLabel = WORKER_DOMAIN_ZH[worker?.domain] || zhText(worker?.domain || "Worker");
   const eventText = model.eventTitle
     ? `${zhEventType(model.eventType)}：${zhEventTitle({ type: model.eventType, title: model.eventTitle })}`
     : "暂无工位事件";
@@ -2777,15 +2624,15 @@ function coreWorkerStationTemplate(worker, task, event, replayFocus) {
     <article class="core-station state-${escapeHtml(model.state)} runtime-${escapeHtml(model.runtimeState)} light-${escapeHtml(model.light.key)} phase-${escapeHtml(model.phase)} accent-${escapeHtml(worker?.accent || "teal")} ${isFocus ? "is-focus" : ""} ${isReplayFocus ? "is-replay-focus" : ""}" data-state="${escapeHtml(model.state)}" data-runtime-state="${escapeHtml(model.runtimeState)}" data-animation="${escapeHtml(model.animation)}" data-light="${escapeHtml(model.light.key)}" data-phase="${escapeHtml(model.phase)}" data-phase-label="${escapeHtml(phaseLabel)}" data-focus="${isFocus ? "true" : "false"}" data-replay-focus="${isReplayFocus ? "true" : "false"}">
       <div class="station-avatar">${escapeHtml(model.mark)}</div>
       <div>
-        <span>${escapeHtml(isReplayFocus ? "回放焦点" : roleLabel)} · ${escapeHtml(zhStatus(model.runtimeState))}</span>
+        <span>${escapeHtml(isReplayFocus ? "Replay focus" : roleLabel)} · ${escapeHtml(zhStatus(model.runtimeState))}</span>
         <strong>${escapeHtml(zhWorkerName(model.name, model.id))}</strong>
         <small>${escapeHtml(zhText(model.action))}</small>
       </div>
       <em>${escapeHtml(formatRunId(model.runId))}</em>
       <div class="station-meta">
-        <span>运行 <strong>${escapeHtml(formatRunId(model.runId))}</strong></span>
-        <span>风险 <strong>${escapeHtml(zhStatus(model.riskLevel))}</strong></span>
-        <span>闸门 <strong>${escapeHtml(zhStatus(model.gateStatus))}</strong></span>
+        <span>Run <strong>${escapeHtml(formatRunId(model.runId))}</strong></span>
+        <span>Risk <strong>${escapeHtml(zhStatus(model.riskLevel))}</strong></span>
+        <span>Gate <strong>${escapeHtml(zhStatus(model.gateStatus))}</strong></span>
       </div>
       <div class="station-progress" aria-hidden="true"><i style="width: ${escapeHtml(String(model.progress))}%"></i></div>
       <div class="station-telemetry">${stationTelemetryTemplate(model.telemetry)}</div>
@@ -3104,8 +2951,9 @@ function renderProjectRootSelector(snapshot, selectedProject) {
     elements.projectRootInput.value = selectedPath;
   }
   elements.projectRootStatus.textContent = snapshot?.localProjects?.selectedPath
-    ? `当前授权项目：${zhText(snapshot.localProjects.selectedName || selectedProject?.name || "本地项目")} · ${selectedPath}`
-    : "必须先选择 project root，之后才会运行证据、diff 或 apply";
+    ? `Authorized: ${zhText(snapshot.localProjects.selectedName || selectedProject?.name || "Local project")} · ${selectedPath}`
+    : "Choose a project root before running evidence, diff, or apply";
+  elements.projectRootStatus.title = selectedPath || "No project root authorized";
 }
 
 function renderMissionComposer(snapshot) {
@@ -3670,9 +3518,9 @@ async function copyLocalJudgeCommand() {
 }
 
 function serviceHealthTone(status) {
-  if (["online", "managed"].includes(status)) return "ready";
-  if (status === "configured") return "configured";
-  if (["manual", "missing"].includes(status)) return "warning";
+  if (["online", "connected", "managed"].includes(status)) return "ready";
+  if (["checking"].includes(status)) return "configured";
+  if (["manual", "missing", "offline", "degraded"].includes(status)) return "warning";
   return "neutral";
 }
 
@@ -3695,14 +3543,14 @@ function renderServiceHealthPanel(snapshot) {
   if (!elements.serviceHealthList) return;
   const health = snapshot.serviceHealth || {};
   const items = [health.local, health.publicEntry, health.tunnel, health.daemon].filter(Boolean);
-  const warnings = items.filter((item) => ["manual", "missing"].includes(item.status));
-  const managed = items.filter((item) => ["online", "managed", "configured"].includes(item.status));
+  const warnings = items.filter((item) => ["manual", "missing", "offline", "degraded"].includes(item.status));
+  const managed = items.filter((item) => ["online", "connected", "managed"].includes(item.status));
 
   elements.serviceHealthStatus.textContent = warnings.length ? "Needs attention" : "Managed";
   elements.serviceHealthStatus.className = warnings.length ? "is-warning" : "is-ready";
   elements.serviceHealthSummary.textContent = warnings.length
-    ? "Public entry or daemon hosting still needs confirmation, but the main service remains visible."
-    : `Local service, public entry, Cloudflare tunnel, and daemon hosting confirmed ${managed.length}/${items.length}.`;
+    ? "The local service is available, but public routing or background hosting needs attention."
+    : `Live checks confirmed ${managed.length}/${items.length} service components.`;
   elements.serviceHealthList.innerHTML = items.length
     ? items.map(serviceHealthCardTemplate).join("")
     : `<div class="service-health-item tone-warning"><strong>No health snapshot yet</strong><p>Refresh the page or check the service process.</p></div>`;
@@ -3955,9 +3803,9 @@ function renderRoomOpsRibbon(snapshot) {
   const companyReport = snapshot.companyReport || {};
   const project = currentProject() || preferredProject(snapshot);
   const latestEvent = missionRibbonEvent(snapshot, project);
-  const completed = companyMetricValue(companyReport, ["completed", "tasks done", "missions", "任务完成", "完成任务"], "0");
-  const savedValue = companyMetricValue(companyReport, ["hours saved", "saved", "节省时间", "节省"], "0");
-  const saved = String(savedValue).includes("小时") ? savedValue : `${savedValue}小时`;
+  const completed = companyMetricValue(companyReport, ["real tasks completed", "completed", "tasks done", "missions"], "0");
+  const savedValue = companyMetricValue(companyReport, ["estimated time saved", "hours saved", "saved"], "0");
+  const saved = String(savedValue).match(/h$/i) ? savedValue : `${savedValue}h`;
   const blocked =
     companyMetricValue(companyReport, ["risk blocked", "risks blocked", "risks gated", "apply blocks", "blocked", "风险阻断", "阻断"], "0");
 
@@ -3975,11 +3823,29 @@ function renderOperatorConsole(snapshot) {
   const launch = snapshot.launch || {};
   const latest = launch.latestEvidence || {};
   const project = currentProject() || preferredProject(snapshot);
-  const activeTask = latestTaskForProject(snapshot, project?.id);
+  const realSnapshot = {
+    ...snapshot,
+    tasks: (snapshot.tasks || []).filter((task) => (task.dataScope || "real") === "real")
+  };
+  const activeTask = latestTaskForProject(realSnapshot, project?.id);
   const director = missionDirectorForTask(activeTask, {
     applyRunnerEnabled: Boolean(autonomy.metrics?.applyRunnerEnabled),
     project
   });
+  const modelProvider = snapshot.modelProvider || {};
+  const verificationStatus = activeTask?.result?.verificationStatus || activeTask?.result?.verification?.status || "not_run";
+  const patchStatus = activeTask?.result?.patchRunStatus || "not_run";
+  if (elements.currentWorkScope) elements.currentWorkScope.textContent = "Real data only";
+  if (elements.currentWorkProject) elements.currentWorkProject.textContent = project?.name || snapshot.localProjects?.selectedName || "Choose a project";
+  if (elements.currentWorkModel) elements.currentWorkModel.textContent = modelProvider.model || modelProvider.provider || "Not configured";
+  if (elements.currentWorkTask) elements.currentWorkTask.textContent = activeTask?.title || "No real task yet";
+  if (elements.currentWorkDiff) elements.currentWorkDiff.textContent = patchRunStatusLabel(patchStatus);
+  if (elements.currentWorkVerification) elements.currentWorkVerification.textContent = verificationStatusLabel(verificationStatus);
+  if (elements.currentWorkNext) elements.currentWorkNext.textContent = director.nextAction || "Choose a project and assign a task";
+  if (elements.currentWorkDiffButton) {
+    elements.currentWorkDiffButton.disabled = !activeTask?.id;
+    elements.currentWorkDiffButton.dataset.taskId = activeTask?.id || "";
+  }
   const blockers = autonomy.hardBlockers || [];
   const objectives = autonomy.objectives || [];
   const score = Number(autonomy.score || 0);
@@ -4053,7 +3919,7 @@ function renderOperatorConsole(snapshot) {
   if (elements.commandPhase) elements.commandPhase.textContent = `阶段：${zhText(director.phaseLabel)}`;
   if (elements.commandRisk) {
     const risk = activeTask?.risk || project?.risk?.key || "low";
-    elements.commandRisk.textContent = risk === "high" ? "人工闸门" : risk === "medium" ? "需复核" : "低风险";
+    elements.commandRisk.textContent = risk === "high" ? "Human Gate" : risk === "medium" ? "Review" : "Low risk";
     elements.commandRisk.className = `command-badge risk-${risk}`;
   }
   if (elements.commandIngestion) {
@@ -4062,18 +3928,24 @@ function renderOperatorConsole(snapshot) {
     const judgeReady = localJudge.enabled && localJudge.latestStatus === "ready";
     const judgeFailed = localJudge.enabled && localJudge.latestStatus === "failed";
     elements.commandIngestion.textContent = judgeReady
-      ? `审核猿模型：${zhText(localJudge.model || "已连接")}`
+      ? `Judge: ${zhText(localJudge.model || "Connected")}`
       : judgeFailed
-        ? "审核猿模型需重试"
+        ? "Judge retry needed"
         : localJudge.enabled
-          ? `审核猿模型：${zhText(localJudge.model || "待审查")}`
+          ? `Judge: ${zhText(localJudge.model || "Pending")}`
           : connected
-            ? "记录已连接"
-            : "本地记录";
+            ? "Records connected"
+            : "Local records";
     elements.commandIngestion.title = localJudge.enabled
-      ? `本地模型：${zhText(localJudge.provider)} · ${zhText(localJudge.model)} · 最近：${localJudgeStatusLabel(localJudge.latestStatus)}`
-      : "未启用本地模型审查";
+      ? `Local model: ${zhText(localJudge.provider)} · ${zhText(localJudge.model)} · Latest: ${localJudgeStatusLabel(localJudge.latestStatus)}`
+      : "Local model review is disabled";
     elements.commandIngestion.className = `command-badge ${judgeReady || connected ? "is-live" : ""}${judgeFailed ? " risk-medium" : ""}`;
+  }
+  if (elements.commandPublicHealth) {
+    const publicHealth = commandPublicHealthBadge(state.snapshot?.serviceHealth || {});
+    elements.commandPublicHealth.textContent = publicHealth.label;
+    elements.commandPublicHealth.className = publicHealth.className;
+    elements.commandPublicHealth.title = publicHealth.title;
   }
   if (elements.commandReadiness) elements.commandReadiness.textContent = `${score}/100`;
   if (elements.commandMode) {
@@ -4816,6 +4688,42 @@ function renderSummary(snapshot) {
   elements.sceneReady.textContent = ready;
 }
 
+function commandPublicHealthBadge(serviceHealth = {}) {
+  const publicStatus = serviceHealth.publicEntry?.status || "";
+  const tunnelStatus = serviceHealth.tunnel?.status || "";
+  const publicUrl = serviceHealth.publicEntry?.url || "";
+
+  if (publicStatus === "online" && ["connected", "online"].includes(tunnelStatus)) {
+    return {
+      label: serviceHealth.publicEntry?.statusLabel === "Protected" ? "Public protected" : "Public live",
+      className: "command-badge is-live",
+      title: publicUrl ? `Live probe confirmed ${publicUrl}.` : "Live probe confirmed the public entry."
+    };
+  }
+
+  if (publicStatus === "checking") {
+    return {
+      label: "Public checking",
+      className: "command-badge",
+      title: "A live public endpoint probe is in progress."
+    };
+  }
+
+  if (["missing", "offline"].includes(publicStatus)) {
+    return {
+      label: publicStatus === "offline" ? "Public offline" : "Public setup needed",
+      className: "command-badge risk-medium",
+      title: serviceHealth.publicEntry?.detail || "The public route is not available."
+    };
+  }
+
+  return {
+    label: "Public pending",
+    className: "command-badge",
+    title: "Waiting for the service health snapshot."
+  };
+}
+
 function deskTemplate(project) {
   const selected = project.id === state.selectedId ? " is-selected" : "";
   const hidden = state.filter !== "all" && project.status.key !== state.filter ? " is-hidden" : "";
@@ -4982,7 +4890,6 @@ function render() {
   document.querySelectorAll(".filter-button").forEach((button) => {
     button.classList.toggle("is-active", button.dataset.filter === state.filter);
   });
-  enforceEnglishSurface(document.body);
 }
 
 function visibleProjects(snapshot) {
@@ -4996,10 +4903,10 @@ function initThreeDeck() {
   if (threeDeck.renderer || threeDeck.disabled || !elements.threeDeck) return;
 
   threeDeck.scene = new THREE.Scene();
-  threeDeck.scene.fog = new THREE.Fog(0xf4f2ed, 9, 24);
+  threeDeck.scene.fog = new THREE.Fog(0x070b11, 10, 26);
   threeDeck.camera = new THREE.PerspectiveCamera(38, 1, 0.1, 100);
-  threeDeck.camera.position.set(0, 6.6, 12.5);
-  threeDeck.camera.lookAt(0, 0, 0);
+  threeDeck.camera.position.set(0, 5.5, 11.8);
+  threeDeck.camera.lookAt(0, 0.55, 0);
 
   try {
     threeDeck.renderer = new THREE.WebGLRenderer({
@@ -5019,8 +4926,10 @@ function initThreeDeck() {
   if (elements.deckViewport) elements.deckViewport.dataset.webgl = "three";
   threeDeck.renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
   threeDeck.renderer.outputColorSpace = THREE.SRGBColorSpace;
+  threeDeck.renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  threeDeck.renderer.toneMappingExposure = 1.18;
 
-  const ambient = new THREE.HemisphereLight(0xffffff, 0x20242c, 1.85);
+  const ambient = new THREE.HemisphereLight(0xdffcf7, 0x111a24, 2.15);
   threeDeck.scene.add(ambient);
 
   const keyLight = new THREE.DirectionalLight(0xffffff, 2.1);
@@ -5031,18 +4940,20 @@ function initThreeDeck() {
   rimLight.position.set(5, 4, -5);
   threeDeck.scene.add(rimLight);
 
-  const grid = new THREE.GridHelper(15, 24, 0xd0d4cf, 0xe1e5e1);
+  const grid = new THREE.GridHelper(15, 24, 0x2f8f86, 0x17252d);
   grid.position.y = -0.04;
   threeDeck.scene.add(grid);
 
   const floor = new THREE.Mesh(
     new THREE.CircleGeometry(7.4, 96),
     new THREE.MeshStandardMaterial({
-      color: 0xf8f7f0,
-      metalness: 0.04,
-      roughness: 0.72,
+      color: 0x101923,
+      emissive: 0x071a1a,
+      emissiveIntensity: 0.12,
+      metalness: 0.18,
+      roughness: 0.64,
       transparent: true,
-      opacity: 0.72
+      opacity: 0.94
     })
   );
   floor.rotation.x = -Math.PI / 2;
@@ -5113,6 +5024,7 @@ function updateThreeDeck(snapshot) {
   clearThreeGroup(threeDeck.group);
   threeDeck.nodeObjects.clear();
   threeDeck.mixers = [];
+  threeDeck.coreWorkerRigs = [];
   threeDeck.signalPulses = [];
   threeDeck.phaseTransferPulses = [];
   elements.sceneLabels.innerHTML = "";
@@ -5173,8 +5085,84 @@ function updateThreeDeck(snapshot) {
   });
 
   createSignalArcs(projects);
+  createCoreWorkerOfficeTrio(snapshot, selectedProject);
 
   focusThreeSelection();
+}
+
+function createCoreWorkerOfficeTrio(snapshot, selectedProject) {
+  if (!selectedProject || !threeDeck.group) return;
+  const task = latestTaskForProject(snapshot, selectedProject.id);
+  const phase = runPhaseFromTask(task);
+  const director = missionDirectorForTask(task, {
+    applyRunnerEnabled: Boolean(snapshot.autonomy?.metrics?.applyRunnerEnabled),
+    project: selectedProject
+  });
+  const specs = [
+    { id: "coding-yuan", color: 0x30e0c6, x: -1.45, z: 0.48 },
+    { id: "judge-yuan", color: 0x8672c8, x: 0, z: -0.2 },
+    { id: "ops-yuan", color: 0xffb454, x: 1.45, z: 0.48 }
+  ];
+  const officeGroup = new THREE.Group();
+  officeGroup.userData.isCoreWorkerOffice = true;
+
+  specs.forEach((spec, index) => {
+    const isFocus = director.focusWorkerId === spec.id;
+    const runtimeState = workerStateForRunPhase(phase, spec.id, { hasActiveTask: Boolean(task) });
+    const workerProject = {
+      ...selectedProject,
+      id: `${selectedProject.id}-${spec.id}`,
+      workerId: spec.id,
+      repo: selectedProject.repo || { changeCount: 0 },
+      packages: selectedProject.packages || [],
+      status: {
+        key: isFocus ? "running" : runtimeState === "completed" ? "ready" : "idle",
+        label: zhStatus(runtimeState)
+      }
+    };
+    const station = new THREE.Group();
+    station.position.set(spec.x, 0, spec.z);
+
+    const pedestal = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.58, 0.68, 0.12, 48),
+      new THREE.MeshStandardMaterial({
+        color: 0x101720,
+        emissive: spec.color,
+        emissiveIntensity: isFocus ? 0.22 : 0.08,
+        metalness: 0.48,
+        roughness: 0.34
+      })
+    );
+    pedestal.position.y = 0.06;
+    station.add(pedestal);
+
+    const roleRing = new THREE.Mesh(
+      new THREE.TorusGeometry(0.72, isFocus ? 0.022 : 0.012, 8, 72),
+      new THREE.MeshBasicMaterial({ color: spec.color, transparent: true, opacity: isFocus ? 0.9 : 0.42 })
+    );
+    roleRing.rotation.x = Math.PI / 2;
+    roleRing.position.y = 0.14;
+    station.add(roleRing);
+
+    const rig = createCodingYuanModelRig(workerProject, spec.color, 0, index, {
+      activeNode: isFocus,
+      phase,
+      workerId: spec.id
+    }) || createAgentRig(workerProject, spec.color, 0, index, {
+      activeNode: isFocus,
+      phase,
+      workerId: spec.id
+    });
+    rig.position.set(0, 0.2, 0);
+    rig.scale.setScalar(isFocus ? 2.05 : 1.72);
+    rig.userData.baseY = rig.position.y;
+    rig.userData.officeRole = spec.id;
+    station.add(rig);
+    officeGroup.add(station);
+    threeDeck.coreWorkerRigs.push(rig);
+  });
+
+  threeDeck.group.add(officeGroup);
 }
 
 function phaseTransferRouteForPhase(phase, mode = "sandbox_patch") {
@@ -5559,19 +5547,9 @@ function createProjectNode(project, index, context = {}) {
     gateRails.push(rail);
   }
 
-  const agentRig = createCodingYuanModelRig(project, color, lift, index, {
-    activeNode,
-    phase,
-    workerId: focusWorkerId
-  }) || createAgentRig(project, color, lift, index, {
-    activeNode,
-    phase,
-    workerId: focusWorkerId
-  });
-  group.add(agentRig);
   createWorkerDispatchMarkers(group, phase, lift, mode, focusWorkerId);
   createMissionPhaseTransferPath(group, project, phase, lift, activeNode, mode);
-  group.userData.agentRig = agentRig;
+  group.userData.agentRig = null;
   group.userData.gateRails = gateRails;
   group.userData.missionPhase = phase;
   group.userData.missionMode = mode;
@@ -6058,7 +6036,7 @@ function clearThreeGroup(group) {
   while (group.children.length) {
     const child = group.children.pop();
     child.traverse((object) => {
-      object.geometry?.dispose?.();
+      if (!object.userData.sharedAvatarGeometry) object.geometry?.dispose?.();
       if (Array.isArray(object.material)) {
         object.material.forEach((material) => material.dispose?.());
       } else {
@@ -6075,8 +6053,9 @@ function resizeThreeDeck() {
   const height = Math.max(1, bounds.height);
   threeDeck.renderer.setSize(width, height, false);
   threeDeck.camera.aspect = width / height;
-  threeDeck.camera.position.z = width < 560 ? 15.8 : 13.7;
-  threeDeck.camera.position.y = width < 560 ? 7.8 : 7.0;
+  threeDeck.camera.position.z = width < 560 ? 14.8 : 11.8;
+  threeDeck.camera.position.y = width < 560 ? 6.5 : 5.5;
+  threeDeck.camera.lookAt(0, 0.55, 0);
   threeDeck.camera.updateProjectionMatrix();
 }
 
@@ -6100,6 +6079,10 @@ function animateThreeDeck(time = 0) {
     animateGateRails(node.userData.gateRails, time, node.userData.missionPhase);
     animateWorkerDispatchMarkers(node.userData.dispatchMarkers, time);
     animateAgentRig(node.userData.agentRig, time);
+  }
+
+  for (const rig of threeDeck.coreWorkerRigs) {
+    animateAgentRig(rig, time);
   }
 
   for (const pulse of threeDeck.signalPulses) {
@@ -7513,7 +7496,23 @@ function connectEvents() {
   });
 }
 
+function setOfficeView(view, { persist = true } = {}) {
+  const nextView = ["workbench", "operations", "office"].includes(view) ? view : "office";
+  document.body.dataset.officeView = nextView;
+  document.querySelectorAll("[data-office-view-target]").forEach((button) => {
+    button.classList.toggle("is-active", button.dataset.officeViewTarget === nextView);
+    button.setAttribute("aria-pressed", button.dataset.officeViewTarget === nextView ? "true" : "false");
+  });
+  if (persist) localStorage.setItem("codingape-office-view", nextView);
+  window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+  requestDeckDraw();
+}
+
 function attachLocalOfficeHandlers() {
+  document.querySelectorAll("[data-office-view-target]").forEach((button) => {
+    button.addEventListener("click", () => setOfficeView(button.dataset.officeViewTarget));
+  });
+  setOfficeView("office", { persist: false });
   elements.refreshButton.addEventListener("click", fetchStatus);
   elements.newMissionButton.addEventListener("click", runCodingLoop);
   elements.runFirstOrderButton?.addEventListener("click", runFirstOrder);
@@ -7570,6 +7569,10 @@ function attachLocalOfficeHandlers() {
   elements.markBlockedButton.addEventListener("click", () => queueSelectedTask("blocked"));
   elements.runCodingLoopButton.addEventListener("click", runCodingLoop);
   elements.runCodingLoopHeroButton.addEventListener("click", runCodingLoop);
+  elements.currentWorkDiffButton?.addEventListener("click", () => {
+    const taskId = elements.currentWorkDiffButton.dataset.taskId;
+    if (taskId) viewTaskEvidence(taskId, { focus: "diff" });
+  });
   elements.viewDossierButton.addEventListener("click", viewDossier);
   elements.testAiwcHealthButton?.addEventListener("click", testAiwcHealth);
   elements.generateSupportBundleButton?.addEventListener("click", generateSupportBundle);
@@ -7725,7 +7728,6 @@ function attachLocalOfficeHandlers() {
 }
 
 async function bootAppMode() {
-  startEnglishSurfaceGuard();
   if (APP_MODE === AppMode.publicHome) {
     renderPublicHome();
     return;
