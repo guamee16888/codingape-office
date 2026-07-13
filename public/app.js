@@ -351,6 +351,7 @@ const threeDeck = {
   renderer: null,
   scene: null,
   mixers: [],
+  coreWorkerRigs: [],
   signalPulses: [],
   phaseTransferPulses: [],
   selectedRing: null,
@@ -452,8 +453,24 @@ function createCodingYuanModelRig(project, color, lift, index, context = {}) {
   const rig = new THREE.Group();
   const model = cloneSkeleton(threeDeck.avatar.template);
   model.userData.projectId = project.id;
+  const accent = new THREE.Color(color);
   model.traverse((object) => {
     object.userData.projectId = project.id;
+    if (object.isMesh || object.isSkinnedMesh) {
+      object.userData.sharedAvatarGeometry = true;
+      const sourceMaterials = Array.isArray(object.material) ? object.material : [object.material];
+      const materials = sourceMaterials.map((source) => {
+        const material = source.clone();
+        material.color?.lerp(accent, active ? 0.2 : 0.1);
+        if (material.emissive) {
+          material.emissive.lerp(accent, active ? 0.34 : 0.18);
+          material.emissiveIntensity = Math.max(material.emissiveIntensity || 0, active ? 0.24 : 0.12);
+        }
+        material.needsUpdate = true;
+        return material;
+      });
+      object.material = Array.isArray(object.material) ? materials : materials[0];
+    }
   });
 
   const box = new THREE.Box3().setFromObject(model);
@@ -1311,7 +1328,7 @@ function renderLiveRunState() {
   const isDone = live.status === "completed";
   const selectedMode = isRunning ? live.mode : selectedMissionMode();
   const buttonStates = [
-    [elements.newMissionButton, "运行当前任务", "编程猿工作中"],
+    [elements.newMissionButton, "Run Current Task", "Codingape Working"],
     [elements.assignMissionButton, missionModeActionLabel(selectedMode), missionModeRunningLabel(selectedMode)],
     [elements.runCodingLoopButton, "Run Loop", "Loop running"],
     [elements.runCodingLoopHeroButton, "Run Three-Worker Demo", "Three workers running"]
@@ -1507,7 +1524,7 @@ function renderWorkers(snapshot) {
   const gated = visibleWorkers.filter((worker) => worker.risk === "high").length;
 
   elements.workerUniverseSignal.textContent =
-    `${visibleWorkers.length} 个核心员工 · ${activeQueues} 个队列${gated ? ` · ${gated} 个被闸门保护` : ""}`;
+    `${visibleWorkers.length} core workers · ${activeQueues} queued${gated ? ` · ${gated} gate protected` : ""}`;
   elements.workerGrid.innerHTML = visibleWorkers.map(workerTemplate).join("");
 
   elements.workerGrid.querySelectorAll(".worker-card").forEach((card) => {
@@ -2514,36 +2531,36 @@ function missionFlowNodeTemplate(task, node, director, replayFocus) {
 }
 
 function missionFlowNodeCaption(task, node, status, isFocus = false, isReplayFocus = false) {
-  if (isReplayFocus) return "回放";
+  if (isReplayFocus) return "Replay";
   const mode = missionModeFromTask(task);
   const nodeId = typeof node === "string" ? node : node?.id;
   const modeHints = {
     review_only: {
-      task: "接单",
-      evidence: status === "passed" ? "只读完成" : "只做证据",
-      verification: "本次不跑",
-      judge: "本次不审",
-      apply: "本次不写"
+      task: "Accepted",
+      evidence: status === "passed" ? "Read-only done" : "Evidence only",
+      verification: "Not in this run",
+      judge: "Not in this run",
+      apply: "No write"
     },
     proposal: {
-      task: "接单",
-      evidence: status === "passed" ? "方案就绪" : "采集+方案",
-      verification: "本次不跑",
-      judge: status === "running" || status === "waiting_human" ? "旁路审查" : "方案审查",
-      apply: "本次不写"
+      task: "Accepted",
+      evidence: status === "passed" ? "Plan ready" : "Evidence + plan",
+      verification: "Not in this run",
+      judge: status === "running" || status === "waiting_human" ? "Side review" : "Plan review",
+      apply: "No write"
     },
     verify: {
-      task: "接单",
-      evidence: "证据+方案",
-      verification: status === "passed" ? "验证通过" : isFocus ? "验证中" : "验证",
-      judge: status === "waiting_human" ? "待复核" : "审核",
-      apply: "本次不写"
+      task: "Accepted",
+      evidence: "Evidence + plan",
+      verification: status === "passed" ? "Passed" : isFocus ? "Verifying" : "Verify",
+      judge: status === "waiting_human" ? "Review needed" : "Review",
+      apply: "No write"
     },
     sandbox_patch: {
-      apply: status === "blocked" ? "安全阻断" : status === "waiting_human" ? "待确认" : "受闸门保护"
+      apply: status === "blocked" ? "Safely blocked" : status === "waiting_human" ? "Awaiting approval" : "Gate protected"
     }
   };
-  return modeHints[mode]?.[nodeId] || (isFocus ? "当前" : zhStatus(status));
+  return modeHints[mode]?.[nodeId] || (isFocus ? "Current" : zhStatus(status));
 }
 
 function renderMissionFlow(snapshot, selectedProject) {
@@ -2559,10 +2576,10 @@ function renderMissionFlow(snapshot, selectedProject) {
 
   if (elements.missionFlowStatus) {
     elements.missionFlowStatus.textContent = replayFocus?.focusNode
-      ? `回放：${replayNode?.label || zhStatus(replayFocus.focusNode)} · ${replayFocus.taskId || "事件"}`
+      ? `Replay: ${replayNode?.label || zhStatus(replayFocus.focusNode)} · ${replayFocus.taskId || "event"}`
       : task
       ? `${zhText(director.phaseLabel)} · ${director.progress}% · ${formatRunId(task.id)}`
-      : "等待任务证据";
+      : "Waiting for task evidence";
   }
   if (elements.missionFlowRail) {
     elements.missionFlowRail.classList.add("is-premium");
@@ -2595,7 +2612,7 @@ function coreWorkerStationTemplate(worker, task, event, replayFocus) {
   const isFocus = director.focusWorkerId === worker?.id;
   const isReplayFocus = replayFocus?.focusWorkerId === worker?.id;
   const phaseLabel = runPhaseLabel(model.phase);
-  const roleLabel = WORKER_DOMAIN_ZH[worker?.domain] || zhText(worker?.domain || "员工");
+  const roleLabel = WORKER_DOMAIN_ZH[worker?.domain] || zhText(worker?.domain || "Worker");
   const eventText = model.eventTitle
     ? `${zhEventType(model.eventType)}：${zhEventTitle({ type: model.eventType, title: model.eventTitle })}`
     : "暂无工位事件";
@@ -2607,15 +2624,15 @@ function coreWorkerStationTemplate(worker, task, event, replayFocus) {
     <article class="core-station state-${escapeHtml(model.state)} runtime-${escapeHtml(model.runtimeState)} light-${escapeHtml(model.light.key)} phase-${escapeHtml(model.phase)} accent-${escapeHtml(worker?.accent || "teal")} ${isFocus ? "is-focus" : ""} ${isReplayFocus ? "is-replay-focus" : ""}" data-state="${escapeHtml(model.state)}" data-runtime-state="${escapeHtml(model.runtimeState)}" data-animation="${escapeHtml(model.animation)}" data-light="${escapeHtml(model.light.key)}" data-phase="${escapeHtml(model.phase)}" data-phase-label="${escapeHtml(phaseLabel)}" data-focus="${isFocus ? "true" : "false"}" data-replay-focus="${isReplayFocus ? "true" : "false"}">
       <div class="station-avatar">${escapeHtml(model.mark)}</div>
       <div>
-        <span>${escapeHtml(isReplayFocus ? "回放焦点" : roleLabel)} · ${escapeHtml(zhStatus(model.runtimeState))}</span>
+        <span>${escapeHtml(isReplayFocus ? "Replay focus" : roleLabel)} · ${escapeHtml(zhStatus(model.runtimeState))}</span>
         <strong>${escapeHtml(zhWorkerName(model.name, model.id))}</strong>
         <small>${escapeHtml(zhText(model.action))}</small>
       </div>
       <em>${escapeHtml(formatRunId(model.runId))}</em>
       <div class="station-meta">
-        <span>运行 <strong>${escapeHtml(formatRunId(model.runId))}</strong></span>
-        <span>风险 <strong>${escapeHtml(zhStatus(model.riskLevel))}</strong></span>
-        <span>闸门 <strong>${escapeHtml(zhStatus(model.gateStatus))}</strong></span>
+        <span>Run <strong>${escapeHtml(formatRunId(model.runId))}</strong></span>
+        <span>Risk <strong>${escapeHtml(zhStatus(model.riskLevel))}</strong></span>
+        <span>Gate <strong>${escapeHtml(zhStatus(model.gateStatus))}</strong></span>
       </div>
       <div class="station-progress" aria-hidden="true"><i style="width: ${escapeHtml(String(model.progress))}%"></i></div>
       <div class="station-telemetry">${stationTelemetryTemplate(model.telemetry)}</div>
@@ -2934,8 +2951,9 @@ function renderProjectRootSelector(snapshot, selectedProject) {
     elements.projectRootInput.value = selectedPath;
   }
   elements.projectRootStatus.textContent = snapshot?.localProjects?.selectedPath
-    ? `当前授权项目：${zhText(snapshot.localProjects.selectedName || selectedProject?.name || "本地项目")} · ${selectedPath}`
-    : "必须先选择 project root，之后才会运行证据、diff 或 apply";
+    ? `Authorized: ${zhText(snapshot.localProjects.selectedName || selectedProject?.name || "Local project")} · ${selectedPath}`
+    : "Choose a project root before running evidence, diff, or apply";
+  elements.projectRootStatus.title = selectedPath || "No project root authorized";
 }
 
 function renderMissionComposer(snapshot) {
@@ -3901,7 +3919,7 @@ function renderOperatorConsole(snapshot) {
   if (elements.commandPhase) elements.commandPhase.textContent = `阶段：${zhText(director.phaseLabel)}`;
   if (elements.commandRisk) {
     const risk = activeTask?.risk || project?.risk?.key || "low";
-    elements.commandRisk.textContent = risk === "high" ? "人工闸门" : risk === "medium" ? "需复核" : "低风险";
+    elements.commandRisk.textContent = risk === "high" ? "Human Gate" : risk === "medium" ? "Review" : "Low risk";
     elements.commandRisk.className = `command-badge risk-${risk}`;
   }
   if (elements.commandIngestion) {
@@ -3910,17 +3928,17 @@ function renderOperatorConsole(snapshot) {
     const judgeReady = localJudge.enabled && localJudge.latestStatus === "ready";
     const judgeFailed = localJudge.enabled && localJudge.latestStatus === "failed";
     elements.commandIngestion.textContent = judgeReady
-      ? `审核猿模型：${zhText(localJudge.model || "已连接")}`
+      ? `Judge: ${zhText(localJudge.model || "Connected")}`
       : judgeFailed
-        ? "审核猿模型需重试"
+        ? "Judge retry needed"
         : localJudge.enabled
-          ? `审核猿模型：${zhText(localJudge.model || "待审查")}`
+          ? `Judge: ${zhText(localJudge.model || "Pending")}`
           : connected
-            ? "记录已连接"
-            : "本地记录";
+            ? "Records connected"
+            : "Local records";
     elements.commandIngestion.title = localJudge.enabled
-      ? `本地模型：${zhText(localJudge.provider)} · ${zhText(localJudge.model)} · 最近：${localJudgeStatusLabel(localJudge.latestStatus)}`
-      : "未启用本地模型审查";
+      ? `Local model: ${zhText(localJudge.provider)} · ${zhText(localJudge.model)} · Latest: ${localJudgeStatusLabel(localJudge.latestStatus)}`
+      : "Local model review is disabled";
     elements.commandIngestion.className = `command-badge ${judgeReady || connected ? "is-live" : ""}${judgeFailed ? " risk-medium" : ""}`;
   }
   if (elements.commandPublicHealth) {
@@ -4885,10 +4903,10 @@ function initThreeDeck() {
   if (threeDeck.renderer || threeDeck.disabled || !elements.threeDeck) return;
 
   threeDeck.scene = new THREE.Scene();
-  threeDeck.scene.fog = new THREE.Fog(0xf4f2ed, 9, 24);
+  threeDeck.scene.fog = new THREE.Fog(0x070b11, 10, 26);
   threeDeck.camera = new THREE.PerspectiveCamera(38, 1, 0.1, 100);
-  threeDeck.camera.position.set(0, 6.6, 12.5);
-  threeDeck.camera.lookAt(0, 0, 0);
+  threeDeck.camera.position.set(0, 5.5, 11.8);
+  threeDeck.camera.lookAt(0, 0.55, 0);
 
   try {
     threeDeck.renderer = new THREE.WebGLRenderer({
@@ -4908,8 +4926,10 @@ function initThreeDeck() {
   if (elements.deckViewport) elements.deckViewport.dataset.webgl = "three";
   threeDeck.renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
   threeDeck.renderer.outputColorSpace = THREE.SRGBColorSpace;
+  threeDeck.renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  threeDeck.renderer.toneMappingExposure = 1.18;
 
-  const ambient = new THREE.HemisphereLight(0xffffff, 0x20242c, 1.85);
+  const ambient = new THREE.HemisphereLight(0xdffcf7, 0x111a24, 2.15);
   threeDeck.scene.add(ambient);
 
   const keyLight = new THREE.DirectionalLight(0xffffff, 2.1);
@@ -4920,18 +4940,20 @@ function initThreeDeck() {
   rimLight.position.set(5, 4, -5);
   threeDeck.scene.add(rimLight);
 
-  const grid = new THREE.GridHelper(15, 24, 0xd0d4cf, 0xe1e5e1);
+  const grid = new THREE.GridHelper(15, 24, 0x2f8f86, 0x17252d);
   grid.position.y = -0.04;
   threeDeck.scene.add(grid);
 
   const floor = new THREE.Mesh(
     new THREE.CircleGeometry(7.4, 96),
     new THREE.MeshStandardMaterial({
-      color: 0xf8f7f0,
-      metalness: 0.04,
-      roughness: 0.72,
+      color: 0x101923,
+      emissive: 0x071a1a,
+      emissiveIntensity: 0.12,
+      metalness: 0.18,
+      roughness: 0.64,
       transparent: true,
-      opacity: 0.72
+      opacity: 0.94
     })
   );
   floor.rotation.x = -Math.PI / 2;
@@ -5002,6 +5024,7 @@ function updateThreeDeck(snapshot) {
   clearThreeGroup(threeDeck.group);
   threeDeck.nodeObjects.clear();
   threeDeck.mixers = [];
+  threeDeck.coreWorkerRigs = [];
   threeDeck.signalPulses = [];
   threeDeck.phaseTransferPulses = [];
   elements.sceneLabels.innerHTML = "";
@@ -5062,8 +5085,84 @@ function updateThreeDeck(snapshot) {
   });
 
   createSignalArcs(projects);
+  createCoreWorkerOfficeTrio(snapshot, selectedProject);
 
   focusThreeSelection();
+}
+
+function createCoreWorkerOfficeTrio(snapshot, selectedProject) {
+  if (!selectedProject || !threeDeck.group) return;
+  const task = latestTaskForProject(snapshot, selectedProject.id);
+  const phase = runPhaseFromTask(task);
+  const director = missionDirectorForTask(task, {
+    applyRunnerEnabled: Boolean(snapshot.autonomy?.metrics?.applyRunnerEnabled),
+    project: selectedProject
+  });
+  const specs = [
+    { id: "coding-yuan", color: 0x30e0c6, x: -1.45, z: 0.48 },
+    { id: "judge-yuan", color: 0x8672c8, x: 0, z: -0.2 },
+    { id: "ops-yuan", color: 0xffb454, x: 1.45, z: 0.48 }
+  ];
+  const officeGroup = new THREE.Group();
+  officeGroup.userData.isCoreWorkerOffice = true;
+
+  specs.forEach((spec, index) => {
+    const isFocus = director.focusWorkerId === spec.id;
+    const runtimeState = workerStateForRunPhase(phase, spec.id, { hasActiveTask: Boolean(task) });
+    const workerProject = {
+      ...selectedProject,
+      id: `${selectedProject.id}-${spec.id}`,
+      workerId: spec.id,
+      repo: selectedProject.repo || { changeCount: 0 },
+      packages: selectedProject.packages || [],
+      status: {
+        key: isFocus ? "running" : runtimeState === "completed" ? "ready" : "idle",
+        label: zhStatus(runtimeState)
+      }
+    };
+    const station = new THREE.Group();
+    station.position.set(spec.x, 0, spec.z);
+
+    const pedestal = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.58, 0.68, 0.12, 48),
+      new THREE.MeshStandardMaterial({
+        color: 0x101720,
+        emissive: spec.color,
+        emissiveIntensity: isFocus ? 0.22 : 0.08,
+        metalness: 0.48,
+        roughness: 0.34
+      })
+    );
+    pedestal.position.y = 0.06;
+    station.add(pedestal);
+
+    const roleRing = new THREE.Mesh(
+      new THREE.TorusGeometry(0.72, isFocus ? 0.022 : 0.012, 8, 72),
+      new THREE.MeshBasicMaterial({ color: spec.color, transparent: true, opacity: isFocus ? 0.9 : 0.42 })
+    );
+    roleRing.rotation.x = Math.PI / 2;
+    roleRing.position.y = 0.14;
+    station.add(roleRing);
+
+    const rig = createCodingYuanModelRig(workerProject, spec.color, 0, index, {
+      activeNode: isFocus,
+      phase,
+      workerId: spec.id
+    }) || createAgentRig(workerProject, spec.color, 0, index, {
+      activeNode: isFocus,
+      phase,
+      workerId: spec.id
+    });
+    rig.position.set(0, 0.2, 0);
+    rig.scale.setScalar(isFocus ? 2.05 : 1.72);
+    rig.userData.baseY = rig.position.y;
+    rig.userData.officeRole = spec.id;
+    station.add(rig);
+    officeGroup.add(station);
+    threeDeck.coreWorkerRigs.push(rig);
+  });
+
+  threeDeck.group.add(officeGroup);
 }
 
 function phaseTransferRouteForPhase(phase, mode = "sandbox_patch") {
@@ -5448,19 +5547,9 @@ function createProjectNode(project, index, context = {}) {
     gateRails.push(rail);
   }
 
-  const agentRig = createCodingYuanModelRig(project, color, lift, index, {
-    activeNode,
-    phase,
-    workerId: focusWorkerId
-  }) || createAgentRig(project, color, lift, index, {
-    activeNode,
-    phase,
-    workerId: focusWorkerId
-  });
-  group.add(agentRig);
   createWorkerDispatchMarkers(group, phase, lift, mode, focusWorkerId);
   createMissionPhaseTransferPath(group, project, phase, lift, activeNode, mode);
-  group.userData.agentRig = agentRig;
+  group.userData.agentRig = null;
   group.userData.gateRails = gateRails;
   group.userData.missionPhase = phase;
   group.userData.missionMode = mode;
@@ -5947,7 +6036,7 @@ function clearThreeGroup(group) {
   while (group.children.length) {
     const child = group.children.pop();
     child.traverse((object) => {
-      object.geometry?.dispose?.();
+      if (!object.userData.sharedAvatarGeometry) object.geometry?.dispose?.();
       if (Array.isArray(object.material)) {
         object.material.forEach((material) => material.dispose?.());
       } else {
@@ -5964,8 +6053,9 @@ function resizeThreeDeck() {
   const height = Math.max(1, bounds.height);
   threeDeck.renderer.setSize(width, height, false);
   threeDeck.camera.aspect = width / height;
-  threeDeck.camera.position.z = width < 560 ? 15.8 : 13.7;
-  threeDeck.camera.position.y = width < 560 ? 7.8 : 7.0;
+  threeDeck.camera.position.z = width < 560 ? 14.8 : 11.8;
+  threeDeck.camera.position.y = width < 560 ? 6.5 : 5.5;
+  threeDeck.camera.lookAt(0, 0.55, 0);
   threeDeck.camera.updateProjectionMatrix();
 }
 
@@ -5989,6 +6079,10 @@ function animateThreeDeck(time = 0) {
     animateGateRails(node.userData.gateRails, time, node.userData.missionPhase);
     animateWorkerDispatchMarkers(node.userData.dispatchMarkers, time);
     animateAgentRig(node.userData.agentRig, time);
+  }
+
+  for (const rig of threeDeck.coreWorkerRigs) {
+    animateAgentRig(rig, time);
   }
 
   for (const pulse of threeDeck.signalPulses) {

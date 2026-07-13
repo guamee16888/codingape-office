@@ -12,7 +12,7 @@ test("control-room stylesheet loads after the legacy base stylesheet", async () 
   const html = await readProjectFile("public/index.html");
 
   const baseIndex = html.indexOf('href="/styles.css"');
-  const controlRoomIndex = html.indexOf('href="/control-room.css"');
+  const controlRoomIndex = html.indexOf('href="/control-room.css?');
 
   assert.notEqual(baseIndex, -1);
   assert.notEqual(controlRoomIndex, -1);
@@ -52,7 +52,7 @@ test("coding loop buttons show live progress and block duplicate runs", async ()
   assert.match(html, /id="commandProgressBar"/);
   assert.match(html, /id="commandProgressSteps"/);
   assert.match(html, /id="commandRunReceipt" class="command-run-receipt" data-status="idle"/);
-  assert.match(app, /\[elements\.newMissionButton, "运行当前任务", "编程猿工作中"\]/);
+  assert.match(app, /\[elements\.newMissionButton, "Run Current Task", "Codingape Working"\]/);
   assert.match(app, /\[elements\.runCodingLoopButton, "Run Loop", "Loop running"\]/);
   assert.match(app, /\[elements\.runCodingLoopHeroButton, "Run Three-Worker Demo", "Three workers running"\]/);
   assert.match(app, /function missionInputTitle\(project\)/);
@@ -65,9 +65,9 @@ test("coding loop buttons show live progress and block duplicate runs", async ()
   assert.match(app, /function missionModeBriefHtml\(mode\)/);
   assert.match(app, /function codingLoopResultInsight\(mode, result, verificationStatus\)/);
   assert.match(app, /function missionFlowNodeCaption\(task, node, status, isFocus = false, isReplayFocus = false\)/);
-  assert.match(app, /review_only:[\s\S]*?verification:\s*"本次不跑"[\s\S]*?apply:\s*"本次不写"/);
-  assert.match(app, /proposal:[\s\S]*?verification:\s*"本次不跑"[\s\S]*?apply:\s*"本次不写"/);
-  assert.match(app, /verify:[\s\S]*?apply:\s*"本次不写"/);
+  assert.match(app, /review_only:[\s\S]*?verification:\s*"Not in this run"[\s\S]*?apply:\s*"No write"/);
+  assert.match(app, /proposal:[\s\S]*?verification:\s*"Not in this run"[\s\S]*?apply:\s*"No write"/);
+  assert.match(app, /verify:[\s\S]*?apply:\s*"No write"/);
   assert.match(app, /<span>这次不会做<\/span>/);
   assert.match(app, /不修改项目文件/);
   assert.match(app, /elements\.missionComposer\?\.addEventListener\("submit"/);
@@ -232,6 +232,7 @@ test("diff review entry points open the evidence inspector at the diff section",
 });
 
 test("main command deck keeps the 3d room dominant and the mission flow visible", async () => {
+  const app = await readProjectFile("public/app.js");
   const css = await readProjectFile("public/control-room.css");
 
   assert.match(css, /#threeDeck\s*{[^}]*brightness\(0\.66\) !important/s);
@@ -240,6 +241,13 @@ test("main command deck keeps the 3d room dominant and the mission flow visible"
   assert.match(css, /\.station-telemetry\s*{[^}]*display:\s*none !important/s);
   assert.match(css, /\.mission-flow-rail\s*{[^}]*grid-template-columns:\s*repeat\(5, minmax\(0, 1fr\)\) !important/s);
   assert.match(css, /\.mission-flow-node\s*{[^}]*min-height:\s*58px !important/s);
+  assert.match(app, /function createCoreWorkerOfficeTrio\(snapshot, selectedProject\)/);
+  assert.match(app, /threeDeck\.coreWorkerRigs\.push\(rig\)/);
+  assert.match(app, /new THREE\.Fog\(0x070b11, 10, 26\)/);
+  assert.match(app, /threeDeck\.camera\.lookAt\(0, 0\.55, 0\)/);
+  assert.match(css, /v31: targeted 3D office clarity/);
+  assert.match(css, /data-office-view="office"\] \.core-station\s*{[^}]*max-height:\s*76px !important/s);
+  assert.match(css, /data-office-view="office"\] \.core-station \.station-telemetry,[\s\S]*?display:\s*none !important/s);
 });
 
 test("gate inspector leads with blocker context and keeps writes human gated", async () => {
@@ -262,8 +270,8 @@ test("Stage-9 first-order screen reduces visual conversion friction", async () =
   const director = await readProjectFile("public/mission-director.js");
   const audit = await readProjectFile("docs/3d/STAGE9_VISUAL_CONVERSION_AUDIT.md");
 
-  assert.match(app, /<span>运行 <strong>\$\{escapeHtml\(formatRunId\(model\.runId\)\)\}<\/strong><\/span>/);
-  assert.match(app, /<span>闸门 <strong>\$\{escapeHtml\(zhStatus\(model\.gateStatus\)\)\}<\/strong><\/span>/);
+  assert.match(app, /<span>Run <strong>\$\{escapeHtml\(formatRunId\(model\.runId\)\)\}<\/strong><\/span>/);
+  assert.match(app, /<span>Gate <strong>\$\{escapeHtml\(zhStatus\(model\.gateStatus\)\)\}<\/strong><\/span>/);
   assert.match(app, /elements\.stageTitle\.textContent = zhText\(director\.roomTitle \|\| director\.taskTitle/);
   assert.doesNotMatch(app, /<span>Light <strong>/);
   assert.match(css, /v24: Stage-9 external-tester conversion pass/);
@@ -365,9 +373,9 @@ test("top command bar exposes local Judge model health when configured", async (
   const app = await readProjectFile("public/app.js");
 
   assert.match(app, /state\.snapshot\?\.localJudge/);
-  assert.match(app, /审核猿模型：/);
-  assert.match(app, /审核猿模型需重试/);
-  assert.match(app, /本地模型：/);
+  assert.match(app, /Judge: /);
+  assert.match(app, /Judge retry needed/);
+  assert.match(app, /Local model: /);
   assert.match(app, /localJudgeStatusLabel\(localJudge\.latestStatus\)/);
 });
 
