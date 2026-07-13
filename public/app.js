@@ -66,7 +66,7 @@ function appModeFromPath(pathname = window.location.pathname) {
 
 const APP_MODE = appModeFromPath();
 document.body.dataset.appMode = APP_MODE;
-document.body.dataset.officeView = "workbench";
+document.body.dataset.officeView = "office";
 
 const state = {
   snapshot: null,
@@ -210,7 +210,6 @@ const elements = {
   currentWorkDiff: document.querySelector("#currentWorkDiff"),
   currentWorkVerification: document.querySelector("#currentWorkVerification"),
   currentWorkNext: document.querySelector("#currentWorkNext"),
-  currentWorkRunButton: document.querySelector("#currentWorkRunButton"),
   currentWorkDiffButton: document.querySelector("#currentWorkDiffButton"),
   commandProject: document.querySelector("#commandProject"),
   commandRun: document.querySelector("#commandRun"),
@@ -227,7 +226,6 @@ const elements = {
   assignMissionButton: document.querySelector("#assignMissionButton"),
   projectRootForm: document.querySelector("#projectRootForm"),
   projectRootInput: document.querySelector("#projectRootInput"),
-  projectRootDisclosure: document.querySelector(".project-root-disclosure"),
   chooseProjectFolderButton: document.querySelector("#chooseProjectFolderButton"),
   saveProjectRootButton: document.querySelector("#saveProjectRootButton"),
   projectRootStatus: document.querySelector("#projectRootStatus"),
@@ -664,10 +662,6 @@ function zhText(value = "") {
     "补丁执行器只生成沙盒补丁产物，没有改动项目代码。": "Patch runner wrote sandbox patch artifacts only; project code was not modified.",
     "演示审批只覆盖沙盒补丁产物；真实写入仍然被阻断。": "Demo approval covers sandbox patch artifacts only; direct project apply remains blocked.",
     "写入执行器没有写入项目代码，因为确认语、环境开关、回滚快照或漂移检查尚未全部满足。": "Apply runner did not write project code because confirmation, environment, rollback, or drift checks are not satisfied.",
-    "Code write runner is still disabled": "代码写入执行器仍处于关闭状态",
-    "Keep writes gated until command allowlists, tests, rollback, and approval checks are ready.": "在命令白名单、测试、回滚和审批检查全部就绪前，继续阻断写入。",
-    "Review or hold each high-risk action before increasing autonomy.": "提高自治等级前，逐项复核或暂停高风险操作。",
-    "Review Judgeape's evidence summary and risk notes.": "复核 Judgeape 的证据摘要与风险说明。",
     "不修改项目文件": "No project file changes",
     "默认阻断": "Blocked by default",
     "需要确认": "Requires confirmation",
@@ -678,8 +672,6 @@ function zhText(value = "") {
     "成功": "Success"
   };
   if (exact[text]) return exact[text];
-  const highRiskGate = text.match(/^(\d+) high-risk Human Gate item\(s\) pending$/);
-  if (highRiskGate) return `${highRiskGate[1]} 个高风险人工闸门项待处理`;
   return text
     .replaceAll("Coding猿", "Codingape")
     .replaceAll("Judge猿", "Judgeape")
@@ -2944,9 +2936,6 @@ function renderProjectRootSelector(snapshot, selectedProject) {
   elements.projectRootStatus.textContent = snapshot?.localProjects?.selectedPath
     ? `当前授权项目：${zhText(snapshot.localProjects.selectedName || selectedProject?.name || "本地项目")} · ${selectedPath}`
     : "必须先选择 project root，之后才会运行证据、diff 或 apply";
-  if (elements.projectRootDisclosure && !selectedPath) {
-    elements.projectRootDisclosure.open = true;
-  }
 }
 
 function renderMissionComposer(snapshot) {
@@ -3520,33 +3509,13 @@ function serviceHealthTone(status) {
 function serviceHealthCardTemplate(item = {}) {
   const tone = serviceHealthTone(item.status);
   const urlLine = item.url ? `<small>${escapeHtml(item.url)}</small>` : "";
-  const label = {
-    "Local service": "本地服务",
-    "Public entry": "公网入口",
-    "Cloudflare tunnel": "Cloudflare 隧道",
-    "Background daemon": "后台服务"
-  }[item.label] || item.label || "服务";
-  const statusLabel = {
-    Online: "正常",
-    Connected: "已连接",
-    Managed: "已托管",
-    Checking: "探测中",
-    Offline: "离线"
-  }[item.statusLabel] || item.statusLabel || "未知";
-  const healthyDetail = {
-    "Local service": `本地服务正在 ${item.url || "当前地址"} 响应。`,
-    "Public entry": "公网入口实时探测返回 HTTP 200。",
-    "Cloudflare tunnel": "公网路由可用，Cloudflare Tunnel 后台连接已建立。",
-    "Background daemon": "macOS 后台服务正在托管 Codingape Office。"
-  }[item.label];
-  const detail = tone === "ready" && healthyDetail ? healthyDetail : zhText(item.detail || "等待下一次状态刷新。");
   return `
     <div class="service-health-item tone-${tone}">
       <div>
-        <span>${escapeHtml(label)}</span>
-        <strong>${escapeHtml(statusLabel)}</strong>
+        <span>${escapeHtml(item.label || "服务")}</span>
+        <strong>${escapeHtml(item.statusLabel || "未知")}</strong>
       </div>
-      <p>${escapeHtml(detail)}</p>
+      <p>${escapeHtml(zhText(item.detail || "等待下一次状态刷新。"))}</p>
       ${urlLine}
     </div>
   `;
@@ -3559,11 +3528,11 @@ function renderServiceHealthPanel(snapshot) {
   const warnings = items.filter((item) => ["manual", "missing", "offline", "degraded"].includes(item.status));
   const managed = items.filter((item) => ["online", "connected", "managed"].includes(item.status));
 
-  elements.serviceHealthStatus.textContent = warnings.length ? "需处理" : "全部正常";
+  elements.serviceHealthStatus.textContent = warnings.length ? "Needs attention" : "Managed";
   elements.serviceHealthStatus.className = warnings.length ? "is-warning" : "is-ready";
   elements.serviceHealthSummary.textContent = warnings.length
-    ? "本地服务可用，但公网入口或后台托管仍需处理。"
-    : `实时探测确认 ${managed.length}/${items.length} 个服务组件正常。`;
+    ? "The local service is available, but public routing or background hosting needs attention."
+    : `Live checks confirmed ${managed.length}/${items.length} service components.`;
   elements.serviceHealthList.innerHTML = items.length
     ? items.map(serviceHealthCardTemplate).join("")
     : `<div class="service-health-item tone-warning"><strong>No health snapshot yet</strong><p>Refresh the page or check the service process.</p></div>`;
@@ -3848,16 +3817,13 @@ function renderOperatorConsole(snapshot) {
   const modelProvider = snapshot.modelProvider || {};
   const verificationStatus = activeTask?.result?.verificationStatus || activeTask?.result?.verification?.status || "not_run";
   const patchStatus = activeTask?.result?.patchRunStatus || "not_run";
-  if (elements.currentWorkScope) elements.currentWorkScope.textContent = "真实工作数据";
-  if (elements.currentWorkProject) elements.currentWorkProject.textContent = project?.name || snapshot.localProjects?.selectedName || "选择项目";
-  if (elements.currentWorkModel) elements.currentWorkModel.textContent = modelProvider.model || modelProvider.provider || "未配置";
-  if (elements.currentWorkTask) elements.currentWorkTask.textContent = activeTask?.title || "还没有真实任务";
+  if (elements.currentWorkScope) elements.currentWorkScope.textContent = "Real data only";
+  if (elements.currentWorkProject) elements.currentWorkProject.textContent = project?.name || snapshot.localProjects?.selectedName || "Choose a project";
+  if (elements.currentWorkModel) elements.currentWorkModel.textContent = modelProvider.model || modelProvider.provider || "Not configured";
+  if (elements.currentWorkTask) elements.currentWorkTask.textContent = activeTask?.title || "No real task yet";
   if (elements.currentWorkDiff) elements.currentWorkDiff.textContent = patchRunStatusLabel(patchStatus);
   if (elements.currentWorkVerification) elements.currentWorkVerification.textContent = verificationStatusLabel(verificationStatus);
-  if (elements.currentWorkNext) elements.currentWorkNext.textContent = zhText(director.nextAction || "选择项目并分配任务");
-  if (elements.currentWorkRunButton) {
-    elements.currentWorkRunButton.disabled = !project?.id || state.liveRun?.status === "running";
-  }
+  if (elements.currentWorkNext) elements.currentWorkNext.textContent = director.nextAction || "Choose a project and assign a task";
   if (elements.currentWorkDiffButton) {
     elements.currentWorkDiffButton.disabled = !activeTask?.id;
     elements.currentWorkDiffButton.dataset.taskId = activeTask?.id || "";
@@ -7437,9 +7403,8 @@ function connectEvents() {
 }
 
 function setOfficeView(view, { persist = true } = {}) {
-  const nextView = ["workbench", "operations", "office"].includes(view) ? view : "workbench";
+  const nextView = ["workbench", "operations", "office"].includes(view) ? view : "office";
   document.body.dataset.officeView = nextView;
-  document.body.dataset.viewTransition = nextView;
   document.querySelectorAll("[data-office-view-target]").forEach((button) => {
     button.classList.toggle("is-active", button.dataset.officeViewTarget === nextView);
     button.setAttribute("aria-pressed", button.dataset.officeViewTarget === nextView ? "true" : "false");
@@ -7447,16 +7412,13 @@ function setOfficeView(view, { persist = true } = {}) {
   if (persist) localStorage.setItem("codingape-office-view", nextView);
   window.scrollTo({ top: 0, left: 0, behavior: "auto" });
   requestDeckDraw();
-  window.setTimeout(() => {
-    if (document.body.dataset.viewTransition === nextView) delete document.body.dataset.viewTransition;
-  }, 240);
 }
 
 function attachLocalOfficeHandlers() {
   document.querySelectorAll("[data-office-view-target]").forEach((button) => {
     button.addEventListener("click", () => setOfficeView(button.dataset.officeViewTarget));
   });
-  setOfficeView(localStorage.getItem("codingape-office-view") || "workbench", { persist: false });
+  setOfficeView("office", { persist: false });
   elements.refreshButton.addEventListener("click", fetchStatus);
   elements.newMissionButton.addEventListener("click", runCodingLoop);
   elements.runFirstOrderButton?.addEventListener("click", runFirstOrder);
@@ -7513,7 +7475,6 @@ function attachLocalOfficeHandlers() {
   elements.markBlockedButton.addEventListener("click", () => queueSelectedTask("blocked"));
   elements.runCodingLoopButton.addEventListener("click", runCodingLoop);
   elements.runCodingLoopHeroButton.addEventListener("click", runCodingLoop);
-  elements.currentWorkRunButton?.addEventListener("click", runCodingLoop);
   elements.currentWorkDiffButton?.addEventListener("click", () => {
     const taskId = elements.currentWorkDiffButton.dataset.taskId;
     if (taskId) viewTaskEvidence(taskId, { focus: "diff" });

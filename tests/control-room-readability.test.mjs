@@ -411,13 +411,13 @@ test("operator console exposes service health for public launch reliability", as
   assert.match(app, /Public protected/);
   assert.match(app, /Public offline/);
   assert.match(app, /Public setup needed/);
-  assert.match(app, /实时探测确认/);
+  assert.match(app, /Live checks confirmed/);
   assert.match(app, /serviceHealthCardTemplate/);
   assert.match(css, /\.service-health-panel\s*{[^}]*display:\s*grid !important/s);
   assert.match(css, /\.service-health-item\.tone-warning\s*{[^}]*rgba\(255, 180, 84, 0\.24\)/s);
 });
 
-test("local office defaults to a task-first workbench with secondary operations and 3d views", async () => {
+test("local office defaults to the 3d office with workbench and operations as secondary views", async () => {
   const html = await readProjectFile("public/index.html");
   const app = await readProjectFile("public/app.js");
   const css = await readProjectFile("public/control-room.css");
@@ -432,7 +432,9 @@ test("local office defaults to a task-first workbench with secondary operations 
   assert.match(html, /id="currentWorkDiff"/);
   assert.match(html, /id="currentWorkVerification"/);
   assert.match(html, /id="currentWorkNext"/);
-  assert.match(app, /document\.body\.dataset\.officeView = "workbench"/);
+  assert.match(html, /class="is-active"[^>]*data-office-view-target="office">3D Office<\/button>/);
+  assert.match(app, /document\.body\.dataset\.officeView = "office"/);
+  assert.match(app, /setOfficeView\("office", \{ persist: false \}\)/);
   assert.match(app, /function setOfficeView\(view, \{ persist = true \} = \{\}\)/);
   assert.match(css, /data-office-view="workbench"[\s\S]*?\.deck-viewport/);
   assert.match(css, /data-office-view="office"[\s\S]*?\.operator-console/);
