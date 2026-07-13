@@ -200,6 +200,7 @@ test("operator console preserves untranslated copy instead of producing broken m
   const server = await readProjectFile("server.js");
 
   assert.doesNotMatch(app, /function enforceEnglishSurface\(root = document\.body\)/);
+  assert.doesNotMatch(app, /enforceEnglishSurface\(document\.body\)/);
   assert.doesNotMatch(app, /new MutationObserver\(scheduleEnglishSurfaceGuard\)/);
   assert.doesNotMatch(app, /Script=Han/);
   assert.match(app, /if \(exact\[text\]\) return exact\[text\]/);
@@ -410,7 +411,7 @@ test("operator console exposes service health for public launch reliability", as
   assert.match(app, /Public protected/);
   assert.match(app, /Public offline/);
   assert.match(app, /Public setup needed/);
-  assert.match(app, /Live checks confirmed/);
+  assert.match(app, /实时探测确认/);
   assert.match(app, /serviceHealthCardTemplate/);
   assert.match(css, /\.service-health-panel\s*{[^}]*display:\s*grid !important/s);
   assert.match(css, /\.service-health-item\.tone-warning\s*{[^}]*rgba\(255, 180, 84, 0\.24\)/s);

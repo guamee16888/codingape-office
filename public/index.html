@@ -170,22 +170,26 @@
             <input id="missionInput" type="text" autocomplete="off" placeholder="Enter a task, for example: inspect project risk and draft an auditable patch proposal" />
             <button id="assignMissionButton" type="submit">Assign to Codingape</button>
           </form>
-          <form id="projectRootForm" class="project-root-form" aria-label="Local project picker">
-            <div class="project-root-label">
-              <label for="projectRootInput">Project root</label>
-              <span id="projectRootStatus">Not saved</span>
-            </div>
-            <div class="project-root-controls">
-              <button id="chooseProjectFolderButton" type="button">Choose Folder</button>
-              <input id="projectRootInput" type="text" autocomplete="off" placeholder="/Users/you/Code/your-project" />
-              <button id="saveProjectRootButton" type="submit">Bind</button>
-            </div>
-          </form>
+          <details class="project-root-disclosure">
+            <summary>
+              <span>Authorized project</span>
+              <strong id="projectRootStatus">Not bound</strong>
+              <small>Change</small>
+            </summary>
+            <form id="projectRootForm" class="project-root-form" aria-label="Local project picker">
+              <label class="project-root-label" for="projectRootInput">Project root</label>
+              <div class="project-root-controls">
+                <button id="chooseProjectFolderButton" type="button">Choose Folder</button>
+                <input id="projectRootInput" type="text" autocomplete="off" placeholder="/Users/you/Code/your-project" />
+                <button id="saveProjectRootButton" type="submit">Bind</button>
+              </div>
+            </form>
+          </details>
         </div>
         <nav class="office-view-switcher" aria-label="Office views">
           <button class="is-active" type="button" data-office-view-target="workbench">Workbench</button>
           <button type="button" data-office-view-target="operations">Operations</button>
-          <button type="button" data-office-view-target="office">Office</button>
+          <button type="button" data-office-view-target="office">3D Office</button>
         </nav>
         <div class="command-status-strip" aria-label="Run status">
           <span class="command-badge is-live">Sandbox mode</span>
@@ -342,8 +346,8 @@
         <section class="operator-console" aria-label="Autonomy console">
           <div class="operator-head">
             <div>
-              <p class="eyebrow">Operator Console</p>
-              <h3>Auditable AI Worker Company</h3>
+              <p class="eyebrow">Local-first workbench</p>
+              <h3>Codingape Task Workbench</h3>
             </div>
             <span id="launchStage">Waiting for first run</span>
           </div>
@@ -354,14 +358,17 @@
                 <span id="currentWorkScope">Real data</span>
               </div>
               <div class="current-work-grid">
-                <div><span>Project</span><strong id="currentWorkProject">--</strong></div>
-                <div><span>Model</span><strong id="currentWorkModel">--</strong></div>
-                <div><span>Task</span><strong id="currentWorkTask">No real task yet</strong></div>
-                <div><span>Diff</span><strong id="currentWorkDiff">Not generated</strong></div>
-                <div><span>Verification</span><strong id="currentWorkVerification">Not run</strong></div>
-                <div><span>Next</span><strong id="currentWorkNext">Choose a project</strong></div>
+                <div class="current-work-project"><span>Project</span><strong id="currentWorkProject">--</strong></div>
+                <div class="current-work-model"><span>Model</span><strong id="currentWorkModel">--</strong></div>
+                <div class="current-work-task"><span>Task</span><strong id="currentWorkTask">No real task yet</strong></div>
+                <div class="current-work-diff"><span>Diff</span><strong id="currentWorkDiff">Not generated</strong></div>
+                <div class="current-work-verification"><span>Verification</span><strong id="currentWorkVerification">Not run</strong></div>
+                <div class="current-work-next"><span>Next</span><strong id="currentWorkNext">Choose a project</strong></div>
               </div>
-              <button id="currentWorkDiffButton" type="button" disabled>Review Diff</button>
+              <div class="current-work-actions">
+                <button id="currentWorkRunButton" type="button">Run Current Task</button>
+                <button id="currentWorkDiffButton" type="button" disabled>Review Diff</button>
+              </div>
             </article>
 
             <article class="readiness-panel">
@@ -499,58 +506,64 @@
 
             <article class="local-model-panel">
               <div class="section-title">
-                <h3>Model Provider</h3>
+                <h3>Model And Review</h3>
                 <span id="localJudgeStatus">Not checked</span>
               </div>
               <p id="localJudgeSummary">Demo Only does not require tokens. To generate real code changes, choose BYO API Key or Local Model.</p>
-              <form id="modelProviderForm" class="model-provider-form">
-                <label>
-                  <span>Mode</span>
-                  <select id="modelProviderMode">
-                    <option value="demo_only">Demo Only</option>
-                    <option value="byo_key">BYO API Key</option>
-                    <option value="local_model">Local Model</option>
-                  </select>
-                </label>
-                <label>
-                  <span>Provider</span>
-                  <select id="modelProviderSelect">
-                    <option value="openai">OpenAI</option>
-                    <option value="anthropic">Anthropic</option>
-                    <option value="gemini">Gemini</option>
-                    <option value="openai_compatible">OpenAI-compatible</option>
-                    <option value="ollama">Ollama</option>
-                    <option value="lm_studio">LM Studio</option>
-                  </select>
-                </label>
-                <label>
-                  <span>Endpoint</span>
-                  <input id="modelProviderEndpoint" type="text" placeholder="http://127.0.0.1:11434" autocomplete="off">
-                </label>
-                <label>
-                  <span>Model</span>
-                  <input id="modelProviderModel" type="text" placeholder="qwen2.5-coder:7b" autocomplete="off">
-                </label>
-                <label>
-                  <span>API Key</span>
-                  <input id="modelProviderApiKey" type="password" placeholder="Stored only in local gitignored config" autocomplete="new-password">
-                </label>
-                <div class="model-provider-actions">
-                  <button id="saveModelProviderButton" type="submit">Save Model Settings</button>
-                  <button id="testModelProviderButton" type="button">Test Connection</button>
-                </div>
-              </form>
-              <p id="modelProviderNotice" class="model-provider-notice">To generate code changes, Codingape may send task-relevant code snippets to the model provider you choose. It does not upload the whole project by default and will not write code before approval.</p>
               <div class="local-model-grid">
                 <div><span>Provider</span><strong id="localJudgeProvider">--</strong></div>
                 <div><span>Model</span><strong id="localJudgeModel">--</strong></div>
                 <div><span>Latest Review</span><strong id="localJudgeLatest">--</strong></div>
               </div>
-              <pre id="localJudgeCommand" class="local-model-command"></pre>
-              <div class="local-model-actions">
-                <button id="testLocalJudgeButton" type="button">Test Connection</button>
-                <button id="copyLocalJudgeCommandButton" type="button">Copy Launch Command</button>
-              </div>
+              <details class="model-config-disclosure">
+                <summary>
+                  <span>Model and connection settings</span>
+                  <small>Expand when needed</small>
+                </summary>
+                <form id="modelProviderForm" class="model-provider-form">
+                  <label>
+                    <span>Mode</span>
+                    <select id="modelProviderMode">
+                      <option value="demo_only">Demo Only</option>
+                      <option value="byo_key">BYO API Key</option>
+                      <option value="local_model">Local Model</option>
+                    </select>
+                  </label>
+                  <label>
+                    <span>Provider</span>
+                    <select id="modelProviderSelect">
+                      <option value="openai">OpenAI</option>
+                      <option value="anthropic">Anthropic</option>
+                      <option value="gemini">Gemini</option>
+                      <option value="openai_compatible">OpenAI-compatible</option>
+                      <option value="ollama">Ollama</option>
+                      <option value="lm_studio">LM Studio</option>
+                    </select>
+                  </label>
+                  <label>
+                    <span>Endpoint</span>
+                    <input id="modelProviderEndpoint" type="text" placeholder="http://127.0.0.1:11434" autocomplete="off">
+                  </label>
+                  <label>
+                    <span>Model</span>
+                    <input id="modelProviderModel" type="text" placeholder="qwen2.5-coder:7b" autocomplete="off">
+                  </label>
+                  <label>
+                    <span>API Key</span>
+                    <input id="modelProviderApiKey" type="password" placeholder="Stored only in local gitignored config" autocomplete="new-password">
+                  </label>
+                  <div class="model-provider-actions">
+                    <button id="saveModelProviderButton" type="submit">Save Model Settings</button>
+                    <button id="testModelProviderButton" type="button">Test Connection</button>
+                  </div>
+                </form>
+                <p id="modelProviderNotice" class="model-provider-notice">To generate code changes, Codingape may send task-relevant code snippets to the model provider you choose. It does not upload the whole project by default and will not write code before approval.</p>
+                <pre id="localJudgeCommand" class="local-model-command"></pre>
+                <div class="local-model-actions">
+                  <button id="testLocalJudgeButton" type="button">Test Connection</button>
+                  <button id="copyLocalJudgeCommandButton" type="button">Copy Launch Command</button>
+                </div>
+              </details>
             </article>
 
             <article class="first-real-order-panel">
@@ -558,7 +571,7 @@
                 <h3>Run First Task: Update README</h3>
                 <span id="firstRealOrderStatus">Waiting for model</span>
               </div>
-              <p id="firstRealOrderSummary">Preview model context first, then generate a plan and diff. Demo Only does not call AI, and nothing is written before approval.</p>
+              <p id="firstRealOrderSummary">Preview the model context, then generate a plan and diff. Nothing is written before explicit approval.</p>
               <label class="first-real-order-select">
                 <span>Safe task template</span>
                 <select id="firstRealOrderTemplate">
@@ -573,7 +586,7 @@
               </div>
               <div id="contextPreviewPanel" class="context-preview-panel">
                 <strong>Context Preview</strong>
-                <p>Codingape Office sends only task-relevant snippets to your selected model. It does not upload the whole project by default.</p>
+                <p>Codingape Office sends only task-relevant snippets to the selected model. It does not upload the whole project by default.</p>
                 <ul id="contextPreviewList"></ul>
                 <small id="contextPreviewMeta">Nothing has been written to the project.</small>
               </div>
@@ -660,7 +673,7 @@
         </section>
       </main>
 
-      <button id="openInspectorButton" class="inspector-fab" type="button" aria-controls="projectDetail" aria-expanded="false">Inspector</button>
+      <button id="openInspectorButton" class="inspector-fab" type="button" aria-label="Open project details" title="Open project details" aria-controls="projectDetail" aria-expanded="false">Details</button>
 
       <aside class="detail-panel" aria-label="Project detail">
         <div class="inspector-shell-head">
@@ -836,6 +849,6 @@
         }
       }
     </script>
-    <script type="module" src="/app.js?v=workbench-20260713"></script>
+    <script type="module" src="/app.js?v=workbench-a8-20260713"></script>
   </body>
 </html>
